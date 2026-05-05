@@ -168,8 +168,8 @@ Healthcare_Web_Project/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/healthcare-ai-platform.git
-cd healthcare-ai-platform
+git clone https://github.com/theliems-76/AI-Powered-Healthcare-Management-System.git
+cd AI-Powered-Healthcare-Management-System
 ```
 
 ### 2. Set up environment variables
