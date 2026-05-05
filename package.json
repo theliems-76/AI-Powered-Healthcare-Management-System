@@ -1,0 +1,21 @@
+{
+  "name": "healthcare_web_project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev:ai": "set PYTHONIOENCODING=utf-8 && uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload --app-dir ai_service",
+    "dev:node": "cd main_backend && npm run dev",
+    "dev:react": "cd frontend_app && npm run dev",
+    "start": "concurrently -c \"cyan,magenta,yellow\" -n \"AI-API,NODEJS,REACT\" \"npm run dev:ai\" \"npm run dev:node\" \"npm run dev:react\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "react-to-print": "^3.3.0"
+  }
+}

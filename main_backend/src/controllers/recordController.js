@@ -1,0 +1,218 @@
+﻿const axios = require('axios');
+const { MedicalRecord, PatientProfile, Dish, Exercise, Ingredient, DishIngredient } = require('../models');
+const { Sequelize, Op } = require('sequelize');
+
+exports.createDiagnosticRecord = async (req, res) => {
+    try {
+        const patientData = req.body;
+        console.log("📥 Đã nhận dữ liệu, đang gọi AI dự đoán...");
+
+        const predictResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/predict', patientData);
+        const aiResult = predictResponse.data;
+        console.log("🤖 AI đã chẩn đoán xong nguy cơ!");
+
+        console.log("🥗 Đang gọi Bác sĩ Dinh dưỡng AI (Gemini)...");
+        const nutritionResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/generate-plan', aiResult, {
+            timeout: 120000
+        });
+
+        let aiFullResponse = nutritionResponse.data;
+        let aiNutritionPlan = "";
+        let recommendedFoods = [];
+        let recommendedActivities =[];
+
+        if (typeof aiFullResponse === 'object' && aiFullResponse.ai_nutritionist_plan) {
+            aiNutritionPlan = aiFullResponse.ai_nutritionist_plan;
+            recommendedFoods = aiFullResponse.recommended_foods ||[];
+            recommendedActivities = aiFullResponse.recommended_activities ||[];
+        } else {
+            try {
+                const text = typeof aiFullResponse === 'string' ? aiFullResponse : JSON.stringify(aiFullResponse);
+                const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+                
+                if (jsonMatch) {
+                    const jsonData = JSON.parse(jsonMatch[1].trim());
+                    recommendedFoods = jsonData.recommended_foods || [];
+                    recommendedActivities = jsonData.recommended_activities ||[];
+                    aiNutritionPlan = text.replace(jsonMatch[0], '').trim();
+                } else {
+                    aiNutritionPlan = text;
+                }
+            } catch (parseError) {
+                console.error("❌ Lỗi bóc tách JSON từ AI:", parseError);
+                aiNutritionPlan = typeof aiFullResponse === 'string' ? aiFullResponse : "Lỗi bóc tách thực đơn.";
+            }
+        }
+
+        let pId = req.body.patientProfileId || null;
+        let dId = null;
+
+        if (req.user.role === 'PATIENT') {
+            const profile = await PatientProfile.findOne({ where: { user_id: req.user.id } });
+            if (profile) {
+                pId = profile.id;
+                dId = profile.managed_by_doctor_id; 
+            }
+        } else if (req.user.role === 'DOCTOR') {
+            dId = req.user.id; 
+        }
+
+        const newRecord = await MedicalRecord.create({
+            patient_id: pId,
+            doctor_id: dId,
+            health_indicators: patientData,
+            ai_risk_score: aiResult.risk_probability,
+            ai_diagnosis: aiResult.diagnosis,
+            ai_explanation: aiResult.explanation,
+            ai_nutrition_plan: aiNutritionPlan,
+        });
+
+        if (recommendedFoods.length > 0) {
+            for (let food of recommendedFoods) {
+                const existingDish = await Dish.findOne({ 
+                    where: {[Op.and]:[
+                            Sequelize.where(
+                                Sequelize.fn('LOWER', Sequelize.col('name')), 
+                                (food.name || "").toLowerCase()
+                            ),
+                            { [Op.or]:[{ user_id: null }, { user_id: req.user.id }] }
+                        ]
+                    } 
+                });
+
+                if (!existingDish) {
+                    const newDish = await Dish.create({
+                        name: food.name,
+                        category: food.category || 'Tự chọn',
+                        user_id: req.user.id,
+                        is_ai_generated: true,
+                        calories_per_100g: food.calories_per_100g || 0,
+                        carbs_per_100g: food.carbs_per_100g || 0,
+                        protein_per_100g: food.protein_per_100g || 0,
+                        fat_per_100g: food.fat_per_100g || 0,
+                        serving_size_g: food.serving_size_g || 100
+                    });
+
+                    if (food.ingredients && Array.isArray(food.ingredients)) {
+                        for (let ing of food.ingredients) {
+                            let [dbIng] = await Ingredient.findOrCreate({
+                                where: { name: ing.name },
+                                defaults: {
+                                    calories_per_100g: ing.calories_per_100g,
+                                    carbs_per_100g: ing.carbs_per_100g,
+                                    protein_per_100g: ing.protein_per_100g,
+                                    fat_per_100g: ing.fat_per_100g,
+                                    is_ai_generated: true
+                                }
+                            });
+
+                            await DishIngredient.create({
+                                dish_id: newDish.id,
+                                ingredient_id: dbIng.id,
+                                weight_grams: ing.weight_g || 100
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        if (recommendedActivities.length > 0) {
+            for (let activity of recommendedActivities) {
+                const existingActivity = await Exercise.findOne({ where: { name: activity.name, user_id: req.user.id } });
+                if (!existingActivity) {
+                    await Exercise.create({
+                        name: activity.name,
+                        category: activity.category || 'Khác',
+                        met_value: activity.met_value || 4.0,
+                        user_id: req.user.id,
+                        is_ai_generated: true
+                    });
+                }
+            }
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Đã phân tích AI và lưu vào Hồ sơ bệnh án thành công!",
+            data: newRecord
+        });
+
+    } catch (error) {
+        console.error("❌ Lỗi Hệ thống Microservice:", error.message);
+        res.status(500).json({ error: "Lỗi kết nối đến AI Service hoặc Database." });
+    }
+};
+
+exports.getRecordById = async (req, res) => {
+    try {
+        const record = await MedicalRecord.findByPk(req.params.id);
+        if (!record) return res.status(404).json({ error: "Không tìm thấy hồ sơ!" });
+        
+        let responseData = record.toJSON();
+        if (typeof responseData.health_indicators === 'string') {
+            responseData.health_indicators = JSON.parse(responseData.health_indicators);
+        }
+        
+        res.status(200).json({ status: "success", data: responseData });
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi hệ thống" });
+    }
+};
+
+exports.getPatientHistory = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const role = req.user.role;
+        let targetPatientProfileId = null;
+
+        if (role === 'PATIENT') {
+            const profile = await PatientProfile.findOne({ where: { user_id: userId } });
+            if (!profile) {
+                return res.status(404).json({ error: "Không tìm thấy hồ sơ bệnh nhân!" });
+            }
+            targetPatientProfileId = profile.id;
+        } else if (role === 'DOCTOR' || role === 'ADMIN') {
+            const { patientId } = req.query;
+            if (!patientId) {
+                return res.status(400).json({ error: "Bác sĩ cần cung cấp patientId để xem lịch sử." });
+            }
+            targetPatientProfileId = patientId;
+        }
+
+        const records = await MedicalRecord.findAll({
+            where: { patient_id: targetPatientProfileId },
+            order: [['createdAt', 'ASC']] 
+        });
+
+       const chartData = records.map(record => {
+            const indicators = typeof record.health_indicators === 'string' 
+                ? JSON.parse(record.health_indicators) 
+                : (record.health_indicators || {});
+
+            let explanation = record.ai_explanation;
+            if (typeof explanation === 'string') {
+                try { explanation = JSON.parse(explanation); } catch (e) { explanation = null; }
+            }
+
+            return {
+                id: record.id,
+                date: new Date(record.createdAt).toLocaleString('vi-VN', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }),
+                risk_score: parseFloat(record.ai_risk_score || 0).toFixed(1),
+                bmi: parseFloat(indicators.BMI || 0).toFixed(1),
+                ai_diagnosis: record.ai_diagnosis,
+                ai_nutrition_plan: record.ai_nutrition_plan,
+                ai_explanation: explanation,
+                health_status: indicators.GenHlth || 0 
+            };
+        });
+
+        res.status(200).json({ status: "success", data: chartData });
+    } catch (error) {
+        console.error("❌ Lỗi API History:", error);
+        res.status(500).json({ error: "Lỗi lấy dữ liệu lịch sử!" });
+    }
+};
