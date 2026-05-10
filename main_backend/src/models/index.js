@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 const { Sequelize, DataTypes } = require('sequelize');
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.js')[env];
@@ -15,7 +15,8 @@ db.User = sequelize.define('User', {
   password_hash: { type: DataTypes.STRING, allowNull: false },
   full_name: { type: DataTypes.STRING, allowNull: false },
   role: { type: DataTypes.ENUM('ADMIN', 'DOCTOR', 'PATIENT'), allowNull: false },
-  phone: { type: DataTypes.STRING }
+  phone: { type: DataTypes.STRING },
+  is_active: { type: DataTypes.BOOLEAN, defaultValue: true }
 }, { timestamps: true });
 
 db.PatientProfile = sequelize.define('PatientProfile', {

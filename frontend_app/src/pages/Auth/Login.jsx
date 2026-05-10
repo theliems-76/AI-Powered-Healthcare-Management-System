@@ -1,4 +1,4 @@
-﻿import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { loginAPI } from '../../services/authService';
@@ -25,7 +25,7 @@ export default function Login() {
             const data = await loginAPI(email, password);
             await login(data.token, data.role, rememberMe);
             toast.success('Đăng nhập thành công!');
-            navigate('/'); 
+            navigate('/dashboard'); 
         } catch (error) {
             toast.error(typeof error === 'string' ? error : (error.message || 'Đăng nhập thất bại!'));
         } finally {

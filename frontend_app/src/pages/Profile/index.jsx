@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect, useContext } from 'react';
-import { User, Phone, Mail, Calendar, MapPin, Weight, Ruler, Save, Loader2, Activity } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { User, Phone, Mail, Calendar, MapPin, Weight, Ruler, Save, Loader2, Activity, Lock } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
@@ -8,6 +8,11 @@ export default function Profile() {
     const { user, updateUser } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    
+    const [passwordData, setPasswordData] = useState({
+        current_password: '', new_password: '', confirm_password: ''
+    });
     
     const [formData, setFormData] = useState({
         full_name: '', phone: '', date_of_birth: '', 
@@ -53,6 +58,27 @@ export default function Profile() {
             toast.error("Lỗi khi lưu hồ sơ!");
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handlePasswordChange = (e) => {
+        setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
+    };
+
+    const handlePasswordSubmit = async (e) => {
+        e.preventDefault();
+        if (passwordData.new_password !== passwordData.confirm_password) {
+            return toast.error("Mật khẩu mới không khớp!");
+        }
+        setIsChangingPassword(true);
+        try {
+            await api.put('/users/password', passwordData);
+            toast.success("Đổi mật khẩu thành công!");
+            setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
+        } catch (error) {
+            toast.error(error.response?.data?.error || "Lỗi khi đổi mật khẩu!");
+        } finally {
+            setIsChangingPassword(false);
         }
     };
 
@@ -161,6 +187,41 @@ export default function Profile() {
                     </button>
                 </div>
             </form>
+            
+            {/* Đổi mật khẩu Form */}
+            <div className="mt-8">
+                <div className="pb-4 border-b border-slate-200 mb-6">
+                    <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <Lock className="w-5 h-5 text-rose-600" />
+                        Bảo Mật & Mật Khẩu
+                    </h2>
+                </div>
+                
+                <form onSubmit={handlePasswordSubmit} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 md:p-8 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 mb-2">Mật khẩu hiện tại</label>
+                                <input type="password" name="current_password" value={passwordData.current_password} onChange={handlePasswordChange} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 outline-none" required />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 mb-2">Mật khẩu mới</label>
+                                <input type="password" name="new_password" value={passwordData.new_password} onChange={handlePasswordChange} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 outline-none" required minLength="6" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 mb-2">Xác nhận mật khẩu mới</label>
+                                <input type="password" name="confirm_password" value={passwordData.confirm_password} onChange={handlePasswordChange} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 outline-none" required minLength="6" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-6 bg-slate-50 border-t border-slate-200 flex justify-end">
+                        <button type="submit" disabled={isChangingPassword} className="flex items-center gap-2 px-8 py-3 bg-rose-600 text-white rounded-xl font-bold shadow-md hover:bg-rose-700 active:scale-95 transition-all disabled:opacity-50">
+                            {isChangingPassword ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                            {isChangingPassword ? 'Đang lưu...' : 'Đổi Mật Khẩu'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

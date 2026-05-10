@@ -1,12 +1,41 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2, Trash2, ChefHat } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 
-export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish }) {
+export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish, dailyGoal, consumed }) {
     const[dishes, setDishes] = useState([]);
     const [search, setSearch] = useState('');
     const[loading, setLoading] = useState(false);
+    const [weights, setWeights] = useState({});
+    const [hoveredDishId, setHoveredDishId] = useState(null);
+
+    const calculateDishMacros = (dish, targetWeight) => {
+        if (!dish) return { calories: 0, carbs: 0, protein: 0 };
+        
+        let sumCal = 0, sumCarb = 0, sumPro = 0;
+        
+        if (dish.calories_per_100g > 0) {
+            const ratio = targetWeight / 100;
+            sumCal = dish.calories_per_100g * ratio;
+            sumCarb = dish.carbs_per_100g * ratio;
+            sumPro = dish.protein_per_100g * ratio;
+        } else if (dish.Ingredients && dish.Ingredients.length > 0) {
+            const ratio = targetWeight / (dish.serving_size_g || 100);
+            dish.Ingredients.forEach(ing => {
+                const ingWeight = (parseFloat(ing.DishIngredient?.weight_grams) || 0) * ratio;
+                const r = ingWeight / 100;
+                sumCal += (parseFloat(ing.calories_per_100g) || 0) * r;
+                sumCarb += (parseFloat(ing.carbs_per_100g) || 0) * r;
+                sumPro += (parseFloat(ing.protein_per_100g) || 0) * r;
+            });
+        }
+        return { calories: sumCal, carbs: sumCarb, protein: sumPro };
+    };
+
+    const previewDish = dishes.find(d => d.id === hoveredDishId);
+    const previewWeight = previewDish ? (weights[previewDish.id] !== undefined ? Number(weights[previewDish.id]) : (previewDish.serving_size_g || 100)) : 0;
+    const previewMacros = calculateDishMacros(previewDish, previewWeight);
 
     useEffect(() => {
         if (isOpen) fetchMenu();
@@ -84,6 +113,54 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
                             <Trash2 className="w-3.5 h-3.5" /> DỌN SẠCH KHO CÁ NHÂN
                         </button>
                     </div>
+
+                    {dailyGoal && consumed && (
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-xl space-y-3">
+                            {/* Calo */}
+                            <div>
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className="text-[11px] font-bold text-slate-700">Ngân sách Calo:</span>
+                                    <span className="text-[11px] font-bold text-blue-700">
+                                        {Math.round(consumed.calories)}{previewMacros.calories > 0 && <span className="text-rose-500"> +{Math.round(previewMacros.calories)}</span>} / {dailyGoal.calories} kcal
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-200 rounded-full h-1.5 flex overflow-hidden">
+                                    <div className="bg-blue-500 h-full transition-all" style={{ width: `${Math.min(100, (consumed.calories / dailyGoal.calories) * 100)}%` }}></div>
+                                    <div className="bg-rose-400 h-full transition-all opacity-80" style={{ width: `${Math.min(100, (previewMacros.calories / dailyGoal.calories) * 100)}%` }}></div>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* Carb */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-[10px] font-bold text-slate-600">Tinh bột (Carb):</span>
+                                        <span className="text-[10px] font-bold text-emerald-600">
+                                            {Math.round(consumed.carbs)}{previewMacros.carbs > 0 && <span className="text-rose-500"> +{Math.round(previewMacros.carbs)}</span>} / {dailyGoal.carbs}g
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-slate-200 rounded-full h-1 flex overflow-hidden">
+                                        <div className="bg-emerald-500 h-full transition-all" style={{ width: `${Math.min(100, (consumed.carbs / dailyGoal.carbs) * 100)}%` }}></div>
+                                        <div className="bg-rose-400 h-full transition-all opacity-80" style={{ width: `${Math.min(100, (previewMacros.carbs / dailyGoal.carbs) * 100)}%` }}></div>
+                                    </div>
+                                </div>
+                                
+                                {/* Protein */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-[10px] font-bold text-slate-600">Đạm (Protein):</span>
+                                        <span className="text-[10px] font-bold text-violet-600">
+                                            {Math.round(consumed.protein)}{previewMacros.protein > 0 && <span className="text-rose-500"> +{Math.round(previewMacros.protein)}</span>} / {dailyGoal.protein}g
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-slate-200 rounded-full h-1 flex overflow-hidden">
+                                        <div className="bg-violet-500 h-full transition-all" style={{ width: `${Math.min(100, (consumed.protein / dailyGoal.protein) * 100)}%` }}></div>
+                                        <div className="bg-rose-400 h-full transition-all opacity-80" style={{ width: `${Math.min(100, (previewMacros.protein / dailyGoal.protein) * 100)}%` }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {}
@@ -101,7 +178,12 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
                     ) : (
                         <div className="space-y-2">
                             {filteredDishes.map(dish => (
-                                <div key={dish.id} className="p-4 rounded-2xl group border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all shadow-sm bg-white">
+                                <div 
+                                    key={dish.id} 
+                                    onMouseEnter={() => setHoveredDishId(dish.id)}
+                                    onMouseLeave={() => setHoveredDishId(null)}
+                                    className="p-4 rounded-2xl group border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all shadow-sm bg-white"
+                                >
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                         
                                         {}
@@ -132,9 +214,15 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
                                             )}
 
                                             {}
-                                            <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl px-3 py-1.5">
-                                                <span className="text-xs font-black text-slate-700">{dish.serving_size_g || 100}</span>
-                                                <span className="text-[10px] text-slate-500 font-bold uppercase">g</span>
+                                            <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl px-2 py-1.5">
+                                                <input 
+                                                    type="number"
+                                                    min="1"
+                                                    value={weights[dish.id] !== undefined ? weights[dish.id] : (dish.serving_size_g || 100)}
+                                                    onChange={(e) => setWeights({ ...weights, [dish.id]: e.target.value })}
+                                                    className="w-12 text-xs font-black text-slate-700 bg-transparent text-right outline-none"
+                                                />
+                                                <span className="text-[10px] text-slate-500 font-bold uppercase pr-1">g</span>
                                             </div>
 
                                             {}
@@ -150,7 +238,10 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
 
                                             {}
                                             <button 
-                                                onClick={() => onAddMeal(dish, dish.serving_size_g || 100)}
+                                                onClick={() => {
+                                                    const w = weights[dish.id] !== undefined ? Number(weights[dish.id]) : (dish.serving_size_g || 100);
+                                                    onAddMeal(dish, w);
+                                                }}
                                                 className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-200 active:scale-95 ml-1"
                                             >
                                                 Thêm

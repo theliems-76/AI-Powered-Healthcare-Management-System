@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
     Activity, LayoutDashboard, Users, Apple, 
@@ -9,7 +9,7 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
     const location = useLocation();
 
     const allMenuItems = [
-    { path: '/', name: 'Tổng quan', icon: LayoutDashboard, roles: ['PATIENT', 'DOCTOR', 'ADMIN'] },
+    { path: '/dashboard', name: 'Tổng quan', icon: LayoutDashboard, roles: ['PATIENT', 'DOCTOR', 'ADMIN'] },
     
     { path: '/assessment', name: 'Khám sức khỏe AI', icon: Stethoscope, roles: ['PATIENT'] },
     

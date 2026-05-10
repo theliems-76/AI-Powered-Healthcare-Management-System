@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 
@@ -119,7 +119,6 @@ export default function Meals() {
                     protein: prev.protein + newMeal.protein
                 }));
             }
-            setIsModalOpen(false);
         } catch (error) {
             toast.error("Lỗi khi thêm món ăn!");
         }
@@ -153,6 +152,8 @@ export default function Meals() {
                 onClose={() => setIsModalOpen(false)} 
                 onAddMeal={handleAddMeal} 
                 onEditDish={handleEditDish}
+                dailyGoal={dailyGoal}
+                consumed={consumed}
             />
             
             <RecipeBuilderModal 

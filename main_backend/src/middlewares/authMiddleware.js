@@ -1,4 +1,4 @@
-﻿const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 exports.verifyToken = (req, res, next) => {
     const token = req.header('Authorization');
@@ -19,3 +19,12 @@ exports.verifyToken = (req, res, next) => {
         res.status(400).json({ error: "Token không hợp lệ hoặc đã hết hạn!" });
     }
 };
+
+exports.checkRole = (roles) => {
+    return (req, res, next) => {
+        if (!req.user || !roles.includes(req.user.role)) {
+            return res.status(403).json({ error: "Access Denied: Bạn không có quyền thực hiện hành động này!" });
+        }
+        next();
+    };
+};

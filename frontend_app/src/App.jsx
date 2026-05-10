@@ -1,4 +1,4 @@
-﻿import React, { useContext } from 'react';
+import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -6,7 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import Landing from './pages/Landing/index';
 import Assessment from './pages/Assessment/index';
 import Meals from './pages/Meals/index';
 import Exercises from './pages/Exercises/index';
@@ -31,11 +33,13 @@ function App() {
       <Router>
         <Routes>
           {}
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-            <Route path="/" element={<Dashboard />} /> {}
+            <Route path="/dashboard" element={<Dashboard />} /> {}
             <Route path="/assessment" element={<Assessment />} /> {}
             <Route path="/meals" element={<Meals />} />
             <Route path="/exercises" element={<Exercises />} />

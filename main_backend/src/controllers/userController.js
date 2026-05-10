@@ -1,4 +1,5 @@
-﻿const { User, PatientProfile, MedicalRecord } = require('../models');
+const { User, PatientProfile, MedicalRecord } = require('../models');
+const bcrypt = require('bcryptjs');
 
 exports.getProfile = async (req, res) => {
     try {
@@ -58,12 +59,16 @@ exports.updateProfile = async (req, res) => {
 };
 exports.getMyPatients = async (req, res) => {
     try {
-        if (req.user.role !== 'DOCTOR' && req.user.role !== 'ADMIN') {
-            return res.status(403).json({ error: "Không có quyền truy cập!" });
-        }
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 15;
+        const offset = (page - 1) * limit;
 
-        const patients = await PatientProfile.findAll({
-            where: { managed_by_doctor_id: req.user.id },
+        const whereCondition = req.user.role === 'ADMIN' ? {} : { managed_by_doctor_id: req.user.id };
+
+        const { count, rows: patients } = await PatientProfile.findAndCountAll({
+            where: whereCondition,
+            limit,
+            offset,
             include:[
                 { 
                     model: User, 
@@ -96,7 +101,15 @@ exports.getMyPatients = async (req, res) => {
             };
         });
 
-        res.status(200).json({ status: "success", data: formattedPatients });
+        res.status(200).json({ 
+            status: "success", 
+            data: formattedPatients,
+            pagination: {
+                total: count,
+                page,
+                totalPages: Math.ceil(count / limit)
+            }
+        });
     } catch (error) {
         console.error("Lỗi getMyPatients:", error);
         res.status(500).json({ error: "Lỗi hệ thống khi tải danh sách bệnh nhân!" });
@@ -144,5 +157,30 @@ exports.assignPatient = async (req, res) => {
     } catch (error) {
         console.error("Lỗi assignPatient:", error);
         res.status(500).json({ error: "Lỗi hệ thống khi gán bệnh nhân!" });
+    }
+};
+
+exports.updatePassword = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { current_password, new_password } = req.body;
+
+        const user = await User.findByPk(userId);
+        if (!user) return res.status(404).json({ error: "Không tìm thấy người dùng!" });
+
+        const isMatch = await bcrypt.compare(current_password, user.password_hash);
+        if (!isMatch) {
+            return res.status(401).json({ error: "Mật khẩu hiện tại không đúng!" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(new_password, salt);
+
+        await user.update({ password_hash: hashedPassword });
+
+        res.status(200).json({ status: "success", message: "Đổi mật khẩu thành công!" });
+    } catch (error) {
+        console.error("Lỗi updatePassword:", error);
+        res.status(500).json({ error: "Lỗi hệ thống khi đổi mật khẩu!" });
     }
 };

@@ -19,7 +19,8 @@ exports.register = async (req, res) => {
             password_hash: hashedPassword,
             full_name,
             role,
-            phone
+            phone,
+            is_active: true
         });
 
         if (role === 'PATIENT') {
@@ -39,6 +40,11 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ where: { email } });
         if (!user) {
             return res.status(401).json({ error: "Email không tồn tại!" });
+        }
+
+        // Kiểm tra trạng thái tài khoản
+        if (user.is_active === false || user.is_active === 0) {
+            return res.status(403).json({ error: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Quản trị viên!" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password_hash);
