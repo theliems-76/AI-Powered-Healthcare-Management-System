@@ -40,3 +40,9 @@ project_assessment.md
 .gemini/
 cv_project_description_en.md
 package-lock.json
+
+# Internal dev notes (do not push)
+DESIGN_LOG.md
+DEVELOPMENT_GUIDE.md
+fix_fonts.js
+frontend_app/src_corrupted/
