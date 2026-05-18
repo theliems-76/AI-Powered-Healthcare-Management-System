@@ -97,6 +97,26 @@ db.PatientExercise = sequelize.define('PatientExercise', {
   date: { type: DataTypes.DATEONLY, allowNull: false }
 }, { timestamps: true });
 
+db.Notification = sequelize.define('Notification', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  user_id: { type: DataTypes.UUID, allowNull: false },
+  title: { type: DataTypes.STRING, allowNull: false },
+  message: { type: DataTypes.TEXT, allowNull: false },
+  type: { type: DataTypes.STRING },
+  is_read: { type: DataTypes.BOOLEAN, defaultValue: false },
+  link: { type: DataTypes.STRING }
+}, { timestamps: true });
+
+db.AuditLog = sequelize.define('AuditLog', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  user_id: { type: DataTypes.UUID, allowNull: true }, // Có thể null nếu action từ system hoặc chưa login
+  action: { type: DataTypes.STRING, allowNull: false }, // VD: 'VIEW_RECORD', 'UPDATE_NOTE'
+  resource_type: { type: DataTypes.STRING }, // VD: 'MedicalRecord'
+  resource_id: { type: DataTypes.STRING }, // ID của record bị tác động
+  ip_address: { type: DataTypes.STRING },
+  details: { type: DataTypes.TEXT } // JSON string lưu chi tiết thay đổi
+}, { timestamps: true });
+
 db.User.hasOne(db.PatientProfile, { foreignKey: 'user_id', as: 'Profile' });
 db.PatientProfile.belongsTo(db.User, { foreignKey: 'user_id' });
 
@@ -130,4 +150,11 @@ db.Dish.belongsTo(db.User, { foreignKey: 'user_id' });
 
 db.User.hasMany(db.Exercise, { foreignKey: 'user_id' });
 db.Exercise.belongsTo(db.User, { foreignKey: 'user_id' });
+
+db.User.hasMany(db.Notification, { foreignKey: 'user_id' });
+db.Notification.belongsTo(db.User, { foreignKey: 'user_id' });
+
+db.User.hasMany(db.AuditLog, { foreignKey: 'user_id' });
+db.AuditLog.belongsTo(db.User, { foreignKey: 'user_id' });
+
 module.exports = db;

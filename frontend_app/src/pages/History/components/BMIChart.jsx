@@ -1,44 +1,22 @@
-﻿import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts';
-import { Calendar, FileText, Activity } from 'lucide-react';
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts';
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
-        return (
-            <div className="bg-white/95 backdrop-blur-xl p-5 rounded-2xl shadow-xl border border-slate-100/50 min-w-[250px] z-50">
-                <p className="text-sm font-bold text-slate-800 mb-4 border-b pb-2">{data.fullDate || label}</p>
-                
-                <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-blue-500" />
-                            <span className="font-semibold text-sm text-slate-600">Chỉ số BMI:</span>
-                        </div>
-                        <span className="font-black text-blue-600 text-base">{payload[0].value}</span>
-                    </div>
+        const bmi = payload[0].value;
+        const isNormal = bmi >= 18.5 && bmi <= 24.9;
 
-                    {data.diagnosis && (
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <div className="flex items-center gap-2 mb-1">
-                                <FileText className="w-4 h-4 text-blue-500" />
-                                <span className="font-semibold text-xs text-slate-600">Chẩn đoán:</span>
-                            </div>
-                            <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                                {data.diagnosis}
-                            </p>
-                        </div>
-                    )}
-                    
-                    <div className="flex items-center justify-between pt-1">
-                        <span className="font-semibold text-xs text-slate-500">Sức khỏe (CDC):</span>
-                        <div className="flex gap-1">
-                            {[1,2,3,4,5].map(star => (
-                                <div key={star} className={`w-1.5 h-4 rounded-sm ${star <= (data.health_status || 0) ? 'bg-emerald-400' : 'bg-slate-200'}`}></div>
-                            ))}
-                        </div>
-                    </div>
+        return (
+            <div className="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl min-w-[160px]">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">{data.fullDate}</p>
+                <div className="flex items-baseline justify-between gap-4">
+                    <span className="text-sm font-bold text-slate-300">BMI</span>
+                    <span className={`text-lg font-black ${isNormal ? 'text-emerald-400' : 'text-amber-400'}`}>{bmi}</span>
                 </div>
+                <p className={`text-[10px] font-bold mt-1 ${isNormal ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    {isNormal ? 'Vùng an toàn' : bmi < 18.5 ? 'Thiếu cân' : 'Thừa cân'}
+                </p>
             </div>
         );
     }
@@ -47,47 +25,47 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function BMIChart({ data }) {
     return (
-        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 transition-all hover:shadow-md group">
-            <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-blue-100 text-blue-600 rounded-xl group-hover:scale-110 transition-transform"><Calendar className="w-6 h-6" /></div>
-                <div>
-                    <h2 className="text-xl font-bold text-slate-800">Kiểm soát Thể trọng (BMI)</h2>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Vùng an toàn: 18.5 - 24.9</p>
-                </div>
+        <div className="flex flex-col h-full">
+            <div className="mb-6">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kiểm soát thể trọng</p>
+                <h2 className="text-base font-black text-slate-900 tracking-tight">Chỉ số Khối cơ thể (BMI)</h2>
             </div>
-            
-            <div className="h-72 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart syncId="historyChart" data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <defs>
-                            {}
-                            <filter id="shadowBMI" height="200%">
-                                <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#2563eb" floodOpacity="0.4"/>
-                            </filter>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 500}} dy={10} />
-                        <YAxis domain={['auto', 'auto']} axisLine={false} tickLine={false} tick={{fill: '#2563eb', fontSize: 12, fontWeight: 'bold'}} />
-                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }} />
-                        
-                        <ReferenceArea y1={18.5} y2={24.9} fill="#10b981" fillOpacity={0.08} />
 
-                        <Line 
-                            type="monotone" 
-                            dataKey="bmi" 
-                            stroke="#2563eb" 
-                            strokeWidth={4} 
-                            dot={{ r: 5, fill: '#fff', stroke: '#2563eb', strokeWidth: 2 }} 
-                            activeDot={{ r: 8, fill: '#2563eb', stroke: '#fff', strokeWidth: 3 }} 
-                            style={{ filter: 'url(#shadowBMI)' }}
+            <div className="flex-1 min-h-[220px]">
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={data} margin={{ top: 10, right: 4, left: -28, bottom: 0 }}>
+                        <ReferenceArea y1={18.5} y2={24.9} fill="#10b981" fillOpacity={0.06} />
+
+                        <XAxis
+                            dataKey="month"
+                            axisLine={false} tickLine={false}
+                            tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                            dy={10}
+                        />
+                        <YAxis
+                            domain={['auto', 'auto']}
+                            axisLine={false} tickLine={false}
+                            tick={{ fill: '#cbd5e1', fontSize: 10, fontWeight: 600 }}
+                        />
+                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1 }} />
+
+                        <Line
+                            type="monotone"
+                            dataKey="bmi"
+                            stroke="#2563eb"
+                            strokeWidth={2.5}
+                            dot={{ r: 3.5, fill: '#fff', stroke: '#2563eb', strokeWidth: 2 }}
+                            activeDot={{ r: 6, fill: '#2563eb', stroke: '#fff', strokeWidth: 2 }}
                         />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
-            
-            {}
-            <div className="flex justify-center gap-6 mt-6">
-                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-400 opacity-30"></div><span className="text-xs font-semibold text-slate-500">Mục tiêu lý tưởng (18.5-24.9)</span></div>
+
+            <div className="flex items-center gap-5 mt-5 pt-4 border-t border-slate-100">
+                <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-60"></span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vùng lý tưởng (18.5 – 24.9)</span>
+                </div>
             </div>
         </div>
     );

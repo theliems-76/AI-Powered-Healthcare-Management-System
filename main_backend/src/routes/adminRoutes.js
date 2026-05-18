@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const auditController = require('../controllers/auditController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 // Middleware kiểm tra quyền ADMIN cho toàn bộ route
@@ -8,6 +9,8 @@ router.get('/stats', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMI
 router.get('/users', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.getAllUsers);
 router.put('/users/:id/role', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.updateUserRole);
 router.put('/users/:id/status', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.toggleUserStatus);
+
+router.get('/logs', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), auditController.getLogs);
 
 router.get('/exercises', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.getSystemExercises);
 router.post('/exercises', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.createSystemExercise);

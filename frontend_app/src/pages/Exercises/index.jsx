@@ -151,7 +151,7 @@ export default function Exercises() {
             {}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 mb-6 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 font-[Manrope]">Nhật Ký Tập Luyện</h1>
+                    <h1 className="text-2xl font-bold text-slate-800 ">Nhật Ký Tập Luyện</h1>
                     <p className="text-sm text-slate-500 mt-1 font-medium">Theo dõi năng lượng tiêu hao theo chuẩn Y khoa.</p>
                 </div>
                 <div className="flex gap-3 mt-4 sm:mt-0">

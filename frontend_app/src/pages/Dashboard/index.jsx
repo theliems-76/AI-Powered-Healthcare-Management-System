@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Gauge, Stethoscope, Lightbulb, TrendingUp, Users } from 'lucide-react';
 import api from '../../services/api';
@@ -11,6 +11,12 @@ export default function Dashboard() {
     const { user } = useContext(AuthContext);
     const [latestRecord, setLatestRecord] = useState(null);
     const [historyData, setHistoryData] = useState([]);
+
+    // Helper to strip markdown for excerpts
+    const stripMarkdown = (text) => {
+        if (!text) return "";
+        return text.replace(/[#*`_]/g, '').trim();
+    };
 
     useEffect(() => {
         if (user?.role !== 'PATIENT') return;
@@ -67,36 +73,61 @@ export default function Dashboard() {
 
             {}
             {user?.role === 'PATIENT' && latestRecord && (
-                <div className="grid grid-cols-12 gap-6">
-                    {}
-                    <div className="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <StatsCard title="Rủi ro tiểu đường" value={latestRecord.risk_score} unit="%" icon={Activity} colorClass="bg-rose-50 text-rose-500" desc="Dựa trên phân tích AI" />
-                        <StatsCard title="Chỉ số BMI" value={latestRecord.bmi} unit="kg/m²" icon={Gauge} colorClass="bg-blue-50 text-blue-500" desc="Trạng thái hiện tại" />
+                <div className="grid grid-cols-12 gap-6 items-start">
+                    {/* Unified Health Panel */}
+                    <div className="col-span-12 lg:col-span-8 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        
+                        {/* Stats Header Area */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-8">
+                            
+                            {/* Risk Stat */}
+                            <div className="pb-6 md:pb-0 md:pr-8 flex flex-col justify-between">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-2 h-2 rounded-full bg-rose-500"></div>
+                                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Rủi ro tiểu đường</p>
+                                </div>
+                                <div className="flex items-baseline gap-1 mt-auto">
+                                    <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">{latestRecord.risk_score}</h2>
+                                    <span className="text-lg font-bold text-slate-400">%</span>
+                                </div>
+                            </div>
 
-                        <div className="md:col-span-2">
+                            {/* BMI Stat */}
+                            <div className="pt-6 md:pt-0 md:pl-8 flex flex-col justify-between">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Chỉ số khối cơ thể (BMI)</p>
+                                </div>
+                                <div className="flex items-baseline gap-1 mt-auto">
+                                    <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">{latestRecord.bmi}</h2>
+                                    <span className="text-lg font-bold text-slate-400">kg/m²</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Integrated Chart Area */}
+                        <div className="flex-1 bg-slate-50/50 border-t border-slate-100 p-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Xu hướng rủi ro (Các lần gần nhất)</p>
+                            </div>
                             {historyData.length >= 2 ? (
-                                <MiniRiskChart data={historyData} />
+                                <MiniRiskChart data={historyData} className="h-40" />
                             ) : (
-                                <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center justify-center h-32 text-slate-400 text-sm font-medium">
+                                <div className="h-40 flex items-center justify-center text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 rounded-2xl">
                                     <TrendingUp className="mr-2" /> Cần thêm {2 - historyData.length} lần khám để hiển thị biểu đồ xu hướng
                                 </div>
                             )}
                         </div>
                     </div>
-
-                    {}
-                    <div className="col-span-12 lg:col-span-4 bg-gradient-to-b from-blue-50 to-white p-6 rounded-3xl border border-blue-100 shadow-sm">
-                        <div className="flex items-center gap-2 mb-4 text-blue-800">
-                            <Lightbulb size={20} />
-                            <h3 className="font-bold">Lời khuyên AI gần nhất</h3>
+                    <div className="col-span-12 lg:col-span-4 bg-slate-900 text-white p-6 rounded-3xl shadow-sm flex flex-col">
+                        <div className="flex items-center gap-2 mb-4 text-slate-300">
+                            <Lightbulb size={20} className="text-emerald-400" />
+                            <h3 className="font-bold text-sm uppercase tracking-wider">Lời khuyên AI gần nhất</h3>
                         </div>
-                        <div className="text-sm text-slate-600 leading-relaxed space-y-4">
-                            {(latestRecord?.ai_nutrition_plan || "Chưa có lời khuyên cụ thể từ AI cho lần khám này.").substring(0, 300) + "..."}
+                        <div className="text-sm text-slate-300 leading-relaxed font-medium flex-1 overflow-hidden">
+                            {stripMarkdown(latestRecord?.ai_nutrition_plan || "Chưa có lời khuyên cụ thể từ AI cho lần khám này.").substring(0, 250)}...
                         </div>
-                        <button
-                            onClick={() => navigate(`/history/${latestRecord?.id}`)}
-                            className="mt-6 w-full py-2 text-blue-600 font-bold text-xs hover:underline"
-                        >
+                        <button onClick={() => navigate(`/history/${latestRecord?.id}`)} className="mt-6 w-full py-2.5 bg-white text-slate-900 rounded-xl font-bold text-sm hover:bg-slate-100 transition-colors">
                             Xem chi tiết phác đồ
                         </button>
                     </div>

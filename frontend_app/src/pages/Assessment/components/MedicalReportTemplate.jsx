@@ -1,6 +1,6 @@
-﻿import React, { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Activity } from 'lucide-react';
+import Logo from '../../../components/ui/Logo';
 
 const MedicalReportTemplate = forwardRef(({ result }, ref) => {
     if (!result) return null;
@@ -12,7 +12,7 @@ const MedicalReportTemplate = forwardRef(({ result }, ref) => {
     });
 
     return (
-        <div ref={ref} className="bg-white text-slate-900 w-full font-sans" style={{ fontFamily: "'Inter', 'Roboto', 'Arial', sans-serif" }}>
+        <div ref={ref} className="bg-white text-slate-900 w-full font-sans" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             
             <style type="text/css" media="print">
                 {`
@@ -23,22 +23,20 @@ const MedicalReportTemplate = forwardRef(({ result }, ref) => {
                     body { 
                         -webkit-print-color-adjust: exact !important; 
                         print-color-adjust: exact !important; 
-                        font-family: 'Inter', 'Roboto', 'Arial', sans-serif !important; 
+                        font-family: 'Plus Jakarta Sans', sans-serif !important; 
                     }
                 `}
             </style>
 
             <div className="p-8 print:p-0">
                 
-                {}
-                <div className="flex justify-between items-center border-b-2 border-slate-200 pb-5 mb-8">
+                {/* Header Section */}
+                <div className="flex justify-between items-center border-b border-slate-200 pb-6 mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center print:bg-blue-600">
-                            <Activity className="text-white w-6 h-6" />
-                        </div>
+                        <Logo className="w-10 h-10" />
                         <div>
-                            <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Clinical AI System</h1>
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Hệ sinh thái Dự báo Sức khỏe</p>
+                            <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Clinical AI</h1>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Hồ sơ Y tế Điện tử</p>
                         </div>
                     </div>
                     <div className="text-right">
@@ -50,14 +48,18 @@ const MedicalReportTemplate = forwardRef(({ result }, ref) => {
                 {}
 
                 {}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-8 flex justify-between items-center print:bg-slate-50 print:break-inside-avoid">
+                {/* Diagnosis Summary Box */}
+                <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 mb-8 flex justify-between items-center print:bg-slate-50 print:break-inside-avoid">
                     <div>
-                        <h3 className="text-sm font-bold text-slate-500 uppercase mb-1">Kết luận từ AI</h3>
-                        <p className="text-xl font-black text-rose-600 print:text-rose-600 uppercase">{result.ai_diagnosis}</p>
+                        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kết luận Lâm sàng (AI)</h3>
+                        <p className="text-xl font-black text-slate-900 uppercase">{result.ai_diagnosis}</p>
                     </div>
                     <div className="text-right border-l border-slate-200 pl-6">
-                        <h3 className="text-sm font-bold text-slate-500 uppercase mb-1">Tỷ lệ Rủi ro</h3>
-                        <p className="text-3xl font-black text-slate-900">{riskScore}%</p>
+                        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Chỉ số Rủi ro</h3>
+                        <div className="flex items-baseline gap-1 justify-end">
+                            <span className="text-4xl font-black text-slate-900 tracking-tighter">{riskScore}</span>
+                            <span className="text-lg font-bold text-slate-400">%</span>
+                        </div>
                     </div>
                 </div>
 
@@ -74,13 +76,12 @@ const MedicalReportTemplate = forwardRef(({ result }, ref) => {
 
                 {}
                 <div className="mt-12 pt-6 border-t border-slate-200 print:break-inside-avoid">
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 print:bg-amber-50">
-                        <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">⚠️ Tuyên bố miễn trừ trách nhiệm Y khoa:</p>
-                        <p className="text-xs text-amber-700 leading-relaxed text-justify">
+                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-5 print:bg-slate-50">
+                        <p className="text-[10px] font-bold text-slate-800 uppercase tracking-widest mb-2">Miễn trừ trách nhiệm Y khoa:</p>
+                        <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
                             Báo cáo này được tự động tạo bởi Trí tuệ nhân tạo (AI) dựa trên các chỉ số bạn nhập vào hệ thống. 
-                            Nội dung này <strong>chỉ mang tính chất tham khảo</strong>, dự báo và hỗ trợ quản lý sức khỏe cá nhân. 
-                            Nó <strong>không thể thay thế</strong> cho việc chẩn đoán, tư vấn, hoặc phác đồ điều trị chính thức từ bác sĩ chuyên môn. 
-                            Vui lòng mang báo cáo này đến cơ sở y tế gần nhất để được thăm khám nếu tỷ lệ rủi ro ở mức cao.
+                            Nội dung này mang tính chất tham khảo, dự báo và hỗ trợ quản lý sức khỏe cá nhân. 
+                            Nó không thay thế chẩn đoán, tư vấn, hoặc phác đồ điều trị từ chuyên gia y tế.
                         </p>
                     </div>
                 </div>

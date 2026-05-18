@@ -1,99 +1,108 @@
-﻿import React from 'react';
-import { CheckCircle, AlertTriangle, Info, ArrowRight, TrendingUp, Activity } from 'lucide-react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+
+const PAGE_SIZE = 5;
 
 export default function InsightsTimeline({ insights }) {
     const navigate = useNavigate();
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-    const getInsightStyle = (type) => {
-        switch (type) {
-            case 'Thành tựu':
-                return { icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-500' };
-            case 'Cảnh báo':
-                return { icon: AlertTriangle, color: 'text-rose-500', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-500' };
-            case 'Thông tin':
-                return { icon: Info, color: 'text-blue-500', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-500' };
-            default:
-                return { icon: Info, color: 'text-slate-500', bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-500' };
-        }
+    const getRiskStyle = (risk) => {
+        if (risk <= 33) return { dot: 'bg-emerald-500', text: 'text-emerald-600', label: 'An toàn' };
+        if (risk <= 66) return { dot: 'bg-amber-500', text: 'text-amber-600', label: 'Cảnh báo' };
+        return { dot: 'bg-rose-500', text: 'text-rose-600', label: 'Rủi ro cao' };
     };
 
-    const parseTopRiskFactors = (explanation) => {
-        if (!explanation || typeof explanation !== 'object') return [];
-        return Object.entries(explanation)
-            .filter(([_, value]) => value > 0)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-            .map(([key, value]) => ({ key, value: (value * 100).toFixed(1) }));
-    };
+    if (insights.length === 0) {
+        return (
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-8">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Lịch sử Lâm sàng</p>
+                <h2 className="text-base font-black text-slate-900 tracking-tight mb-6">Tóm tắt các lần Khám</h2>
+                <p className="text-sm text-slate-400 font-medium">Chưa có phân tích y khoa nào được ghi nhận.</p>
+            </div>
+        );
+    }
+
+    const visibleRows = insights.slice(0, visibleCount);
+    const hasMore = visibleCount < insights.length;
+    const canCollapse = visibleCount > PAGE_SIZE;
 
     return (
-        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-full">
-            <h2 className="font-extrabold text-2xl text-slate-800 mb-8 font-[Manrope]">Phân tích chuyên sâu từ AI</h2>
-            
-            <div className="relative pl-6 space-y-8 before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-slate-100">
-                {insights.length === 0 && <p className="text-slate-400 font-medium">Chưa có phân tích y khoa nào được ghi nhận.</p>}
-                
-                {insights.map((item) => {
-                    const style = getInsightStyle(item.type);
-                    const Icon = style.icon;
-                    const [datePart, timePart] = item.date.split(', ');
-                    const topFactors = parseTopRiskFactors(item.explanation);
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Header */}
+            <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lịch sử Lâm sàng</p>
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">Tóm tắt các lần Khám</h2>
+                </div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    {visibleCount > insights.length ? insights.length : visibleCount} / {insights.length} bản ghi
+                </span>
+            </div>
+
+            {/* Table header */}
+            <div className="grid grid-cols-12 px-8 py-3 bg-slate-50/50 border-b border-slate-100">
+                <div className="col-span-3"><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ngày Khám</p></div>
+                <div className="col-span-5"><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kết luận AI</p></div>
+                <div className="col-span-2 text-center"><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rủi ro</p></div>
+                <div className="col-span-2 text-center"><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Trạng thái</p></div>
+            </div>
+
+            {/* Rows */}
+            <div className="divide-y divide-slate-50">
+                {visibleRows.map((item, idx) => {
+                    const style = getRiskStyle(item.risk);
+                    const [datePart] = item.date.split(', ');
 
                     return (
-                        <div key={item.id} className="relative group">
-                            {}
-                            <div className={`absolute -left-[30px] bg-white rounded-full p-1 border-2 ${style.border} z-10 shadow-sm group-hover:scale-110 transition-transform`}>
-                                <Icon className={`w-4 h-4 ${style.color}`} />
+                        <div
+                            key={item.id ?? idx}
+                            onClick={() => navigate(`/history/${item.id}`)}
+                            className="grid grid-cols-12 px-8 py-5 items-center hover:bg-slate-50/50 transition-colors cursor-pointer group"
+                        >
+                            <div className="col-span-3">
+                                <p className="text-sm font-bold text-slate-700">{datePart}</p>
                             </div>
-                            
-                            {}
-                            <div className={`${style.bg} p-6 rounded-2xl border border-slate-100 hover:shadow-md transition-all`}>
-                                <div className="flex justify-between items-center mb-4 border-b border-white/50 pb-3">
-                                    <div>
-                                        <span className={`text-sm font-black ${style.text}`}>{datePart}</span>
-                                        <span className="text-xs font-bold text-slate-400 uppercase ml-2">{timePart}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-lg">
-                                        <Activity className="w-3 h-3 text-slate-500" />
-                                        <span className="text-xs font-bold text-slate-600">Sức khỏe: {item.health_status}/5</span>
-                                    </div>
-                                </div>
-                                
-                                <div className="mb-4">
-                                    <h3 className={`font-bold text-lg mb-1 ${style.text}`}>Chẩn đoán: {item.diagnosis || 'Không có ghi chú'}</h3>
-                                    <p className="text-slate-500 text-sm font-medium">Nguy cơ dự đoán: <span className="font-bold">{item.risk}%</span></p>
-                                </div>
-
-                                {}
-                                {topFactors.length > 0 && (
-                                    <div className="bg-white/60 p-4 rounded-xl mb-4">
-                                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                            <TrendingUp className="w-4 h-4 text-rose-500" />
-                                            Yếu tố cốt lõi làm tăng rủi ro
-                                        </h4>
-                                        <div className="space-y-2">
-                                            {topFactors.map(factor => (
-                                                <div key={factor.key} className="flex justify-between items-center text-sm">
-                                                    <span className="font-semibold text-slate-700">{factor.key}</span>
-                                                    <span className="font-black text-rose-500">+{factor.value}%</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <button 
-                                    onClick={() => navigate(`/history/${item.id}`)}
-                                    className={`flex items-center gap-2 text-sm font-bold mt-2 ${style.text} hover:opacity-80 transition-opacity active:scale-95`}
-                                >
-                                    Xem Phác đồ Điều trị <ArrowRight className="w-4 h-4" />
-                                </button>
+                            <div className="col-span-5 pr-4">
+                                <p className="text-sm font-semibold text-slate-600 truncate">{item.diagnosis || '—'}</p>
+                            </div>
+                            <div className="col-span-2 flex items-center justify-center gap-2">
+                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${style.dot}`}></span>
+                                <span className={`text-sm font-black ${style.text}`}>{item.risk}%</span>
+                            </div>
+                            <div className="col-span-2 flex items-center justify-center gap-2">
+                                <span className={`text-[10px] font-black uppercase tracking-wider ${style.text}`}>{style.label}</span>
+                                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 transition-colors" />
                             </div>
                         </div>
                     );
                 })}
             </div>
+
+            {/* Expand / Collapse Footer */}
+            {(hasMore || canCollapse) && (
+                <div className="border-t border-slate-100 flex divide-x divide-slate-100">
+                    {hasMore && (
+                        <button
+                            onClick={() => setVisibleCount(v => v + PAGE_SIZE)}
+                            className="flex-1 flex items-center justify-center gap-2 py-4 text-xs font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                        >
+                            <ChevronDown className="w-4 h-4" />
+                            Xem thêm {Math.min(PAGE_SIZE, insights.length - visibleCount)} bản ghi
+                        </button>
+                    )}
+                    {canCollapse && (
+                        <button
+                            onClick={() => setVisibleCount(PAGE_SIZE)}
+                            className="flex-1 flex items-center justify-center gap-2 py-4 text-xs font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+                        >
+                            <ChevronUp className="w-4 h-4" />
+                            Thu gọn
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

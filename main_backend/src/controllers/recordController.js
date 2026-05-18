@@ -1,6 +1,7 @@
-﻿const axios = require('axios');
-const { MedicalRecord, PatientProfile, Dish, Exercise, Ingredient, DishIngredient } = require('../models');
+const axios = require('axios');
+const { MedicalRecord, PatientProfile, Dish, Exercise, Ingredient, DishIngredient, Notification } = require('../models');
 const { Sequelize, Op } = require('sequelize');
+const { logAction } = require('./auditController');
 
 exports.createDiagnosticRecord = async (req, res) => {
     try {
@@ -132,6 +133,17 @@ exports.createDiagnosticRecord = async (req, res) => {
             }
         }
 
+        // Kích hoạt chuông thông báo cho bác sĩ nếu nguy cơ cao (>66)
+        if (aiResult.risk_probability > 66 && dId) {
+            await Notification.create({
+                user_id: dId, // Gửi cho bác sĩ quản lý
+                title: 'Cảnh báo Bệnh nhân Rủi ro cao!',
+                message: `Hệ thống vừa phát hiện nguy cơ cao (${aiResult.risk_probability}%) ở một bệnh nhân của bạn. Vui lòng kiểm tra.`,
+                type: 'URGENT_RISK',
+                link: `/history/${newRecord.id}`
+            });
+        }
+
         res.status(200).json({
             status: "success",
             message: "Đã phân tích AI và lưu vào Hồ sơ bệnh án thành công!",
@@ -154,6 +166,18 @@ exports.getRecordById = async (req, res) => {
             responseData.health_indicators = JSON.parse(responseData.health_indicators);
         }
         
+        // Ghi log bảo mật (chỉ khi có req.user, nghĩa là có người dùng truy cập)
+        if (req.user) {
+            await logAction(
+                req.user.id,
+                'VIEW_RECORD_DETAIL',
+                'MedicalRecord',
+                record.id,
+                req.ip || req.connection.remoteAddress,
+                { patient_id: record.patient_id, viewer_role: req.user.role }
+            );
+        }
+
         res.status(200).json({ status: "success", data: responseData });
     } catch (error) {
         res.status(500).json({ error: "Lỗi hệ thống" });
@@ -206,7 +230,8 @@ exports.getPatientHistory = async (req, res) => {
                 ai_diagnosis: record.ai_diagnosis,
                 ai_nutrition_plan: record.ai_nutrition_plan,
                 ai_explanation: explanation,
-                health_status: indicators.GenHlth || 0 
+                health_status: indicators.GenHlth || 0,
+                doctor_notes: record.doctor_notes || null
             };
         });
 

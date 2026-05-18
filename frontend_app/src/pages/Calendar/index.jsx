@@ -107,7 +107,7 @@ export default function CalendarSchedule() {
             
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight font-[Manrope] flex items-center gap-3">
+                    <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight  flex items-center gap-3">
                         <CalendarIcon className="text-blue-600 w-8 h-8" />
                         Lịch Hoạt Động & Dinh Dưỡng
                     </h1>

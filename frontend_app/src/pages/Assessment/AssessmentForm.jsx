@@ -1,13 +1,31 @@
-﻿import React from 'react';
+import React, { useState } from 'react';
 import { Activity, HeartPulse, History, Loader2 } from 'lucide-react';
 import Tooltip from '../../components/ui/Tooltip'; 
 
 export default function AssessmentForm({ formData, handleChange, handleSubmit, isLoading, readOnly = false }) {
+    const [hw, setHw] = useState({ h: '', w: '' });
+
+    const handleHWChange = (e) => {
+        const { name, value } = e.target;
+        setHw(prev => {
+            const next = { ...prev, [name]: value };
+            if (next.h && next.w) {
+                const heightM = parseFloat(next.h) / 100;
+                const weightKg = parseFloat(next.w);
+                if (heightM > 0) {
+                    const bmi = (weightKg / (heightM * heightM)).toFixed(1);
+                    handleChange({ target: { name: 'BMI', value: parseFloat(bmi) } });
+                }
+            }
+            return next;
+        });
+    };
+
     return (
         <section>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
                 <div>
-                    <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 mb-1 font-[Manrope]">
+                    <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 mb-1 ">
                         {readOnly ? "Hồ sơ khám bệnh chi tiết" : "Khảo Sát Lâm Sàng (21 Chỉ Số)"}
                     </h2>
                     <p className="text-sm text-slate-500 font-medium">
@@ -17,23 +35,24 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                 {!readOnly && (
                     <button 
                         onClick={handleSubmit} disabled={isLoading}
-                        className={`flex items-center px-6 py-2.5 rounded-xl font-bold shadow-md transition-all active:scale-95 text-sm ${
-                            isLoading ? 'bg-slate-400 text-white cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-blue-300'
+                        className={`flex items-center px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all active:scale-95 text-sm ${
+                            isLoading ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800'
                         }`}
                     >
-                        {isLoading ? <Loader2 className="animate-spin mr-2 w-4 h-4" /> : <Activity className="mr-2 w-4 h-4" />}
+                        {isLoading ? <Loader2 className="animate-spin mr-2 w-4 h-4" /> : <Activity className="mr-2 w-4 h-4 text-emerald-400" />}
                         {isLoading ? 'Đang phân tích...' : 'Phân Tích AI & Sinh Thực Đơn'}
                     </button>
                 )}
             </div>
 
-            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-5 ${readOnly ? 'opacity-80 pointer-events-none' : ''}`}>
+            <div className={`bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ${readOnly ? 'opacity-80 pointer-events-none' : ''}`}>
+                <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
                 
-                {}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col">
-                    <div className="flex items-center space-x-3 mb-4">
-                        <div className="bg-blue-100 p-1.5 rounded-lg"><HeartPulse className="text-blue-700 w-5 h-5" /></div>
-                        <h3 className="font-bold text-base text-slate-800">1. Sinh trắc học</h3>
+                {/* Cột 1: Sinh trắc học */}
+                <div className="p-8 flex flex-col">
+                    <div className="flex items-center space-x-3 mb-6">
+                        <HeartPulse className="text-slate-900 w-5 h-5" />
+                        <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">1. Sinh trắc học</h3>
                     </div>
                     <div className="space-y-3 flex-1">
                         <div className="grid grid-cols-2 gap-3">
@@ -62,12 +81,31 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                                 </select>
                             </div>
                         </div>
-                        <div className="space-y-1">
-                            <Tooltip text="Dưới 18.5: Gầy | 18.5-24.9: Bình thường | >= 25: Béo phì">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase cursor-help">Chỉ số BMI</label>
-                            </Tooltip>
-                            <input disabled={readOnly} type="number" step="0.1" name="BMI" value={formData.BMI === 0 ? "" : formData.BMI} onChange={handleChange} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
-                        </div>
+                        {readOnly ? (
+                            <div className="space-y-1">
+                                <Tooltip text="Dưới 18.5: Gầy | 18.5-24.9: Bình thường | >= 25: Béo phì">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase cursor-help">Chỉ số BMI</label>
+                                </Tooltip>
+                                <input disabled type="number" value={formData.BMI} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none text-sm font-bold text-blue-600" />
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-3 gap-2">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Cao (cm)</label>
+                                    <input type="number" name="h" value={hw.h} onChange={handleHWChange} placeholder="170" className="w-full p-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Nặng (kg)</label>
+                                    <input type="number" name="w" value={hw.w} onChange={handleHWChange} placeholder="65" className="w-full p-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Tooltip text="BMI tự động tính">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase cursor-help text-blue-600">BMI</label>
+                                    </Tooltip>
+                                    <input disabled type="text" value={formData.BMI || "--"} className="w-full p-2 bg-blue-50 border border-blue-100 rounded-lg outline-none text-sm font-black text-blue-700 text-center" />
+                                </div>
+                            </div>
+                        )}
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-500 uppercase">Huyết áp cao</label>
@@ -85,11 +123,11 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                     </div>
                 </div>
 
-                {}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col">
-                    <div className="flex items-center space-x-3 mb-4">
-                        <div className="bg-emerald-100 p-1.5 rounded-lg"><Activity className="text-emerald-700 w-5 h-5" /></div>
-                        <h3 className="font-bold text-base text-slate-800">2. Lối sống & Thói quen</h3>
+                {/* Cột 2: Lối sống */}
+                <div className="p-8 flex flex-col">
+                    <div className="flex items-center space-x-3 mb-6">
+                        <Activity className="text-slate-900 w-5 h-5" />
+                        <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">2. Lối sống & Thói quen</h3>
                     </div>
                     <div className="space-y-2 flex-1">
                         {[
@@ -109,11 +147,11 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                     </div>
                 </div>
 
-                {}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col">
-                    <div className="flex items-center space-x-3 mb-4">
-                        <div className="bg-rose-100 p-1.5 rounded-lg"><History className="text-rose-700 w-5 h-5" /></div>
-                        <h3 className="font-bold text-base text-slate-800">3. Bệnh sử & Y tế</h3>
+                {/* Cột 3: Y tế */}
+                <div className="p-8 flex flex-col">
+                    <div className="flex items-center space-x-3 mb-6">
+                        <History className="text-slate-900 w-5 h-5" />
+                        <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">3. Bệnh sử & Y tế</h3>
                     </div>
                     <div className="space-y-3 flex-1">
                         <div className="grid grid-cols-2 gap-3">
@@ -196,6 +234,7 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
