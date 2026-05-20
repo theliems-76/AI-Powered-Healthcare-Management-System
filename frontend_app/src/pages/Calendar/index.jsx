@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight, Flame, Utensils, Activity, ArrowDown, ArrowUp, AlertCircle, Info } from 'lucide-react';
 import api from '../../services/api';
 
@@ -107,8 +107,8 @@ export default function CalendarSchedule() {
             
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight  flex items-center gap-3">
-                        <CalendarIcon className="text-blue-600 w-8 h-8" />
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lịch sử Hoạt động</p>
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                         Lịch Hoạt Động & Dinh Dưỡng
                     </h1>
                     <p className="text-slate-500 font-medium mt-1">Theo dõi nhật ký nạp và tiêu hao năng lượng mỗi ngày.</p>
@@ -149,8 +149,8 @@ export default function CalendarSchedule() {
                                         key={i} 
                                         onClick={() => setSelectedDate(dayObj.dateStr)}
                                         className={`min-h-[100px] p-2 rounded-xl border transition-all cursor-pointer relative overflow-hidden group
-                                            ${isSelected ? 'bg-blue-600 border-blue-600 shadow-md shadow-blue-500/30' : 
-                                              isToday ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-100 hover:border-blue-300 hover:shadow-sm'}`}
+                                            ${isSelected ? 'bg-slate-900 border-slate-900 shadow-md' : 
+                                              isToday ? 'bg-slate-50 border-slate-300' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-sm'}`}
                                     >
                                         <div className={`text-sm font-bold mb-2 ${isSelected ? 'text-white' : 'text-slate-700'}`}>
                                             {dayObj.date.getDate()}
@@ -221,7 +221,7 @@ export default function CalendarSchedule() {
                     {}
                     <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex-1">
                         <h3 className="font-bold text-slate-800 text-lg mb-6 flex items-center gap-2">
-                            <Clock className="text-blue-600 w-5 h-5" /> Chi tiết hoạt động
+                            Chi tiết hoạt động
                         </h3>
 
                         {isLoadingDay ? (

@@ -157,13 +157,13 @@ export default function Exercises() {
                 <div className="flex gap-3 mt-4 sm:mt-0">
                     <button 
                         onClick={() => handleOpenBuilder(null)} 
-                        className="px-5 py-2.5 text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors shadow-sm active:scale-95"
+                        className="px-5 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm active:scale-95"
                     >
                         Tạo môn mới
                     </button>
                     <button 
                         onClick={() => setIsSearchOpen(true)} 
-                        className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 transition-all active:scale-95"
+                        className="px-5 py-2.5 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all active:scale-95"
                     >
                         Thêm bài tập
                     </button>

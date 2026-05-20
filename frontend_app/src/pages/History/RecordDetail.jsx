@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import AssessmentForm from '../Assessment/AssessmentForm';
@@ -29,8 +29,8 @@ export default function RecordDetail() {
 
     return (
         <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-500">
-            <button onClick={() => navigate('/history')} className="mb-6 flex items-center text-slate-500 hover:text-blue-600 font-bold">
-                <ArrowLeft size={18} className="mr-1" /> Quay lại lịch sử
+            <button onClick={() => navigate('/history')} className="mb-6 flex items-center text-xs text-slate-400 uppercase tracking-widest font-bold hover:text-slate-800 transition-colors">
+                <ArrowLeft size={16} className="mr-1" /> Quay lại lịch sử
             </button>
             
             {}

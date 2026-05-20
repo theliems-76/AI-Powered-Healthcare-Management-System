@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Loader2, Users, Calendar, Activity, ChevronRight } from 'lucide-react';
 
 const getInitials = (name) => {
@@ -61,7 +61,7 @@ export default function PatientList({ loading, patients, onPatientClick }) {
                                 <tr
                                     key={patient.id}
                                     onClick={() => onPatientClick(patient)}
-                                    className="hover:bg-blue-50/40 transition-colors cursor-pointer group"
+                                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
                                 >
                                     {}
                                     <td className="px-5 py-4">
@@ -70,7 +70,7 @@ export default function PatientList({ loading, patients, onPatientClick }) {
                                                 {getInitials(patient.full_name)}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-800 text-sm group-hover:text-blue-700 transition-colors leading-tight">
+                                                <p className="font-bold text-slate-800 text-sm group-hover:text-slate-900 transition-colors leading-tight">
                                                     {patient.full_name}
                                                 </p>
                                                 <p className="text-[11px] text-slate-400 font-medium mt-0.5">
@@ -119,7 +119,7 @@ export default function PatientList({ loading, patients, onPatientClick }) {
 
                                     {}
                                     <td className="pr-4 py-4">
-                                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
                                     </td>
                                 </tr>
                             );
