@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 export default function DailySchedule({ selectedDate, onSelectDate }) {
     const getWeekDates = () => {
@@ -23,7 +23,7 @@ export default function DailySchedule({ selectedDate, onSelectDate }) {
     const todayString = new Date().toISOString().split('T')[0];
 
     return (
-        <div className="flex justify-between md:justify-start gap-2 md:gap-4 overflow-x-auto pb-2">
+        <div className="flex w-full bg-slate-200/50 p-1.5 rounded-2xl">
             {weekDates.map((date, index) => {
                 const dateString = date.toISOString().split('T')[0];
                 const isSelected = selectedDate === dateString;
@@ -33,19 +33,19 @@ export default function DailySchedule({ selectedDate, onSelectDate }) {
                     <button
                         key={index}
                         onClick={() => onSelectDate(dateString)}
-                        className={`min-w-[65px] flex flex-col items-center p-3 rounded-xl border transition-all ${
+                        className={`flex-1 flex flex-col items-center py-2 rounded-xl transition-all relative ${
                             isSelected 
-                                ? 'bg-slate-800 border-slate-800 text-white shadow-md' 
-                                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400 hover:bg-slate-50'
+                                ? 'bg-white shadow-sm text-slate-900' 
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                         }`}
                     >
-                        <span className={`text-[10px] font-bold uppercase mb-1 ${isSelected ? 'text-slate-300' : 'text-slate-400'}`}>
+                        <span className={`text-[10px] font-bold uppercase mb-0.5 ${isSelected ? 'text-slate-400' : 'text-slate-400'}`}>
                             {dayNames[index]}
                         </span>
-                        <span className="text-lg font-black">{date.getDate()}</span>
+                        <span className="text-sm font-black">{date.getDate()}</span>
                         
-                        {}
-                        {isToday && <div className={`w-1.5 h-1.5 rounded-full mt-1 ${isSelected ? 'bg-white' : 'bg-rose-500'}`}></div>}
+                        {/* Dot Today */}
+                        {isToday && <div className={`absolute bottom-1 w-1 h-1 rounded-full ${isSelected ? 'bg-slate-900' : 'bg-slate-400'}`}></div>}
                     </button>
                 );
             })}

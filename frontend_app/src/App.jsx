@@ -19,6 +19,7 @@ import Admin from './pages/Admin/index';
 import Dashboard from './pages/Dashboard/index';
 import RecordDetail from './pages/History/RecordDetail';
 import Profile from './pages/Profile/index';
+import Appointments from './pages/Appointments/index';
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   
@@ -49,10 +50,22 @@ function App() {
             <Route path="/calendar" element={<CalendarSchedule />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/appointments" element={<Appointments />} />
           </Route>
 
         </Routes>
-        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+        <ToastContainer 
+          position="bottom-right" 
+          autoClose={3000} 
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
       </Router>
     </AuthProvider>
   );

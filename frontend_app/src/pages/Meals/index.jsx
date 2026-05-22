@@ -107,6 +107,7 @@ export default function Meals() {
                     time: validTime, 
                     name: selectedDish.name, 
                     ...mealData,
+                    weight: mealData.weight_grams,
                     calories: mealData.total_calories_calculated,
                     carbs: mealData.total_carbs_calculated,
                     protein: mealData.total_protein_calculated
@@ -176,21 +177,21 @@ export default function Meals() {
             />
 
             {}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 mb-6 gap-4">
+            <div className="pb-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 shrink-0">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 ">Quản Lý Dinh Dưỡng</h1>
-                    <p className="text-sm text-slate-500 mt-1 font-medium">Theo dõi năng lượng và xây dựng thực đơn cá nhân.</p>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Quản Lý Dinh Dưỡng</h1>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">Theo dõi năng lượng và xây dựng thực đơn cá nhân.</p>
                 </div>
                 <div className="flex gap-3 mt-4 sm:mt-0">
                     <button 
                         onClick={() => handleOpenRecipeBuilder()} 
-                        className="px-5 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm active:scale-95"
+                        className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:border-slate-300 transition-colors shadow-sm active:scale-95"
                     >
                         Tạo món ăn
                     </button>
                     <button 
                         onClick={() => setIsModalOpen(true)} 
-                        className="px-5 py-2.5 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all active:scale-95"
+                        className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
                     >
                         Thêm vào nhật ký
                     </button>
@@ -198,14 +199,14 @@ export default function Meals() {
             </div>
 
             {}
-            <div className="mb-6">
-                <DailySchedule selectedDate={selectedDate} onSelectDate={setSelectedDate} />
-            </div>
-
-            {}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {}
-                <div className="lg:col-span-1">
+            <div className="flex-1 bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden flex flex-col lg:flex-row min-h-[75vh]">
+                
+                <div className="w-full lg:w-1/3 bg-slate-50/50 p-6 md:p-8 border-r border-slate-100 flex flex-col gap-8 shrink-0">
+                    <div>
+                        <h3 className="font-bold text-[10px] text-slate-500 uppercase tracking-widest mb-4">Lịch trình</h3>
+                        <DailySchedule selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+                    </div>
+                    
                     <MealBudgetCard 
                         dailyGoal={dailyGoal} 
                         consumed={consumed} 
@@ -213,14 +214,13 @@ export default function Meals() {
                     />
                 </div>
 
-                {}
-                <div className="lg:col-span-2">
-                    <div className="bg-white p-6 rounded-xl border border-slate-200 h-full shadow-sm">
-                        <div className="mb-6 flex justify-between items-center">
-                            <h2 className="font-semibold text-slate-800 text-lg">
-                                Nhật ký ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}
-                            </h2>
-                        </div>
+                <div className="w-full lg:w-2/3 p-6 md:p-8 flex flex-col bg-white relative overflow-hidden">
+                    <div className="mb-8 pb-4 border-b border-slate-100 flex justify-between items-end shrink-0">
+                        <h2 className="font-black text-slate-900 text-xl tracking-tight">
+                            Nhật ký ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}
+                        </h2>
+                    </div>
+                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                         <MealList meals={meals} onRemoveMeal={handleRemoveMeal} />
                     </div>
                 </div>

@@ -6,25 +6,26 @@ export default function PatientDoctorNote({ doctorNotes }) {
     if (!doctorNotes) return null;
 
     return (
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl">
-            <div className="flex items-center gap-2.5 mb-4">
-                <div className="bg-white/20 p-2 rounded-xl">
-                    <Stethoscope className="w-5 h-5" />
+        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden relative">
+            {/* Header Section */}
+            <div className="bg-slate-900 p-6 md:p-8 flex items-center gap-5 md:gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shrink-0 p-1 shadow-inner relative overflow-hidden">
+                    <div className="w-full h-full bg-slate-50 rounded-full flex items-center justify-center border border-slate-200">
+                        <Stethoscope className="w-8 h-8 md:w-10 md:h-10 text-slate-900" strokeWidth={1.5} />
+                    </div>
                 </div>
                 <div>
-                    <h3 className="font-black text-base">Nhận xét từ Bác sĩ</h3>
-                    <p className="text-blue-200 text-xs font-medium">Ghi chú chuyên môn dành riêng cho bạn</p>
+                    <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">Chỉ định từ Bác sĩ</h3>
+                    <p className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Nhận xét lâm sàng & Điều chỉnh phác đồ</p>
                 </div>
             </div>
 
-            <div className="bg-white/10 rounded-2xl p-4 border border-white/20">
-                <div className="flex items-start gap-3">
-                    <MessageSquare className="w-4 h-4 text-blue-200 mt-0.5 flex-shrink-0" />
-                    <div 
-                        className="text-sm text-white leading-relaxed prose prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(doctorNotes) }}
-                    />
-                </div>
+            {/* Content Section */}
+            <div className="p-8 md:p-10 bg-white">
+                <div 
+                    className="prose prose-slate prose-headings:font-black prose-p:font-medium max-w-none text-slate-800 text-sm md:text-base leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(doctorNotes) }}
+                />
             </div>
         </div>
     );

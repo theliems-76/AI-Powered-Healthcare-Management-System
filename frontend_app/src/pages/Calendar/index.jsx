@@ -108,10 +108,10 @@ export default function CalendarSchedule() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lịch sử Hoạt động</p>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">
                         Lịch Hoạt Động & Dinh Dưỡng
                     </h1>
-                    <p className="text-slate-500 font-medium mt-1">Theo dõi nhật ký nạp và tiêu hao năng lượng mỗi ngày.</p>
+                    <p className="text-sm text-slate-500 mt-1 font-medium">Theo dõi nhật ký nạp và tiêu hao năng lượng mỗi ngày.</p>
                 </div>
             </div>
 
@@ -148,29 +148,26 @@ export default function CalendarSchedule() {
                                     <div 
                                         key={i} 
                                         onClick={() => setSelectedDate(dayObj.dateStr)}
-                                        className={`min-h-[100px] p-2 rounded-xl border transition-all cursor-pointer relative overflow-hidden group
-                                            ${isSelected ? 'bg-slate-900 border-slate-900 shadow-md' : 
-                                              isToday ? 'bg-slate-50 border-slate-300' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-sm'}`}
+                                        className={`min-h-[100px] p-2.5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group
+                                            ${isSelected ? 'bg-white border-transparent ring-2 ring-slate-900 shadow-md' : 
+                                              isToday ? 'bg-slate-50 border-slate-300' : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'}`}
                                     >
-                                        <div className={`text-sm font-bold mb-2 ${isSelected ? 'text-white' : 'text-slate-700'}`}>
+                                        <div className={`text-xs font-bold mb-3 w-7 h-7 flex items-center justify-center rounded-full transition-colors ${isSelected ? 'bg-slate-900 text-white' : 'text-slate-700 group-hover:bg-slate-200'}`}>
                                             {dayObj.date.getDate()}
                                         </div>
 
                                         {hasData ? (
-                                            <div className="space-y-1 mt-1">
-                                                <div className={`flex items-center justify-between text-[10px] font-bold px-1.5 py-0.5 rounded ${isSelected ? 'bg-white/20 text-white' : 'bg-orange-50 text-orange-600'}`}>
+                                            <div className="space-y-1.5 mt-1">
+                                                <div className="flex items-center justify-between text-[10px] font-bold px-1.5 py-1 rounded bg-amber-50 text-amber-600">
                                                     <Utensils className="w-3 h-3" />
                                                     <span>{data.consumed}</span>
                                                 </div>
-                                                <div className={`flex items-center justify-between text-[10px] font-bold px-1.5 py-0.5 rounded ${isSelected ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
+                                                <div className="flex items-center justify-between text-[10px] font-bold px-1.5 py-1 rounded bg-emerald-50 text-emerald-600">
                                                     <Activity className="w-3 h-3" />
                                                     <span>{data.burned}</span>
                                                 </div>
                                             </div>
                                         ) : null}
-
-                                        {}
-                                        {isSelected && <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>}
                                     </div>
                                 );
                             })}
@@ -182,74 +179,77 @@ export default function CalendarSchedule() {
                 <div className="lg:col-span-5 flex flex-col gap-6">
                     
                     {}
-                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 shadow-xl text-white relative overflow-hidden">
-                        <div className="absolute -right-6 -bottom-6 opacity-10"><Activity className="w-40 h-40" /></div>
-                        
-                        <div className="flex justify-between items-start mb-6 relative z-10">
+                    <div className="bg-slate-900 rounded-3xl p-6 shadow-sm text-white relative overflow-hidden">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h3 className="text-slate-300 font-medium text-sm mb-1">Ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}</h3>
-                                <h2 className="text-2xl font-bold">Thâm Hụt Năng Lượng</h2>
+                                <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-1">
+                                    Ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}
+                                </h3>
+                                <h2 className="text-2xl font-black tracking-tight text-white">Thâm Hụt Năng Lượng</h2>
                             </div>
-                            <div className={`px-3 py-1.5 rounded-xl font-bold text-sm flex items-center gap-1 ${isWeightLoss ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-                                {isWeightLoss ? <ArrowDown className="w-4 h-4"/> : <ArrowUp className="w-4 h-4"/>}
+                            <div className={`px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 ${isWeightLoss ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                {isWeightLoss ? <ArrowDown className="w-3.5 h-3.5"/> : <ArrowUp className="w-3.5 h-3.5"/>}
                                 {Math.abs(selectedDayData.deficit)} kcal
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4 mb-2 relative z-10">
-                            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/5">
-                                <Flame className="w-5 h-5 text-orange-400 mb-2" />
-                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Nạp vào</div>
-                                <div className="text-lg font-bold">{selectedDayData.consumed}</div>
+                        <div className="grid grid-cols-3 gap-4 mb-2">
+                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-colors">
+                                <Flame className="w-5 h-5 text-amber-400 mb-2" />
+                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Nạp vào</div>
+                                <div className="text-xl font-black text-white">{selectedDayData.consumed}</div>
                             </div>
-                            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/5">
+                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-colors">
                                 <Activity className="w-5 h-5 text-emerald-400 mb-2" />
-                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Tiêu hao</div>
-                                <div className="text-lg font-bold">{selectedDayData.burned}</div>
+                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Tiêu hao</div>
+                                <div className="text-xl font-black text-white">{selectedDayData.burned}</div>
                             </div>
-                            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/5">
+                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-colors">
                                 <Info className="w-5 h-5 text-blue-400 mb-2" />
-                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">TDEE / Nền</div>
-                                <div className="text-lg font-bold">{targetCalories}</div>
+                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">TDEE / Nền</div>
+                                <div className="text-xl font-black text-white">{targetCalories}</div>
                             </div>
                         </div>
-                        <p className="text-xs text-slate-400 font-medium mt-3 text-center relative z-10">
+                        <p className="text-[10px] text-slate-500 font-bold mt-4 uppercase tracking-widest">
                             Thâm hụt = (TDEE + Tiêu hao) - Nạp vào
                         </p>
                     </div>
 
                     {}
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex-1">
-                        <h3 className="font-bold text-slate-800 text-lg mb-6 flex items-center gap-2">
-                            Chi tiết hoạt động
-                        </h3>
+                    <div className="bg-white p-0 rounded-3xl shadow-sm border border-slate-200 flex-1 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+                            <h3 className="font-bold text-[10px] text-slate-500 uppercase tracking-widest">
+                                Chi tiết hoạt động
+                            </h3>
+                        </div>
 
                         {isLoadingDay ? (
-                            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>
+                            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-900"></div></div>
                         ) : timelineEvents.length === 0 ? (
                             <div className="text-center py-12">
-                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <AlertCircle className="w-8 h-8 text-slate-300" />
-                                </div>
-                                <p className="text-slate-500 font-medium">Chưa có dữ liệu ăn uống/tập luyện trong ngày này.</p>
+                                <p className="text-slate-400 text-sm font-medium">Chưa có dữ liệu trong ngày này.</p>
                             </div>
                         ) : (
-                            <div className="relative pl-3 border-l-2 border-slate-100 space-y-6">
+                            <div className="divide-y divide-slate-100">
                                 {timelineEvents.map((event) => {
                                     const isMeal = event.type === 'meal';
-                                    const Icon = isMeal ? Utensils : Activity;
-                                    const bgColor = isMeal ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600';
-                                    const dotColor = isMeal ? 'bg-orange-500' : 'bg-emerald-500';
 
                                     return (
-                                        <div key={event.id} className="relative pl-5">
-                                            <div className={`absolute -left-[21px] top-1 w-4 h-4 rounded-full border-4 border-white ${dotColor}`}></div>
-                                            
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h4 className="font-bold text-slate-800 text-sm">{event.title}</h4>
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${bgColor}`}>{event.time}</span>
+                                        <div key={event.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50/50 transition-colors">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1.5">
+                                                    <h4 className="font-bold text-slate-800 text-sm tracking-tight">{event.title}</h4>
+                                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-md">
+                                                        {event.time}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[11px] font-medium text-slate-500">{event.desc}</p>
                                             </div>
-                                            <p className="text-xs font-medium text-slate-500">{event.desc}</p>
+                                            <div className="mt-3 sm:mt-0 flex-shrink-0">
+                                                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border ${isMeal ? 'border-amber-200 text-amber-600 bg-amber-50' : 'border-emerald-200 text-emerald-600 bg-emerald-50'}`}>
+                                                    {isMeal ? 'NẠP VÀO' : 'TIÊU HAO'}
+                                                </span>
+                                            </div>
                                         </div>
                                     );
                                 })}

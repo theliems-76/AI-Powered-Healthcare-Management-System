@@ -109,12 +109,23 @@ db.Notification = sequelize.define('Notification', {
 
 db.AuditLog = sequelize.define('AuditLog', {
   id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
-  user_id: { type: DataTypes.UUID, allowNull: true }, // Có thể null nếu action từ system hoặc chưa login
-  action: { type: DataTypes.STRING, allowNull: false }, // VD: 'VIEW_RECORD', 'UPDATE_NOTE'
-  resource_type: { type: DataTypes.STRING }, // VD: 'MedicalRecord'
-  resource_id: { type: DataTypes.STRING }, // ID của record bị tác động
+  user_id: { type: DataTypes.UUID, allowNull: true },
+  action: { type: DataTypes.STRING, allowNull: false },
+  resource_type: { type: DataTypes.STRING },
+  resource_id: { type: DataTypes.STRING },
   ip_address: { type: DataTypes.STRING },
-  details: { type: DataTypes.TEXT } // JSON string lưu chi tiết thay đổi
+  details: { type: DataTypes.TEXT }
+}, { timestamps: true });
+
+db.Appointment = sequelize.define('Appointment', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  doctor_id: { type: DataTypes.UUID, allowNull: false },
+  patient_profile_id: { type: DataTypes.UUID, allowNull: false },
+  appointment_date: { type: DataTypes.DATEONLY, allowNull: false },
+  appointment_time: { type: DataTypes.TIME, allowNull: false },
+  status: { type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED'), defaultValue: 'PENDING' },
+  reason: { type: DataTypes.STRING },
+  notes: { type: DataTypes.TEXT }
 }, { timestamps: true });
 
 db.User.hasOne(db.PatientProfile, { foreignKey: 'user_id', as: 'Profile' });
@@ -156,5 +167,11 @@ db.Notification.belongsTo(db.User, { foreignKey: 'user_id' });
 
 db.User.hasMany(db.AuditLog, { foreignKey: 'user_id' });
 db.AuditLog.belongsTo(db.User, { foreignKey: 'user_id' });
+
+db.User.hasMany(db.Appointment, { foreignKey: 'doctor_id' });
+db.Appointment.belongsTo(db.User, { foreignKey: 'doctor_id', as: 'Doctor' });
+
+db.PatientProfile.hasMany(db.Appointment, { foreignKey: 'patient_profile_id' });
+db.Appointment.belongsTo(db.PatientProfile, { foreignKey: 'patient_profile_id', as: 'Patient' });
 
 module.exports = db;

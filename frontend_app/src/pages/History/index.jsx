@@ -43,7 +43,8 @@ export default function History() {
                         bmi: parseFloat(item.bmi),
                         diagnosis: item.ai_diagnosis,
                         health_status: item.health_status,
-                        explanation: item.ai_explanation
+                        explanation: item.ai_explanation,
+                        doctor_notes: item.doctor_notes
                     }));
                     setFullData(formattedData);
                 }
@@ -89,7 +90,8 @@ export default function History() {
                 risk: item.risk,
                 diagnosis: item.diagnosis,
                 health_status: item.health_status,
-                explanation: item.explanation
+                explanation: item.explanation,
+                doctor_notes: item.doctor_notes
             };
         });
     }, [fullData]);

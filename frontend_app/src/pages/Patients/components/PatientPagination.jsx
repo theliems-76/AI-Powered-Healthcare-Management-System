@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function PatientPagination({ pagination, onPageChange }) {
@@ -35,7 +35,7 @@ export default function PatientPagination({ pagination, onPageChange }) {
                 Hiển thị{' '}
                 <span className="text-slate-800">{from}–{to}</span>{' '}
                 của{' '}
-                <span className="text-blue-600">{total}</span> bệnh nhân
+                <span className="text-slate-900 font-black">{total}</span> hồ sơ
             </p>
 
             {}
@@ -58,8 +58,8 @@ export default function PatientPagination({ pagination, onPageChange }) {
                             onClick={() => onPageChange(p)}
                             className={`min-w-[36px] h-9 rounded-lg text-sm font-bold transition-all ${
                                 p === page
-                                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
-                                    : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                    ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10'
+                                    : 'border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
                             }`}
                         >
                             {p}

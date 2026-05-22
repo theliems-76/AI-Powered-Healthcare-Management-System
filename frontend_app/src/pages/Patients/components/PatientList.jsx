@@ -19,8 +19,8 @@ const getRiskStyle = (score) => {
 export default function PatientList({ loading, patients, onPatientClick }) {
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white rounded-2xl border border-slate-200">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-2" />
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white rounded-[2rem] border-2 border-slate-200">
+                <Loader2 className="w-8 h-8 animate-spin text-slate-900 mb-2" />
                 <p className="text-sm font-bold">Đang tải hồ sơ...</p>
             </div>
         );
@@ -28,7 +28,7 @@ export default function PatientList({ loading, patients, onPatientClick }) {
 
     if (patients.length === 0) {
         return (
-            <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
+            <div className="text-center py-20 bg-white rounded-[2rem] border-2 border-dashed border-slate-300">
                 <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-bold">Không tìm thấy bệnh nhân nào.</p>
                 <p className="text-xs text-slate-400 mt-1">Nhấn "Thêm bệnh nhân" để bắt đầu quản lý.</p>
@@ -37,11 +37,11 @@ export default function PatientList({ loading, patients, onPatientClick }) {
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="bg-slate-50 border-b border-slate-100">
+                        <tr className="bg-white border-b border-slate-100">
                             <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Bệnh nhân</th>
                             <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest hidden md:table-cell">Liên hệ</th>
                             <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest hidden lg:table-cell">
@@ -61,7 +61,7 @@ export default function PatientList({ loading, patients, onPatientClick }) {
                                 <tr
                                     key={patient.id}
                                     onClick={() => onPatientClick(patient)}
-                                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                                    className="hover:bg-slate-50 transition-colors cursor-pointer group"
                                 >
                                     {}
                                     <td className="px-5 py-4">
@@ -119,7 +119,7 @@ export default function PatientList({ loading, patients, onPatientClick }) {
 
                                     {}
                                     <td className="pr-4 py-4">
-                                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-900 transition-colors" />
                                     </td>
                                 </tr>
                             );

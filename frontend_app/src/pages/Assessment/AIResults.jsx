@@ -5,6 +5,7 @@ import Tooltip from '../../components/ui/Tooltip';
 import { toast } from 'react-toastify';
 import { useReactToPrint } from 'react-to-print';
 import MedicalReportTemplate from './components/MedicalReportTemplate';
+import PatientDoctorNote from '../History/components/PatientDoctorNote';
 
 export default function AIResults({ result, userRole }) {
     const componentRef = useRef();
@@ -128,21 +129,30 @@ export default function AIResults({ result, userRole }) {
                     </div>
                 )}
 
-                {}
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-10">
-                    <div className="mb-8 pb-6 border-b border-slate-100">
-                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-2">Phác đồ Cá nhân hóa</p>
-                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Kế hoạch Điều trị & Dinh dưỡng</h3>
-                    </div>
+                {/* Phác đồ & Lời khuyên */}
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-10 space-y-10">
                     
-                    <div className="prose prose-slate max-w-none prose-headings:font-black prose-headings:tracking-tight prose-a:text-blue-600 prose-p:font-medium prose-p:text-slate-600 text-sm">
+                    {/* Bác sĩ nhận xét (Chỉ hiện nếu có) */}
+                    {result.doctor_notes && (
+                        <div>
+                            <PatientDoctorNote doctorNotes={result.doctor_notes} />
+                        </div>
+                    )}
+
+                    <div>
+                        <div className="mb-8 pb-6 border-b border-slate-900">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Phác đồ Cá nhân hóa (Bởi AI & Bác sĩ)</p>
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Kế hoạch Điều trị & Dinh dưỡng</h3>
+                        </div>
+                    
+                    <div className="prose prose-slate max-w-none prose-headings:font-black prose-headings:tracking-tight prose-a:text-slate-900 prose-p:font-medium prose-p:text-slate-600 text-sm">
                         <ReactMarkdown>{result.ai_nutrition_plan}</ReactMarkdown>
                     </div>
 
                     <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-3 print:hidden">
                         <button 
                             onClick={handleDownloadPDF}
-                            className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors active:scale-95"
+                            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-900 text-slate-900 font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-colors active:scale-95"
                         >
                             <Printer size={16}/> In Bệnh án
                         </button>
@@ -150,11 +160,12 @@ export default function AIResults({ result, userRole }) {
                         {(userRole === 'DOCTOR' || userRole === 'ADMIN') && (
                             <button 
                                 onClick={() => toast.success("Đã lưu hồ sơ và gửi thông báo cho bệnh nhân thành công!")}
-                                className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 transition-colors active:scale-95"
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-colors active:scale-95 shadow-xl shadow-slate-900/10"
                             >
                                 <Send size={16}/> Gửi cho Bệnh nhân
                             </button>
                         )}
+                    </div>
                     </div>
                 </div>
             </div>
