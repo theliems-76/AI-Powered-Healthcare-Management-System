@@ -1,54 +1,53 @@
-﻿import React from 'react';
+import React from 'react';
 import { Activity } from 'lucide-react';
 
 export default function AuthLayout({ children, title, subtitle }) {
   return (
-    <div className="min-h-screen flex bg-white font-sans"> {}
+    <div className="min-h-screen flex bg-slate-50 font-sans selection:bg-indigo-500 selection:text-white">
       
-      {}
-      <div className="hidden lg:flex lg:w-1/2 bg-blue-600 relative overflow-hidden items-center justify-center">
+      {/* Cột trái: Artwork / Branding */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center bg-slate-900">
         
-        {}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-50 animate-blob"></div>
-          <div className="absolute top-1/4 -right-24 w-96 h-96 bg-blue-400 rounded-full mix-blend-screen filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+        {/* Abstract Glowing Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-indigo-600/30 blur-[120px]"></div>
+          <div className="absolute bottom-[10%] -right-[20%] w-[60%] h-[60%] rounded-full bg-cyan-500/20 blur-[100px]"></div>
         </div>
         
-        {}
-        <div className="relative z-10 p-12 max-w-lg text-center">
-          <div className="bg-white p-4 rounded-3xl inline-block shadow-xl mb-8">
-            <Activity size={48} className="text-blue-600" />
+        {/* Glassmorphism Card */}
+        <div className="relative z-10 p-12 max-w-lg">
+          <div className="w-20 h-20 bg-white/10 backdrop-blur-xl rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl mb-12">
+            <Activity className="w-10 h-10 text-cyan-400" />
           </div>
           
-          {}
-          <h1 className="text-4xl font-extrabold text-white mb-4 tracking-tight leading-tight">
+          <h1 className="text-5xl font-black text-white mb-6 tracking-tight leading-[1.1]">
             Hệ Sinh Thái<br/>
-            <span className="text-blue-200">Y Tế AI Thông Minh</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-400">Y Tế AI Thông Minh</span>
           </h1>
           
-          {}
-          <p className="text-lg text-blue-100 font-medium leading-relaxed">
-            Ứng dụng trí tuệ nhân tạo trong chẩn đoán rủi ro tiểu đường và thiết kế lộ trình dinh dưỡng cá nhân hóa.
+          <p className="text-lg text-slate-400 font-medium leading-relaxed max-w-md">
+            Đột phá trong phân tích rủi ro lâm sàng và cá nhân hóa lộ trình điều trị bằng Trí tuệ nhân tạo.
           </p>
         </div>
       </div>
 
-      {}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
+      {/* Cột phải: Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 xl:p-24 bg-white relative">
+        <div className="w-full max-w-md space-y-10 relative z-10">
           
-          {}
-          <div className="lg:hidden flex items-center gap-2 mb-8">
-             <Activity size={32} className="text-blue-600" />
-             <span className="text-2xl font-extrabold text-blue-900">Clinical AI</span>
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-8">
+             <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center">
+                 <Activity className="w-6 h-6 text-cyan-400" />
+             </div>
+             <span className="text-2xl font-black text-slate-900 tracking-tight">Clinical AI</span>
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">{title}</h2>
-            <p className="text-slate-500 font-medium">{subtitle}</p>
+          <div className="space-y-3">
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight">{title}</h2>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{subtitle}</p>
           </div>
 
-          {}
           {children}
 
         </div>

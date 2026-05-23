@@ -16,7 +16,9 @@ db.User = sequelize.define('User', {
   full_name: { type: DataTypes.STRING, allowNull: false },
   role: { type: DataTypes.ENUM('ADMIN', 'DOCTOR', 'PATIENT'), allowNull: false },
   phone: { type: DataTypes.STRING },
-  is_active: { type: DataTypes.BOOLEAN, defaultValue: true }
+  is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
+  reset_token: { type: DataTypes.STRING },
+  reset_token_expires: { type: DataTypes.DATE }
 }, { timestamps: true });
 
 db.PatientProfile = sequelize.define('PatientProfile', {

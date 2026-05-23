@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerAPI } from '../../services/authService';
 import { toast } from 'react-toastify';
@@ -58,12 +58,14 @@ export default function Register() {
                 <Input label="Xác nhận Mật khẩu" name="confirmPassword" icon={Lock} type="password" required
                     value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" />
 
-                <Button type="submit" isLoading={isLoading} className="mt-2">
-                    {isLoading ? 'Đang tạo tài khoản...' : 'Đăng Ký Miễn Phí'}
-                </Button>
+                <div className="pt-4">
+                    <Button type="submit" isLoading={isLoading}>
+                        {isLoading ? 'Đang tạo tài khoản...' : 'Đăng Ký Miễn Phí'}
+                    </Button>
+                </div>
 
-                <p className="text-center text-sm text-slate-500 font-medium pt-4">
-                    Đã có tài khoản? <Link to="/login" className="font-bold text-blue-600 hover:underline">Đăng nhập ngay</Link>
+                <p className="text-center text-[11px] text-slate-500 font-bold uppercase tracking-widest pt-6">
+                    Đã có tài khoản? <Link to="/login" className="font-black text-indigo-600 hover:underline">Đăng nhập ngay</Link>
                 </p>
             </form>
         </AuthLayout>

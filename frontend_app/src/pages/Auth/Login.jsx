@@ -58,30 +58,33 @@ export default function Login() {
                             type="checkbox" 
                             checked={rememberMe}
                             onChange={(e) => setRememberMe(e.target.checked)}
-                            className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" 
+                            className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" 
                         />
-                        <span className="text-slate-600 font-medium select-none">Ghi nhớ tôi</span>
+                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest select-none">Ghi nhớ phiên</span>
                     </label>
                     {}
-                    <Link to="/forgot-password" className="font-bold text-blue-600 hover:text-blue-800 transition-colors">
+                    <Link to="/forgot-password" className="text-[10px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-colors">
                         Quên mật khẩu?
                     </Link>
                 </div>
 
-                <Button type="submit" isLoading={isLoading}>
-                    {isLoading ? 'Đang xác thực...' : 'Đăng Nhập Hệ Thống'}
-                </Button>
+                <div className="pt-2">
+                    <Button type="submit" isLoading={isLoading}>
+                        {isLoading ? 'Đang xác thực...' : 'Đăng Nhập Hệ Thống'}
+                    </Button>
+                </div>
 
-                <p className="text-center text-sm text-slate-500 font-medium">
-                    Chưa có tài khoản? <Link to="/register" className="font-bold text-blue-600 hover:underline">Đăng ký ngay</Link>
-                </p>
-                {}
-                <p className="text-center text-sm text-slate-500 font-medium">
-                    <a href="mailto:admin@clinicalai.com?subject=Yêu cầu cấp tài khoản Y Tế" 
-                       className="font-bold text-blue-600 hover:underline">
-                       Liên hệ Quản trị viên
-                    </a>
-                </p>
+                <div className="pt-6 space-y-3">
+                    <p className="text-center text-[11px] text-slate-500 font-bold uppercase tracking-widest">
+                        Chưa có tài khoản? <Link to="/register" className="font-black text-indigo-600 hover:underline">Đăng ký ngay</Link>
+                    </p>
+                    <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                        <a href="mailto:admin@clinicalai.com?subject=Yêu cầu cấp tài khoản Y Tế" 
+                           className="hover:text-slate-600 transition-colors">
+                           Liên hệ Quản trị viên
+                        </a>
+                    </p>
+                </div>
             </form>
         </AuthLayout>
     );

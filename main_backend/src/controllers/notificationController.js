@@ -1,4 +1,4 @@
-const { Notification, User } = require('../models');
+const { Notification, User, AuditLog } = require('../models');
 
 exports.getNotifications = async (req, res) => {
     try {
@@ -42,7 +42,7 @@ exports.broadcast = async (req, res) => {
         
         let whereClause = {};
         if (targetRoles && targetRoles.length > 0 && !targetRoles.includes('ALL')) {
-            whereClause.role = targetRoles; // e.g. ['DOCTOR', 'PATIENT']
+            whereClause.role = targetRoles;
         }
 
         const users = await User.findAll({
@@ -59,6 +59,16 @@ exports.broadcast = async (req, res) => {
         }));
 
         await Notification.bulkCreate(notifications);
+        
+        if (req.user && req.user.id) {
+            await AuditLog.create({
+                user_id: req.user.id,
+                action: 'BROADCAST_NOTIFICATION',
+                resource_type: 'Notification',
+                details: JSON.stringify({ title, message, type, count: notifications.length, targetRoles }),
+                ip_address: req.ip
+            });
+        }
         
         res.json({ success: true, message: `Đã gửi thông báo thành công tới ${notifications.length} người dùng.` });
     } catch (err) {

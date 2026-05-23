@@ -13,6 +13,7 @@ export default function DoctorActionCard({ recordId, initialNotes }) {
     const [isEditing, setIsEditing] = useState(!initialNotes);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(!!initialNotes);
+    const quillRef = React.useRef(null);
 
     if (user?.role !== 'DOCTOR') return null;
 
@@ -58,20 +59,56 @@ export default function DoctorActionCard({ recordId, initialNotes }) {
 
             {isEditing ? (
                 <div className="space-y-3">
-                    <div className="bg-white text-slate-800 rounded-xl overflow-hidden">
+                    <div className="bg-white text-slate-800 rounded-xl [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-slate-200 [&_.ql-editor]:min-h-[150px] [&_.ql-editor]:text-sm [&_.ql-editor]:font-medium">
                         <ReactQuill 
+                            bounds={'body'}
+                            ref={quillRef}
                             theme="snow"
                             value={notes}
                             onChange={setNotes}
                             placeholder="Nhập nhận xét chuyên môn, có thể định dạng, thêm ảnh..."
-                            className="h-48 pb-10"
                         />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.onchange = async (e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    const uploadData = new FormData();
+                                    uploadData.append('file', file);
+                                    const toastId = toast.loading('Đang tải lên...');
+                                    try {
+                                        const res = await api.post('/upload', uploadData, {
+                                            headers: { 'Content-Type': 'multipart/form-data' }
+                                        });
+                                        if (res.data.status === 'success') {
+                                            const fileUrl = res.data.data.url;
+                                            const fileName = res.data.data.name;
+                                            const quill = quillRef.current.getEditor();
+                                            const range = quill.getSelection(true) || { index: quill.getLength() };
+                                            quill.insertText(range.index, `\n📎 Đính kèm: ${fileName}\n`, 'link', fileUrl);
+                                            quill.setSelection(range.index + fileName.length + 14);
+                                            toast.update(toastId, { render: "Đã đính kèm file!", type: "success", isLoading: false, autoClose: 2000 });
+                                        }
+                                    } catch (err) {
+                                        toast.update(toastId, { render: "Lỗi tải file lên", type: "error", isLoading: false, autoClose: 3000 });
+                                    }
+                                };
+                                input.click();
+                            }}
+                            className="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-white/90 hover:bg-white px-4 py-2.5 rounded-xl transition shadow-sm border border-slate-200"
+                        >
+                            📎 Đính kèm File
+                        </button>
+
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-2 bg-white text-blue-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-blue-50 transition active:scale-95 disabled:opacity-60"
+                            className="flex items-center gap-2 bg-white text-blue-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-blue-50 transition active:scale-95 disabled:opacity-60 shadow-sm"
                         >
                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                             {saving ? 'Đang lưu...' : 'Lưu ghi chú'}

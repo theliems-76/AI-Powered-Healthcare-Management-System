@@ -39,7 +39,7 @@ export default function Header({ user, logout, toggleMobileSidebar }) {
     };
 
     return (
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 print:hidden">
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-4 sm:px-8 shrink-0 z-50 relative print:hidden">
             
             {}
             <div className="flex items-center gap-4">

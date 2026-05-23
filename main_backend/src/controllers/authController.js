@@ -1,5 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { Op } = require('sequelize');
 const { User, PatientProfile } = require('../models');
 
 exports.register = async (req, res) => {
@@ -61,6 +63,56 @@ exports.login = async (req, res) => {
             token: token,
             role: user.role 
         });
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi Server: " + error.message });
+    }
+};
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: "Email không tồn tại trong hệ thống!" });
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        user.reset_token = resetToken;
+        user.reset_token_expires = new Date(Date.now() + 3600000); // 1 hour
+        await user.save();
+
+        // Trong thực tế sẽ gửi Email. Ở local demo, ta trả về token qua API để test.
+        res.json({ 
+            status: "success", 
+            message: "Đã tạo yêu cầu khôi phục mật khẩu!", 
+            token: resetToken 
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi Server: " + error.message });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        const user = await User.findOne({ 
+            where: { 
+                reset_token: token,
+                reset_token_expires: { [Op.gt]: new Date() }
+            } 
+        });
+
+        if (!user) {
+            return res.status(400).json({ error: "Đường dẫn không hợp lệ hoặc đã hết hạn!" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password_hash = await bcrypt.hash(newPassword, salt);
+        user.reset_token = null;
+        user.reset_token_expires = null;
+        await user.save();
+
+        res.json({ status: "success", message: "Đổi mật khẩu thành công! Hãy đăng nhập lại." });
     } catch (error) {
         res.status(500).json({ error: "Lỗi Server: " + error.message });
     }

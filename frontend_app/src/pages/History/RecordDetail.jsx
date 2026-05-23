@@ -80,8 +80,9 @@ export default function RecordDetail() {
                     <div className="p-8 md:p-10 flex-1">
                         <div className="space-y-4">
                             <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest">Nhận xét & Chẩn đoán bổ sung</label>
-                            <div className="bg-white rounded-xl overflow-hidden [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-slate-200 [&_.ql-editor]:min-h-[250px] [&_.ql-editor]:text-sm [&_.ql-editor]:font-medium">
+                            <div className="bg-white rounded-xl [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-slate-200 [&_.ql-editor]:min-h-[250px] [&_.ql-editor]:text-sm [&_.ql-editor]:font-medium">
                                 <ReactQuill 
+                                    bounds={'body'}
                                     theme="snow"
                                     value={doctorNotes}
                                     onChange={setDoctorNotes}
@@ -97,7 +98,39 @@ export default function RecordDetail() {
                                 />
                             </div>
                             
-                            <div className="flex justify-end mt-8">
+                            <div className="flex justify-end gap-3 mt-8">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const input = document.createElement('input');
+                                        input.type = 'file';
+                                        input.onchange = async (e) => {
+                                            const file = e.target.files[0];
+                                            if (!file) return;
+                                            const uploadData = new FormData();
+                                            uploadData.append('file', file);
+                                            const toastId = toast.loading('Đang tải lên...');
+                                            try {
+                                                const res = await api.post('/upload', uploadData, {
+                                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                                });
+                                                if (res.data.status === 'success') {
+                                                    const fileUrl = res.data.data.url;
+                                                    const fileName = res.data.data.name;
+                                                    setDoctorNotes(prev => prev + `\n<p><a href="${fileUrl}" target="_blank" rel="noopener noreferrer">📎 Đính kèm: ${fileName}</a></p>\n`);
+                                                    toast.update(toastId, { render: "Đã đính kèm file!", type: "success", isLoading: false, autoClose: 2000 });
+                                                }
+                                            } catch (err) {
+                                                toast.update(toastId, { render: "Lỗi tải file lên", type: "error", isLoading: false, autoClose: 3000 });
+                                            }
+                                        };
+                                        input.click();
+                                    }}
+                                    className="px-6 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-black text-[11px] uppercase tracking-widest rounded-xl transition-colors flex items-center gap-2 shadow-sm active:scale-95"
+                                >
+                                    📎 Đính kèm File
+                                </button>
+                                
                                 <button 
                                     onClick={handleSaveNotes}
                                     disabled={isSaving}
