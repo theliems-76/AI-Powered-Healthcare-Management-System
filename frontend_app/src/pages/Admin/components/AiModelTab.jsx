@@ -44,7 +44,7 @@ export default function AiModelTab() {
             <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 className="text-xl font-black text-slate-800 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                             <BrainCircuit className="w-6 h-6 text-indigo-600" /> Báo Cáo Minh Bạch Mô Hình AI (XAI)
                         </h2>
                         <p className="text-sm text-slate-500 mt-1 max-w-3xl leading-relaxed">
@@ -69,7 +69,7 @@ export default function AiModelTab() {
                             <metric.icon className={`w-6 h-6 ${metric.color}`} />
                         </div>
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{metric.label}</p>
-                        <p className={`text-2xl font-black ${metric.color}`}>{metric.value}</p>
+                        <p className={`text-2xl font-bold ${metric.color}`}>{metric.value}</p>
                     </div>
                 ))}
             </div>
@@ -107,21 +107,21 @@ export default function AiModelTab() {
                             
                             <div className="p-4 font-bold text-slate-600 bg-slate-50 rounded-l-lg flex items-center justify-center">Dự đoán:<br/>Bình thường</div>
                             <div className="p-4 bg-orange-100 text-orange-800 rounded-lg border border-orange-200 flex flex-col justify-center">
-                                <span className="font-black text-xl">4,975</span>
+                                <span className="font-bold text-xl">4,975</span>
                                 <span className="text-[10px] uppercase">True Negative (TN)</span>
                             </div>
                             <div className="p-4 bg-rose-50 text-rose-700 rounded-lg border border-rose-100 flex flex-col justify-center">
-                                <span className="font-black text-xl">1,443</span>
+                                <span className="font-bold text-xl">1,443</span>
                                 <span className="text-[10px] uppercase">False Negative (FN)</span>
                             </div>
 
                             <div className="p-4 font-bold text-slate-600 bg-slate-50 rounded-l-lg flex items-center justify-center">Dự đoán:<br/>Có bệnh</div>
                             <div className="p-4 bg-orange-50 text-orange-700 rounded-lg border border-orange-100 flex flex-col justify-center">
-                                <span className="font-black text-xl">2,095</span>
+                                <span className="font-bold text-xl">2,095</span>
                                 <span className="text-[10px] uppercase">False Positive (FP)</span>
                             </div>
                             <div className="p-4 bg-orange-200 text-orange-900 rounded-lg border border-orange-300 flex flex-col justify-center">
-                                <span className="font-black text-xl">5,626</span>
+                                <span className="font-bold text-xl">5,626</span>
                                 <span className="text-[10px] uppercase">True Positive (TP)</span>
                             </div>
                         </div>

@@ -5,12 +5,15 @@ import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import StatsCard from './components/StatsCard';
 import MiniRiskChart from './components/MiniRiskChart';
+import AdminOverviewTab from '../Admin/components/AdminOverviewTab';
+import AdminStats from '../Admin/components/AdminStats';
 
 export default function Dashboard() {
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
     const [latestRecord, setLatestRecord] = useState(null);
     const [historyData, setHistoryData] = useState([]);
+    const [adminStats, setAdminStats] = useState(null);
 
     // Helper to strip markdown for excerpts
     const stripMarkdown = (text) => {
@@ -19,19 +22,27 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
-        if (user?.role !== 'PATIENT') return;
-
-        const fetchData = async () => {
-            try {
-                const res = await api.get('/records/history');
-                if (res.data.data?.length > 0) {
-                    const data = res.data.data;
-                    setHistoryData(data);
-                    setLatestRecord(data[data.length - 1]);
-                }
-            } catch (e) { console.error(e); }
-        };
-        fetchData();
+        if (user?.role === 'PATIENT') {
+            const fetchData = async () => {
+                try {
+                    const res = await api.get('/records/history');
+                    if (res.data.data?.length > 0) {
+                        const data = res.data.data;
+                        setHistoryData(data);
+                        setLatestRecord(data[data.length - 1]);
+                    }
+                } catch (e) { console.error(e); }
+            };
+            fetchData();
+        } else if (user?.role === 'ADMIN') {
+            const fetchAdminStats = async () => {
+                try {
+                    const res = await api.get('/admin/stats');
+                    setAdminStats(res.data.data);
+                } catch (e) { console.error(e); }
+            };
+            fetchAdminStats();
+        }
     }, [user?.role]);
 
     return (
@@ -223,6 +234,13 @@ export default function Dashboard() {
                             Xem chi tiết phác đồ
                         </button>
                     </div>
+                </div>
+            )}
+
+            {user?.role === 'ADMIN' && adminStats && (
+                <div className="space-y-8">
+                    <AdminStats stats={adminStats} />
+                    <AdminOverviewTab stats={adminStats} />
                 </div>
             )}
         </div>

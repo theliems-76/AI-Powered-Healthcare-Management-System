@@ -104,7 +104,6 @@ export default function Appointments() {
                         onClick={() => setIsModalOpen(true)}
                         className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95 flex items-center gap-2"
                     >
-                        <Calendar className="w-4 h-4" />
                         Tạo Lịch Khám
                     </button>
                 </div>
@@ -119,12 +118,9 @@ export default function Appointments() {
                 {isLoading ? (
                     <div className="p-12 text-center text-slate-500"><div className="animate-spin w-6 h-6 border-2 border-slate-900 border-t-transparent rounded-full mx-auto"></div></div>
                 ) : appointments.length === 0 ? (
-                    <div className="p-16 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Calendar className="w-8 h-8 text-slate-300" />
-                        </div>
-                        <h3 className="font-bold text-slate-900 text-lg mb-1">Không có lịch hẹn</h3>
-                        <p className="text-sm font-medium text-slate-500">Ngày này chưa có bệnh nhân nào đặt lịch.</p>
+                    <div className="flex flex-col items-center justify-center py-24">
+                        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Trống Lịch Hẹn</h3>
+                        <p className="text-sm font-medium text-slate-500">Chưa có bệnh nhân nào được xếp lịch thăm khám trong ngày này.</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-slate-100">
@@ -134,12 +130,11 @@ export default function Appointments() {
                                     <div className="text-2xl font-black text-slate-900 tracking-tight">{app.appointment_time.slice(0, 5)}</div>
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
-                                        <User className="w-4 h-4 text-slate-400" />
+                                    <h3 className="text-lg font-black text-slate-900 mb-1">
                                         {app.Patient?.User?.full_name}
                                     </h3>
                                     <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
-                                        <span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> {app.reason || 'Khám tổng quát'}</span>
+                                        <span>{app.reason || 'Khám tổng quát'}</span>
                                         <span className={`px-2.5 py-0.5 rounded border text-[10px] uppercase font-bold tracking-widest ${getStatusStyle(app.status)}`}>
                                             {app.status}
                                         </span>

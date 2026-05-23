@@ -16,8 +16,8 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
     { path: '/calendar', name: 'Lịch trình', icon: Calendar, roles: ['PATIENT'] },
     { path: '/meals', name: 'Quản lý Dinh dưỡng', icon: Apple, roles: ['PATIENT'] },
     { path: '/exercises', name: 'Tập luyện', icon: Dumbbell, roles: ['PATIENT'] },
-    { path: '/patients', name: 'Hồ sơ Bệnh nhân', icon: Users, roles: ['DOCTOR', 'ADMIN'] },
-    { path: '/appointments', name: 'Quản lý Lịch hẹn', icon: Calendar, roles: ['DOCTOR', 'ADMIN'] },
+    { path: '/patients', name: 'Hồ sơ Bệnh nhân', icon: Users, roles: ['DOCTOR'] },
+    { path: '/appointments', name: 'Quản lý Lịch hẹn', icon: Calendar, roles: ['DOCTOR'] },
     { path: '/admin', name: 'Quản trị Dữ liệu', icon: Database, roles: ['ADMIN'] },
 ];
 

@@ -22,7 +22,7 @@ export default function FoodsTable({ data }) {
                     {data.map((food) => (
                         <tr key={food.id} className="hover:bg-blue-50/30 transition-colors group">
                             <td className="px-6 py-4 font-bold text-slate-800">{food.name}</td>
-                            <td className="px-6 py-4 text-center font-black text-blue-600">{food.calories} <span className="text-[10px] text-slate-400 uppercase">kcal</span></td>
+                            <td className="px-6 py-4 text-center font-bold text-blue-600">{food.calories} <span className="text-[10px] text-slate-400 uppercase">kcal</span></td>
                             <td className="px-6 py-4 text-center font-bold text-slate-600">{food.carbs} g</td>
                             <td className="px-6 py-4 text-center">
                                 <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-md text-[10px] font-bold uppercase tracking-wider">{food.category}</span>

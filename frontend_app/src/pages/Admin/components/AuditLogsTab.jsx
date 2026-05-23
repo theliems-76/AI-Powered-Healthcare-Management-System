@@ -46,35 +46,38 @@ export default function AuditLogsTab() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
             <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
                 <div>
-                    <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <ShieldAlert className="w-5 h-5 text-indigo-600" /> Nhật ký Bảo mật (Audit Logs)
-                    </h2>
-                    <p className="text-sm text-slate-500 mt-1">Giám sát mọi truy cập và thay đổi dữ liệu nhạy cảm.</p>
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-indigo-400 to-purple-600 shadow-sm"></div>
+                        <h2 className="text-base font-bold text-slate-900 uppercase tracking-widest flex items-center gap-3">
+                            Nhật Ký Bảo Mật (Audit Logs)
+                        </h2>
+                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Giám sát mọi truy cập và thay đổi dữ liệu nhạy cảm.</p>
                 </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 mb-6">
                 <form onSubmit={handleSearch} className="flex-1 relative">
-                    <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         type="text"
-                        placeholder="Tìm theo email, tên, IP..."
+                        placeholder="TÌM THEO EMAIL, TÊN, IP..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all shadow-sm"
                     />
                 </form>
                 <div className="flex gap-2">
                     <select
                         value={actionFilter}
                         onChange={(e) => setActionFilter(e.target.value)}
-                        className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="px-5 py-3 bg-white border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-700 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
                     >
                         <option value="ALL">Tất cả hành động</option>
                         <option value="VIEW_RECORD_DETAIL">Xem Hồ sơ</option>
                         <option value="UPDATE_DOCTOR_NOTES">Cập nhật Ghi chú</option>
                     </select>
-                    <button onClick={() => fetchLogs(1)} className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition">
+                    <button onClick={() => fetchLogs(1)} className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 shadow-xl shadow-indigo-600/20 active:scale-95 transition-all">
                         Lọc
                     </button>
                 </div>
@@ -83,15 +86,15 @@ export default function AuditLogsTab() {
             {loading ? (
                 <div className="flex justify-center py-10"><Loader2 className="w-8 h-8 animate-spin text-indigo-600" /></div>
             ) : (
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <div className="bg-white border border-slate-100 rounded-[2rem] shadow-sm overflow-hidden transition-all hover:shadow-md">
                     <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                        <thead className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
                             <tr>
-                                <th className="px-6 py-4">Thời gian</th>
-                                <th className="px-6 py-4">Người thực hiện</th>
-                                <th className="px-6 py-4">Hành động</th>
-                                <th className="px-6 py-4">IP Address</th>
-                                <th className="px-6 py-4">Chi tiết (JSON)</th>
+                                <th className="p-5">Thời gian</th>
+                                <th className="p-5">Người thực hiện</th>
+                                <th className="p-5">Hành động</th>
+                                <th className="p-5">IP Address</th>
+                                <th className="p-5">Chi tiết (JSON)</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">

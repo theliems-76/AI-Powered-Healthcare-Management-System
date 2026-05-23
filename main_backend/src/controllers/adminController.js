@@ -100,13 +100,65 @@ exports.getSystemStats = async (req, res) => {
         const totalPatients = await User.count({ where: { role: 'PATIENT' } });
         const totalDoctors = await User.count({ where: { role: 'DOCTOR' } });
         const totalRecords = await MedicalRecord.count();
-        const totalDishes = await Dish.count({ where: { user_id: null, is_deleted: false } }); // Món gốc của hệ thống
+        const totalDishes = await Dish.count({ where: { user_id: null, is_deleted: false } });
+
+        // Risk distribution (AI Risk) - ONLY LATEST RECORD PER PATIENT
+        const allRecords = await MedicalRecord.findAll({ 
+            attributes: ['patient_id', 'ai_risk_score', 'createdAt'],
+            order: [['createdAt', 'DESC']]
+        });
+        
+        const latestRiskPerPatient = {};
+        allRecords.forEach(r => {
+            if (r.ai_risk_score != null && !latestRiskPerPatient[r.patient_id]) {
+                latestRiskPerPatient[r.patient_id] = r.ai_risk_score;
+            }
+        });
+
+        let riskHigh = 0, riskMedium = 0, riskLow = 0;
+        Object.values(latestRiskPerPatient).forEach(score => {
+            if (score > 66) riskHigh++;
+            else if (score > 33) riskMedium++;
+            else riskLow++;
+        });
+
+        const assessedPatientsCount = Object.keys(latestRiskPerPatient).length;
+        const unassessedPatients = Math.max(0, totalPatients - assessedPatientsCount);
+
+        const riskDistribution = [
+            { name: "Nguy cơ cao", value: riskHigh, fill: "url(#riskHigh)" },
+            { name: "Trung bình", value: riskMedium, fill: "url(#riskMedium)" },
+            { name: "Khỏe mạnh", value: riskLow, fill: "url(#riskLow)" },
+            { name: "Chưa đánh giá", value: unassessedPatients, fill: "url(#riskEmpty)" }
+        ].filter(item => item.value > 0);
+
+        // Record trend (last 6 months safely)
+        const recordTrend = [];
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const key = `T${d.getMonth() + 1}/${d.getFullYear()}`;
+            recordTrend.push({ name: key, records: 0 });
+        }
+        
+        const records = await MedicalRecord.findAll({ attributes: ['createdAt'] });
+        records.forEach(r => {
+            const d = new Date(r.createdAt);
+            const key = `T${d.getMonth() + 1}/${d.getFullYear()}`;
+            const target = recordTrend.find(x => x.name === key);
+            if (target) target.records += 1;
+        });
 
         res.status(200).json({
             status: "success",
-            data: { totalUsers, totalPatients, totalDoctors, totalRecords, totalDishes }
+            data: { 
+                totalUsers, totalPatients, totalDoctors, totalRecords, totalDishes,
+                riskDistribution: riskDistribution.length > 0 ? riskDistribution : [{ name: "Chưa có dữ liệu", value: 1, fill: "#e2e8f0" }],
+                recordTrend
+            }
         });
     } catch (error) {
+        console.error("Lỗi lấy thống kê:", error);
         res.status(500).json({ error: "Lỗi lấy thống kê!" });
     }
 };

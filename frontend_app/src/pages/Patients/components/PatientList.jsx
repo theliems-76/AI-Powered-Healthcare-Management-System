@@ -28,10 +28,9 @@ export default function PatientList({ loading, patients, onPatientClick }) {
 
     if (patients.length === 0) {
         return (
-            <div className="text-center py-20 bg-white rounded-[2rem] border-2 border-dashed border-slate-300">
-                <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 font-bold">Không tìm thấy bệnh nhân nào.</p>
-                <p className="text-xs text-slate-400 mt-1">Nhấn "Thêm bệnh nhân" để bắt đầu quản lý.</p>
+            <div className="flex flex-col items-center justify-center py-24 bg-white rounded-[2rem] border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Chưa Có Dữ Liệu</h3>
+                <p className="text-sm text-slate-500 font-medium max-w-sm text-center">Bạn chưa theo dõi bệnh nhân nào. Vui lòng thêm bệnh nhân để bắt đầu quy trình quản lý lâm sàng.</p>
             </div>
         );
     }
@@ -44,14 +43,10 @@ export default function PatientList({ loading, patients, onPatientClick }) {
                         <tr className="bg-white border-b border-slate-100">
                             <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Bệnh nhân</th>
                             <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest hidden md:table-cell">Liên hệ</th>
-                            <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest hidden lg:table-cell">
-                                <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Lần khám cuối</div>
-                            </th>
-                            <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">
-                                <div className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5" /> Rủi ro AI</div>
-                            </th>
+                            <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest hidden lg:table-cell">Lần khám cuối</th>
+                            <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Rủi ro AI</th>
                             <th className="px-5 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest hidden sm:table-cell">Chẩn đoán</th>
-                            <th className="w-10"></th>
+                            <th className="w-8"></th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -118,9 +113,7 @@ export default function PatientList({ loading, patients, onPatientClick }) {
                                     </td>
 
                                     {}
-                                    <td className="pr-4 py-4">
-                                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-900 transition-colors" />
-                                    </td>
+                                    <td className="pr-5 py-4"></td>
                                 </tr>
                             );
                         })}

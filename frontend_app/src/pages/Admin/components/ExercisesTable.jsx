@@ -21,7 +21,7 @@ export default function ExercisesTable({ data }) {
                     {data.map((ex) => (
                         <tr key={ex.id} className="hover:bg-indigo-50/30 transition-colors group">
                             <td className="px-6 py-4 font-bold text-slate-800">{ex.name}</td>
-                            <td className="px-6 py-4 text-center font-black text-indigo-600">{ex.met}</td>
+                            <td className="px-6 py-4 text-center font-bold text-indigo-600">{ex.met}</td>
                             <td className="px-6 py-4 text-center">
                                 <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-bold uppercase tracking-wider">{ex.category}</span>
                             </td>

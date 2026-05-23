@@ -28,8 +28,8 @@ export default function PatientHeader({ onAssigned }) {
         <>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-6 border-b border-slate-100 mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-3">
-                        <Users className="w-8 h-8 text-slate-900" /> Quản Lý Bệnh Nhân
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">
+                        Quản Lý Bệnh Nhân
                     </h1>
                     <p className="text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-widest">
                         Danh sách hồ sơ bệnh nhân đang được bạn theo dõi và điều trị
@@ -40,7 +40,7 @@ export default function PatientHeader({ onAssigned }) {
                         onClick={() => setShowModal(true)}
                         className="flex items-center gap-2 px-6 py-3 font-black text-white bg-slate-900 rounded-xl hover:bg-slate-800 shadow-xl shadow-slate-900/10 transition-all active:scale-95 text-[11px] uppercase tracking-widest"
                     >
-                        <UserPlus className="w-4 h-4" /> Thêm bệnh nhân
+                        Thêm bệnh nhân
                     </button>
                 </div>
             </div>
@@ -70,7 +70,6 @@ export default function PatientHeader({ onAssigned }) {
                                     Email bệnh nhân
                                 </label>
                                 <div className="relative">
-                                    <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
                                         type="email"
                                         value={email}
@@ -78,7 +77,7 @@ export default function PatientHeader({ onAssigned }) {
                                         placeholder="patient@example.com"
                                         required
                                         autoFocus
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400"
+                                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400"
                                     />
                                 </div>
                                 <p className="text-[10px] font-bold text-slate-400 mt-2">

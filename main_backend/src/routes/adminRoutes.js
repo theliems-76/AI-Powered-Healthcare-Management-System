@@ -12,6 +12,9 @@ router.put('/users/:id/status', authMiddleware.verifyToken, authMiddleware.check
 
 router.get('/logs', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), auditController.getLogs);
 
+const notificationController = require('../controllers/notificationController');
+router.post('/notifications/broadcast', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), notificationController.broadcast);
+
 router.get('/exercises', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.getSystemExercises);
 router.post('/exercises', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.createSystemExercise);
 router.post('/exercises/bulk', authMiddleware.verifyToken, authMiddleware.checkRole(['ADMIN']), adminController.importSystemExercises);

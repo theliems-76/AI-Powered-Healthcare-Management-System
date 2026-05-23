@@ -7,6 +7,8 @@ import UserTable from './components/UserTable';
 import AdminPagination from './components/AdminPagination';
 import AdminExerciseTab from './components/AdminExerciseTab';
 import AdminDishTab from './components/AdminDishTab';
+import AuditLogsTab from './components/AuditLogsTab';
+import AdminNotificationsTab from './components/AdminNotificationsTab';
 import { Loader2, ShieldCheck, Search } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 20;
@@ -88,43 +90,56 @@ export default function AdminDashboard() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
-            <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                <ShieldCheck className="w-8 h-8 text-rose-600" />
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-slate-100 pb-6">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-800">Quản Trị Hệ Thống</h1>
-                    <p className="text-sm text-slate-500 font-medium">Bảng điều khiển dành riêng cho Administrator</p>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">
+                        Quản Trị Hệ Thống
+                    </h1>
+                    <p className="text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-widest">
+                        Bảng điều khiển dành riêng cho Administrator
+                    </p>
                 </div>
             </div>
 
-            <AdminStats stats={stats} />
-
             {/* Điều hướng Tabs */}
-            <div className="flex items-center gap-2 border-b border-slate-200 pb-px">
+            <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-px">
                 <button
                     onClick={() => setActiveTab('users')}
-                    className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors ${activeTab === 'users' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                    className={`px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'users' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-900'}`}
                 >
-                    Quản Lý Người Dùng
+                    Người Dùng
                 </button>
                 <button
                     onClick={() => setActiveTab('exercises')}
-                    className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors ${activeTab === 'exercises' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                    className={`px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'exercises' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-900'}`}
                 >
-                    Kho Bài Tập (Hệ Thống)
+                    Kho Bài Tập
                 </button>
                 <button
                     onClick={() => setActiveTab('dishes')}
-                    className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors ${activeTab === 'dishes' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                    className={`px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'dishes' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-900'}`}
                 >
-                    Kho Món Ăn (Hệ Thống)
+                    Kho Món Ăn
+                </button>
+                <button
+                    onClick={() => setActiveTab('logs')}
+                    className={`px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'logs' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-900'}`}
+                >
+                    Nhật Ký Bảo Mật
+                </button>
+                <button
+                    onClick={() => setActiveTab('notifications')}
+                    className={`px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'notifications' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-900'}`}
+                >
+                    Thông Báo Hệ Thống
                 </button>
             </div>
 
             {/* TAB: NGƯỜI DÙNG */}
             {activeTab === 'users' && (
-                <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+                <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
                             Danh sách Tài khoản
                             {loading && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
                         </h2>
@@ -181,6 +196,12 @@ export default function AdminDashboard() {
 
             {/* TAB: MÓN ĂN */}
             {activeTab === 'dishes' && <AdminDishTab />}
+            
+            {/* TAB: NHẬT KÝ BẢO MẬT */}
+            {activeTab === 'logs' && <AuditLogsTab />}
+
+            {/* TAB: THÔNG BÁO HỆ THỐNG */}
+            {activeTab === 'notifications' && <AdminNotificationsTab />}
         </div>
     );
 }
