@@ -8,8 +8,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-charts': ['chart.js', 'react-chartjs-2'],
-          'vendor-icons': ['lucide-react']
+          'vendor-ui': ['lucide-react', 'recharts', 'framer-motion'],
+          'vendor-utils': ['axios', 'react-toastify', 'dompurify']
         }
       }
     },
