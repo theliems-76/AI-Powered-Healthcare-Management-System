@@ -27,7 +27,7 @@ exports.register = async (req, res) => {
                 existingUser.phone = phone;
                 await existingUser.save();
 
-                const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+                const verifyLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`;
                 const emailHtml = `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
                         <h2 style="color: #0f172a; text-align: center;">Chào mừng đến với Hệ thống Y Tế AI</h2>
@@ -210,7 +210,7 @@ exports.forgotPassword = async (req, res) => {
         user.reset_token_expires = new Date(Date.now() + 3600000); // 1 hour
         await user.save();
 
-        const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+        const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
         const emailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
                 <h2 style="color: #0f172a; text-align: center;">Yêu cầu Đặt lại Mật khẩu</h2>
