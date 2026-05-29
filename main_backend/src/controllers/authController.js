@@ -82,7 +82,7 @@ exports.register = async (req, res) => {
 
         // Send Email if not active
         if (!isActive) {
-            const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+            const verifyLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`;
             const emailHtml = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
                     <h2 style="color: #0f172a; text-align: center;">Chào mừng đến với Hệ thống Y Tế AI</h2>
@@ -177,7 +177,7 @@ exports.resendVerification = async (req, res) => {
         user.verification_token = verificationToken;
         await user.save();
 
-        const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+        const verifyLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`;
         const emailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
                 <h2 style="color: #0f172a; text-align: center;">Xác thực lại tài khoản</h2>
