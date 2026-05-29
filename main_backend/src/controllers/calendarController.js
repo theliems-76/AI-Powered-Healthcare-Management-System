@@ -1,4 +1,4 @@
-﻿const { PatientMeal, PatientExercise, PatientProfile, MedicalRecord } = require('../models');
+const { PatientMeal, PatientExercise, PatientProfile, MedicalRecord, Appointment } = require('../models');
 const { Op } = require('sequelize');
 
 exports.getMonthlyStats = async (req, res) => {
@@ -64,11 +64,18 @@ exports.getMonthlyStats = async (req, res) => {
             }
         });
 
+        const appointments = await Appointment.findAll({
+            where: {
+                patient_profile_id: profile.id,
+                appointment_date: { [Op.between]: [startDate, endDate] }
+            }
+        });
+
         const groupedData = {};
 
         meals.forEach(m => {
             if (!groupedData[m.date]) {
-                groupedData[m.date] = { consumed: 0, carbs: 0, protein: 0, burned: 0, deficit: 0, hasData: true };
+                groupedData[m.date] = { consumed: 0, carbs: 0, protein: 0, burned: 0, deficit: 0, hasData: true, appointments: [] };
             }
             groupedData[m.date].consumed += parseFloat(m.total_calories_calculated || 0);
             groupedData[m.date].carbs += parseFloat(m.total_carbs_calculated || 0);
@@ -77,9 +84,17 @@ exports.getMonthlyStats = async (req, res) => {
 
         exercises.forEach(e => {
             if (!groupedData[e.date]) {
-                groupedData[e.date] = { consumed: 0, carbs: 0, protein: 0, burned: 0, deficit: 0, hasData: true };
+                groupedData[e.date] = { consumed: 0, carbs: 0, protein: 0, burned: 0, deficit: 0, hasData: true, appointments: [] };
             }
             groupedData[e.date].burned += parseFloat(e.calories_burned || 0);
+        });
+
+        appointments.forEach(a => {
+            if (!groupedData[a.appointment_date]) {
+                groupedData[a.appointment_date] = { consumed: 0, carbs: 0, protein: 0, burned: 0, deficit: 0, hasData: true, appointments: [] };
+            }
+            if (!groupedData[a.appointment_date].appointments) groupedData[a.appointment_date].appointments = [];
+            groupedData[a.appointment_date].appointments.push({ status: a.status, id: a.id });
         });
 
         for (const date in groupedData) {

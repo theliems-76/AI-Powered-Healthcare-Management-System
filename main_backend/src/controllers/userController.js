@@ -57,6 +57,20 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ error: "Lỗi lưu thông tin cá nhân!" });
     }
 };
+
+exports.getAllDoctors = async (req, res) => {
+    try {
+        const doctors = await User.findAll({
+            where: { role: 'DOCTOR', is_active: true },
+            attributes: ['id', 'full_name', 'email']
+        });
+        res.status(200).json({ status: 'success', data: doctors });
+    } catch (error) {
+        console.error("Lỗi getAllDoctors:", error);
+        res.status(500).json({ error: "Lỗi tải danh sách bác sĩ" });
+    }
+};
+
 exports.getMyPatients = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;

@@ -1,0 +1,144 @@
+Võ Xuân Thi
+ệ
+n
+Ho Chi Minh City, Vietnam 
+• 
+thienmapvo@gmail.com 
+• 
++84 983676346 
+• 
+linkedin.com/in/v%25C3%25B5-xu%25C3%25A2n-thi%25E1%25BB%2587n-
+42257b371
+github.com/theliems-76
+ 
+ •  
+leetcode.com/u/1doiliemkhiet
+Final-year Applied Mathematics and Informatics student with a strong quantitative foundation and a passion for machine learning. My journey
+began in web development, but has since pivoted towards the complex challenges in NLP, ML, and Deep Learning. I am adept at leveraging
+mathematical principles to understand and build intelligent systems, and I am actively seeking opportunities to contribute to impactful, data-driven
+projects.
+EDUCATION
+Bachelor of Science - Mathematics & Computer Science
+Sep 2022 - Sep 2026
+University of Science, VNU-HCM
+GPA: 
+GPA: 3.64
+Final Year Student
+PROJECTS
+AI-Powered Healthcare Management System 
+Mar 2026 - Jul 2026
+Project Overview
+: Developed a comprehensive AI-driven platform specifically designed for 
+Diabetes risk assessment and
+management
+, combining Machine Learning diagnostics with LLM-powered specialized nutrition planning.
+Tech Stack
+:
+Frontend
+: React (Vite), Tailwind CSS, Framer Motion, Recharts.
+Backend
+: Node.js (Express), FastAPI (Python), MySQL (Sequelize ORM).
+AI/ML
+: Google Gemini 2.5 Flash, CatBoost, SHAP (Explainable AI).
+Key Contributions
+:
+Diabetes Prediction Engine
+: Engineered a high-accuracy diagnostic pipeline using a CatBoost model trained on medical datasets to
+predict 
+Type 2 Diabetes risk
+ across 21 indicators.
+Explainable AI Integration
+: Integrated SHAP values to provide transparent medical explanations, helping users understand 
+which
+health factors (e.g., BMI, Glucose, Physical Activity) contributed most to 
+their
+ risk score.
+Specialized Nutrition Engine
+: Integrated Google Gemini API to generate dynamic, 
+diabetic-friendly nutrition plans
+ (e.g., 45%
+Carb, 20% Protein ratios) based on clinical health data.
+Interactive Analytics Dashboard
+: Designed a high-performance dashboard with Recharts to visualize patient health trends, risk
+history, and caloric balance.
+Microservices Architecture
+: Orchestrated communication between a Node.js main backend and a Python AI service, ensuring
+seamless data flow and high scalability.
+Secure Authentication
+: Implemented a complete security layer using JWT and bcrypt for role-based access control (RBAC)
+supporting Patients, Doctors, and Admins.
+Data Accuracy
+: Applied the Mifflin-St Jeor equation and health-specific activity factors to ensure medical-grade accuracy in calorie
+and macronutrient tracking.
+Optimizing a Cell Response Prediction Model (Virtual Cell Challenge)
+Oct 2025 - Nov 2025
+Developed an advanced pipeline to predict the expression changes of over 20,000 genes after a target gene knockdown, using single-cell
+RNA-seq data.
+Key Achievement
+: Increased the 
+DES (Differential Expression Score)
+ to 
+0.289
+, significantly outperforming baseline models, by
+implementing an intelligent, batch-corrected "Signature" method.
+Key Techniques
+:
+Engineered gene perturbation "Signatures" by isolating the intervention signal from technical noise across 48 experimental batches.
+Utilized scGPT embeddings to find proxy genes for unseen perturbations, enhancing the model's generalization capabilities.
+Optimized the cell generation process using a Negative Binomial distribution with gene-specific parameters learned from data,
+successfully
+ balancing and maintaining a high 
+PDS (Perturbation Dissimilarity Score)
+ of 
+0.631
+.
+Performed Grid Search to fine-tune the ALPHA hyperparameter, reducing the Mean Absolute Error (MAE) to a low of 0.0067.
+Conversation Summarization System 
+Dec 2024 - Jan 2025
+Applied transfer learning techniques to fine-tune a pre-trained BART model (facebook/bart-large-xsum) for the specific task of
+conversational summarization.
+Implemented data preprocessing pipelines using Python (Pandas, NLTK) to prepare the SamSum dataset for model training.
+Evaluated the fine-tuned model's performance using ROUGE metrics via the Hugging Face evaluate library, achieving demonstrating the
+model's effectiveness in generating concise summaries.
+Utilized Hugging Face transformers and PyTorch/TensorFlow to manage the model training and inference processes.
+(Outcome) Produced a fine-tuned summarization model
+ specifically adapted for conversational data.
+Learning Education Management System 
+Nov 2024 - Dec 2024
+Developed a full-stack web application using Java Spring Boot (Backend) and ReactJS (Frontend) to streamline learning center
+operations.
+Designed and implemented a relational database schema in SQL Server to effectively manage student, teacher, and course information.
+Built RESTful APIs with Spring Boot to facilitate communication between the frontend and backend services.
+Implemented user role management (Admin, Teacher, Student) ensuring appropriate access control.
+(Outcome) Delivered a functional prototype
+ covering core management features for students, classes, and basic scheduling.
+SKILLS
+Programming Languages:
+ 
+Python, JavaScript, HTML, CSS, C++, Java, Latex
+Libraries & Frameworks:
+ 
+Tailwind, Reactjs
+Tools & Platforms:
+ 
+Git, GitHub, Kaggle, Visual studio code, Jupyter Notebook
+CERTIFICATIONS
+Advanced Learning Algorithms 
+ 
+by 
+Cousera
+Sep 2025
+Generative Modeling 
+ 
+by 
+PiMA Academy
+Sep 2025
+Supervised Machine Learning: Regression and Classification 
+ 
+by 
+Coursera
+Jun 2025
+LANGUAGES
+English (5.5 VSTEP)
+ 
+(Professional working proficiency)

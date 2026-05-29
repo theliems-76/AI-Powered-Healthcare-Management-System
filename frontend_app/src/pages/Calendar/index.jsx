@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight, Flame, Utensils, Activity, ArrowDown, ArrowUp, AlertCircle, Info } from 'lucide-react';
 import api from '../../services/api';
+import { getLocalDateString } from '../../utils/dateUtils';
 
 export default function CalendarSchedule() {
     const today = new Date();
     const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-    const [selectedDate, setSelectedDate] = useState(today.toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(getLocalDateString(today));
     
     const [monthlyData, setMonthlyData] = useState({});
     const [targetCalories, setTargetCalories] = useState(2000);
@@ -13,6 +14,7 @@ export default function CalendarSchedule() {
 
     const [dailyMeals, setDailyMeals] = useState([]);
     const [dailyExercises, setDailyExercises] = useState([]);
+    const [dailyAppointments, setDailyAppointments] = useState([]);
     const [isLoadingDay, setIsLoadingDay] = useState(false);
 
     useEffect(() => {
@@ -39,9 +41,10 @@ export default function CalendarSchedule() {
         const fetchDaily = async () => {
             setIsLoadingDay(true);
             try {
-                const [mealsRes, exRes] = await Promise.all([
+                const [mealsRes, exRes, apptRes] = await Promise.all([
                     api.get(`/meals/schedule?date=${selectedDate}`),
-                    api.get(`/exercises/schedule?date=${selectedDate}`)
+                    api.get(`/exercises/schedule?date=${selectedDate}`),
+                    api.get(`/appointments?date=${selectedDate}`)
                 ]);
                 
                 if (mealsRes.data.status === 'success') {
@@ -49,6 +52,9 @@ export default function CalendarSchedule() {
                 }
                 if (exRes.data.status === 'success') {
                     setDailyExercises(exRes.data.data || []);
+                }
+                if (apptRes.data.status === 'success') {
+                    setDailyAppointments(apptRes.data.data || []);
                 }
             } catch (error) {
                 console.error("Lỗi tải chi tiết ngày:", error);
@@ -96,6 +102,14 @@ export default function CalendarSchedule() {
             desc: `Đốt cháy ${Math.round(e.calories_burned)} kcal trong ${e.duration_minutes} phút`,
             type: 'exercise',
             timestamp: e.createdAt
+        })),
+        ...dailyAppointments.map(a => ({
+            id: `a-${a.id}`,
+            time: a.appointment_time.slice(0, 5),
+            title: `Lịch khám bệnh ${a.Doctor?.full_name ? `- BS. ${a.Doctor.full_name}` : ''}`,
+            desc: `${a.reason || 'Khám định kỳ'} - Trạng thái: ${a.status === 'PENDING' ? 'Chờ duyệt' : a.status === 'CONFIRMED' ? 'Đã xác nhận' : a.status === 'COMPLETED' ? 'Đã khám' : 'Đã hủy'}`,
+            type: 'appointment',
+            timestamp: `${selectedDate}T${a.appointment_time}`
         }))
     ].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
@@ -142,30 +156,40 @@ export default function CalendarSchedule() {
                                 const isSelected = selectedDate === dayObj.dateStr;
                                 const data = monthlyData[dayObj.dateStr];
                                 const hasData = !!data;
-                                const isToday = dayObj.dateStr === today.toISOString().split('T')[0];
+                                const isToday = dayObj.dateStr === getLocalDateString(today);
 
                                 return (
                                     <div 
                                         key={i} 
                                         onClick={() => setSelectedDate(dayObj.dateStr)}
-                                        className={`min-h-[100px] p-2.5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group
+                                        className={`h-28 sm:h-32 p-2 sm:p-2.5 rounded-2xl border transition-all cursor-pointer relative flex flex-col overflow-hidden group
                                             ${isSelected ? 'bg-white border-transparent ring-2 ring-slate-900 shadow-md' : 
                                               isToday ? 'bg-slate-50 border-slate-300' : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'}`}
                                     >
-                                        <div className={`text-xs font-bold mb-3 w-7 h-7 flex items-center justify-center rounded-full transition-colors ${isSelected ? 'bg-slate-900 text-white' : 'text-slate-700 group-hover:bg-slate-200'}`}>
+                                        <div className={`text-xs font-bold w-7 h-7 flex shrink-0 items-center justify-center rounded-full transition-colors ${isSelected ? 'bg-slate-900 text-white' : 'text-slate-700 group-hover:bg-slate-200'}`}>
                                             {dayObj.date.getDate()}
                                         </div>
 
                                         {hasData ? (
-                                            <div className="space-y-1.5 mt-1">
-                                                <div className="flex items-center justify-between text-[10px] font-bold px-1.5 py-1 rounded bg-amber-50 text-amber-600">
-                                                    <Utensils className="w-3 h-3" />
-                                                    <span>{data.consumed}</span>
-                                                </div>
-                                                <div className="flex items-center justify-between text-[10px] font-bold px-1.5 py-1 rounded bg-emerald-50 text-emerald-600">
-                                                    <Activity className="w-3 h-3" />
-                                                    <span>{data.burned}</span>
-                                                </div>
+                                            <div className="flex-1 mt-2 space-y-1 overflow-y-auto custom-scrollbar pr-1">
+                                                {data.consumed > 0 && (
+                                                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-bold px-1.5 py-1 rounded bg-amber-50 text-amber-600">
+                                                        <Utensils className="w-3 h-3 shrink-0" />
+                                                        <span className="truncate ml-1">{data.consumed}</span>
+                                                    </div>
+                                                )}
+                                                {data.burned > 0 && (
+                                                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-bold px-1.5 py-1 rounded bg-emerald-50 text-emerald-600">
+                                                        <Activity className="w-3 h-3 shrink-0" />
+                                                        <span className="truncate ml-1">{data.burned}</span>
+                                                    </div>
+                                                )}
+                                                {data.appointments && data.appointments.length > 0 && (
+                                                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-bold px-1.5 py-1 rounded bg-blue-50 text-blue-600">
+                                                        <CalendarIcon className="w-3 h-3 shrink-0" />
+                                                        <span className="truncate ml-1">{data.appointments.length}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         ) : null}
                                     </div>
@@ -233,12 +257,13 @@ export default function CalendarSchedule() {
                             <div className="divide-y divide-slate-100">
                                 {timelineEvents.map((event) => {
                                     const isMeal = event.type === 'meal';
+                                    const isAppt = event.type === 'appointment';
 
                                     return (
                                         <div key={event.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50/50 transition-colors">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1.5">
-                                                    <h4 className="font-bold text-slate-800 text-sm tracking-tight">{event.title}</h4>
+                                                    <h4 className={`font-bold text-sm tracking-tight ${isAppt ? 'text-blue-700' : 'text-slate-800'}`}>{event.title}</h4>
                                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-md">
                                                         {event.time}
                                                     </span>
@@ -246,8 +271,8 @@ export default function CalendarSchedule() {
                                                 <p className="text-[11px] font-medium text-slate-500">{event.desc}</p>
                                             </div>
                                             <div className="mt-3 sm:mt-0 flex-shrink-0">
-                                                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border ${isMeal ? 'border-amber-200 text-amber-600 bg-amber-50' : 'border-emerald-200 text-emerald-600 bg-emerald-50'}`}>
-                                                    {isMeal ? 'NẠP VÀO' : 'TIÊU HAO'}
+                                                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border ${isMeal ? 'border-amber-200 text-amber-600 bg-amber-50' : isAppt ? 'border-blue-200 text-blue-600 bg-blue-50' : 'border-emerald-200 text-emerald-600 bg-emerald-50'}`}>
+                                                    {isMeal ? 'NẠP VÀO' : isAppt ? 'LỊCH HẸN' : 'TIÊU HAO'}
                                                 </span>
                                             </div>
                                         </div>

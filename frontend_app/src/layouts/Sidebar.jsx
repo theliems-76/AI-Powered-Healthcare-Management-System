@@ -17,12 +17,23 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
     { path: '/meals', name: 'Quản lý Dinh dưỡng', icon: Apple, roles: ['PATIENT'] },
     { path: '/exercises', name: 'Tập luyện', icon: Dumbbell, roles: ['PATIENT'] },
     { path: '/patients', name: 'Hồ sơ Bệnh nhân', icon: Users, roles: ['DOCTOR'] },
-    { path: '/appointments', name: 'Quản lý Lịch hẹn', icon: Calendar, roles: ['DOCTOR'] },
+    { path: '/appointments', name: 'Lịch hẹn (Khám bệnh)', icon: Calendar, roles: ['DOCTOR', 'PATIENT'] },
     { path: '/admin', name: 'Quản trị Dữ liệu', icon: Database, roles: ['ADMIN'] },
 ];
 
     const currentRole = user?.role || 'PATIENT';
-    const menuItems = allMenuItems.filter(item => item.roles.includes(currentRole));
+    const menuItems = allMenuItems.filter(item => {
+        if (!item.roles.includes(currentRole)) return false;
+        
+        // Bệnh nhân chưa có bác sĩ phụ trách sẽ không thấy tab Lịch hẹn
+        if (currentRole === 'PATIENT' && item.path === '/appointments') {
+            if (!user?.Profile?.managed_by_doctor_id) {
+                return false;
+            }
+        }
+        
+        return true;
+    });
 
     return (
         <>
@@ -42,9 +53,11 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
                 {/* Logo Area */}
                 <div className="h-20 flex items-center justify-between px-6 shrink-0">
                     <div className="flex items-center gap-3">
-                        <Logo className="w-9 h-9 shadow-sm" />
+                        <div className="w-11 h-11 bg-slate-900 rounded-[12px] shadow-md flex items-center justify-center shrink-0">
+                            <Logo className="w-7 h-7" />
+                        </div>
                         <div>
-                            <div className="text-lg font-black text-slate-900 tracking-tight">Clinical AI</div>
+                            <div className="text-lg font-black text-slate-900 tracking-tight">Hiệp Sĩ Tiểu Đường</div>
                             <div className="text-[10px] tracking-widest text-slate-400 font-semibold uppercase">Workspace</div>
                         </div>
                     </div>
@@ -79,7 +92,7 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
 
                 {/* Footer Area */}
                 <div className="p-4 shrink-0 flex items-center justify-between text-xs font-medium text-slate-400">
-                    <span>Clinical AI System</span>
+                    <span>Hiệp Sĩ Tiểu Đường System</span>
                     <span>v2.4.0</span>
                 </div>
             </aside>

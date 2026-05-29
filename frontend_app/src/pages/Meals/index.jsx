@@ -8,8 +8,10 @@ import DailySchedule from './components/DailySchedule';
 import FoodSearchModal from '../../components/meals/FoodSearchModal';
 import RecipeBuilderModal from '../../components/meals/RecipeBuilderModal';
 
+import { getLocalDateString } from '../../utils/dateUtils';
+
 export default function Meals() {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(getLocalDateString());
     const [dailyGoal, setDailyGoal] = useState({ calories: 2000, carbs: 250, protein: 100 });
     const [consumed, setConsumed] = useState({ calories: 0, carbs: 0, protein: 0 });
     const [medicalAdvice, setMedicalAdvice] = useState("");

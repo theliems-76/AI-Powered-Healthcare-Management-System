@@ -4,7 +4,7 @@ const appointmentController = require('../controllers/appointmentController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 router.use(authMiddleware.verifyToken);
-router.use(authMiddleware.checkRole(['DOCTOR', 'ADMIN']));
+router.use(authMiddleware.checkRole(['DOCTOR', 'ADMIN', 'PATIENT']));
 
 router.post('/', appointmentController.createAppointment);
 router.get('/', appointmentController.getAppointments);

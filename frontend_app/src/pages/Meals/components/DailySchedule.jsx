@@ -1,4 +1,5 @@
 import React from 'react';
+import { getLocalDateString } from '../../../utils/dateUtils';
 
 export default function DailySchedule({ selectedDate, onSelectDate }) {
     const getWeekDates = () => {
@@ -20,12 +21,12 @@ export default function DailySchedule({ selectedDate, onSelectDate }) {
     const weekDates = getWeekDates();
     const dayNames =['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
     
-    const todayString = new Date().toISOString().split('T')[0];
+    const todayString = getLocalDateString();
 
     return (
         <div className="flex w-full bg-slate-200/50 p-1.5 rounded-2xl">
             {weekDates.map((date, index) => {
-                const dateString = date.toISOString().split('T')[0];
+                const dateString = getLocalDateString(date);
                 const isSelected = selectedDate === dateString;
                 const isToday = todayString === dateString;
 

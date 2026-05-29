@@ -7,9 +7,10 @@ import ExerciseList from './components/ExerciseList';
 import DailySchedule from '../Meals/components/DailySchedule'; 
 import ExerciseSearchModal from '../../components/exercises/ExerciseSearchModal';
 import ExerciseBuilderModal from '../../components/exercises/ExerciseBuilderModal';
+import { getLocalDateString } from '../../utils/dateUtils';
 
 export default function Exercises() {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(getLocalDateString());
 
     const [userWeight, setUserWeight] = useState(65);
     const DAILY_BURN_GOAL = 500; 

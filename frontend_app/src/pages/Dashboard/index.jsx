@@ -14,6 +14,8 @@ export default function Dashboard() {
     const [latestRecord, setLatestRecord] = useState(null);
     const [historyData, setHistoryData] = useState([]);
     const [adminStats, setAdminStats] = useState(null);
+    const [todayAppointments, setTodayAppointments] = useState([]);
+    const [recentUpdates, setRecentUpdates] = useState([]);
 
     // Helper to strip markdown for excerpts
     const stripMarkdown = (text) => {
@@ -42,6 +44,27 @@ export default function Dashboard() {
                 } catch (e) { console.error(e); }
             };
             fetchAdminStats();
+        } else if (user?.role === 'DOCTOR') {
+            const fetchDoctorStats = async () => {
+                try {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const dateStr = `${year}-${month}-${day}`;
+                    
+                    const res = await api.get(`/appointments?date=${dateStr}`);
+                    if (res.data.status === 'success') {
+                        setTodayAppointments(res.data.data);
+                    }
+                    
+                    const resPatients = await api.get('/users/patients?limit=5');
+                    if (resPatients.data.status === 'success') {
+                        setRecentUpdates(resPatients.data.data.filter(p => p.latest_risk_score !== null));
+                    }
+                } catch (e) { console.error(e); }
+            };
+            fetchDoctorStats();
         }
     }, [user?.role]);
 
@@ -105,12 +128,31 @@ export default function Dashboard() {
                         <div className="mt-8 flex-1 flex flex-col">
                             <div className="flex justify-between items-end mb-4">
                                 <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Lịch hẹn hôm nay</h3>
-                                <span className="text-[10px] font-black text-slate-900">0 LỊCH</span>
+                                <span className="text-[10px] font-black text-slate-900">{todayAppointments.length} LỊCH</span>
                             </div>
-                            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-transparent border border-dashed border-slate-300 rounded-2xl">
-                                <span className="text-3xl font-black text-slate-200 mb-2">--</span>
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Lịch trình trống</p>
-                            </div>
+                            {todayAppointments.length > 0 ? (
+                                <div className="flex-1 flex flex-col space-y-2 overflow-y-auto custom-scrollbar pr-2 max-h-48">
+                                    {todayAppointments.map(app => (
+                                        <div key={app.id} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center cursor-pointer hover:border-slate-300 transition-colors" onClick={() => navigate('/appointments')}>
+                                            <div>
+                                                <p className="text-sm font-black text-slate-900">{app.Patient?.User?.full_name}</p>
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{app.reason || 'Khám tổng quát'}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-sm font-black text-slate-900">{app.appointment_time.slice(0, 5)}</span>
+                                                <p className={`text-[9px] font-black uppercase tracking-widest mt-0.5 ${app.status === 'PENDING' ? 'text-amber-500' : app.status === 'CONFIRMED' ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                                    {app.status === 'PENDING' ? 'Chờ duyệt' : app.status === 'CONFIRMED' ? 'Đã xác nhận' : app.status === 'COMPLETED' ? 'Hoàn tất' : 'Đã hủy'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-transparent border border-dashed border-slate-300 rounded-2xl">
+                                    <span className="text-3xl font-black text-slate-200 mb-2">--</span>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Lịch trình trống</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -127,27 +169,26 @@ export default function Dashboard() {
                         </div>
                         
                         <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                            {/* Mock Data */}
-                            {[
-                                { name: "Nguyễn Văn A", risk: 85, time: "10 PHÚT TRƯỚC", desc: "Đã cập nhật chỉ số đường huyết mới." },
-                                { name: "Trần Thị B", risk: 42, time: "2 GIỜ TRƯỚC", desc: "Hoàn thành bài đánh giá định kỳ." },
-                                { name: "Lê Văn C", risk: 15, time: "HÔM QUA", desc: "Báo cáo: Đã giảm 2kg trong tháng." }
-                            ].map((p, i) => (
-                                <div key={i} className="group relative pl-4 border-l-2 hover:border-slate-800 border-slate-100 transition-colors cursor-pointer py-2">
+                            {recentUpdates.length > 0 ? recentUpdates.map((p, i) => (
+                                <div key={i} className="group relative pl-4 border-l-2 hover:border-slate-800 border-slate-100 transition-colors cursor-pointer py-2" onClick={() => navigate(`/patients/${p.id}`)}>
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <h4 className="font-black text-slate-900 text-base tracking-tight group-hover:text-slate-600 transition-colors">{p.name}</h4>
-                                            <p className="text-xs font-medium text-slate-500 mt-1">{p.desc}</p>
+                                            <h4 className="font-black text-slate-900 text-base tracking-tight group-hover:text-slate-600 transition-colors">{p.full_name}</h4>
+                                            <p className="text-xs font-medium text-slate-500 mt-1 line-clamp-1">{p.latest_diagnosis || 'Đã cập nhật hồ sơ y tế'}</p>
                                         </div>
-                                        <div className="text-right flex flex-col items-end">
-                                            <span className="text-[10px] font-bold text-slate-400 tracking-widest">{p.time}</span>
-                                            <span className={`mt-2 text-[10px] font-black uppercase tracking-widest ${p.risk > 66 ? 'text-rose-600' : p.risk > 33 ? 'text-amber-500' : 'text-emerald-500'}`}>
-                                                RỦI RO: {p.risk}%
+                                        <div className="text-right flex flex-col items-end shrink-0 pl-4">
+                                            <span className="text-[10px] font-bold text-slate-400 tracking-widest">{p.last_visit}</span>
+                                            <span className={`mt-2 text-[10px] font-black uppercase tracking-widest ${p.latest_risk_score > 66 ? 'text-rose-600' : p.latest_risk_score > 33 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                                                RỦI RO: {Math.round(p.latest_risk_score)}%
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="text-center py-8 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                                    Chưa có cập nhật nào từ bệnh nhân
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -171,67 +212,86 @@ export default function Dashboard() {
 
             {}
             {user?.role === 'PATIENT' && latestRecord && (
-                <div className="grid grid-cols-12 gap-6 items-start">
+                <div className="grid grid-cols-12 gap-6 items-stretch">
                     {/* Unified Health Panel */}
-                    <div className="col-span-12 lg:col-span-8 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div className="col-span-12 lg:col-span-8 bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden flex flex-col relative group">
+                        {/* Soft background glow */}
+                        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-50 rounded-full blur-[80px] -z-10 group-hover:bg-blue-100 transition-colors duration-1000"></div>
                         
                         {/* Stats Header Area */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-8 md:p-10 z-10">
                             
-                            {/* Risk Stat */}
-                            <div className="pb-6 md:pb-0 md:pr-8 flex flex-col justify-between">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-                                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Rủi ro tiểu đường</p>
+                            {/* Risk Stat - Glowing & Bold */}
+                            <div className="pb-8 md:pb-0 md:pr-10 flex flex-col justify-between">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-rose-100">
+                                        <div className="absolute w-full h-full bg-rose-400 rounded-full animate-ping opacity-20"></div>
+                                        <div className="w-3 h-3 rounded-full bg-rose-500"></div>
+                                    </div>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Rủi ro tiểu đường</p>
                                 </div>
-                                <div className="flex items-baseline gap-1 mt-auto">
-                                    <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">{latestRecord.risk_score}</h2>
-                                    <span className="text-lg font-bold text-slate-400">%</span>
+                                <div className="flex items-baseline gap-2 mt-auto">
+                                    <h2 className="text-[4rem] font-black text-transparent bg-clip-text bg-gradient-to-br from-rose-500 to-orange-400 tracking-tighter leading-none drop-shadow-sm">{latestRecord.risk_score}</h2>
+                                    <span className="text-2xl font-black text-rose-300">%</span>
                                 </div>
                             </div>
 
-                            {/* BMI Stat */}
-                            <div className="pt-6 md:pt-0 md:pl-8 flex flex-col justify-between">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Chỉ số khối cơ thể (BMI)</p>
+                            {/* BMI Stat - Sleek */}
+                            <div className="pt-8 md:pt-0 md:pl-10 flex flex-col justify-between">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                                    </div>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Chỉ số khối cơ thể</p>
                                 </div>
-                                <div className="flex items-baseline gap-1 mt-auto">
-                                    <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">{latestRecord.bmi}</h2>
-                                    <span className="text-lg font-bold text-slate-400">kg/m²</span>
+                                <div className="flex items-baseline gap-2 mt-auto">
+                                    <h2 className="text-[4rem] font-black text-slate-800 tracking-tighter leading-none">{latestRecord.bmi}</h2>
+                                    <span className="text-xl font-bold text-slate-400">kg/m²</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Integrated Chart Area */}
-                        <div className="flex-1 bg-slate-50/50 border-t border-slate-100 p-8">
-                            <div className="flex justify-between items-center mb-6">
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Xu hướng rủi ro (Các lần gần nhất)</p>
+                        {/* Integrated Chart Area - Edge to Edge */}
+                        <div className="flex-1 bg-gradient-to-b from-slate-50/50 to-white border-t border-slate-100 p-8 md:p-10 relative z-10">
+                            <div className="flex justify-between items-center mb-8">
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <TrendingUp size={16} className="text-indigo-400" /> Xu hướng rủi ro (Các lần gần nhất)
+                                </p>
                             </div>
                             {historyData.length >= 2 ? (
-                                <MiniRiskChart data={historyData} className="h-40" />
+                                <div className="relative h-48 -mx-4 sm:mx-0">
+                                    <MiniRiskChart data={historyData} className="h-full w-full" />
+                                </div>
                             ) : (
-                                <div className="h-40 flex items-center justify-center text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 rounded-2xl">
-                                    <TrendingUp className="mr-2" /> Cần thêm {2 - historyData.length} lần khám để hiển thị biểu đồ xu hướng
+                                <div className="h-48 flex flex-col items-center justify-center text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 rounded-3xl bg-white/50">
+                                    <Activity className="w-8 h-8 text-slate-300 mb-3" />
+                                    <span>Cần thêm {2 - historyData.length} lần khám để phân tích xu hướng</span>
                                 </div>
                             )}
                         </div>
                     </div>
-                    <div className="col-span-12 lg:col-span-4 bg-slate-900 p-8 rounded-3xl shadow-sm flex flex-col relative overflow-hidden">
-                        <div className="absolute -right-10 -top-10 opacity-5">
-                            <Lightbulb className="w-48 h-48 text-white" />
-                        </div>
-                        <div className="flex items-center gap-2 mb-6 text-slate-300 relative z-10">
-                            <div className="p-2 bg-slate-800 rounded-lg">
-                                <Lightbulb size={16} className="text-emerald-400" />
+
+                    {/* AI Advice Panel - Premium Dark Clinical */}
+                    <div className="col-span-12 lg:col-span-4 bg-slate-900 p-8 md:p-10 rounded-[2rem] shadow-2xl shadow-slate-900/20 flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500 border border-slate-800">
+                        {/* Subtle AI Glows (Cinematic Tech Feel) */}
+                        <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-cyan-500/10 blur-[60px] group-hover:bg-cyan-500/20 transition-colors duration-700"></div>
+                        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[40px]"></div>
+                        
+                        <div className="flex items-center gap-3 mb-8 relative z-10">
+                            <div className="p-2.5 bg-slate-800 rounded-xl shadow-inner border border-slate-700">
+                                <Lightbulb size={20} className="text-cyan-400 animate-pulse" />
                             </div>
-                            <h3 className="font-bold text-[10px] uppercase tracking-widest text-slate-400">Lời khuyên AI</h3>
+                            <h3 className="font-black text-xs uppercase tracking-widest text-white drop-shadow-md">Phân tích từ AI</h3>
                         </div>
-                        <div className="text-sm text-slate-300 leading-relaxed font-medium flex-1 overflow-hidden relative z-10 mb-8">
-                            {stripMarkdown(latestRecord?.ai_nutrition_plan || "Chưa có lời khuyên cụ thể từ AI cho lần khám này.").substring(0, 250)}...
+                        
+                        <div className="text-base text-slate-300 leading-relaxed font-medium flex-1 relative z-10 mb-10">
+                            <p className="line-clamp-6">
+                                {stripMarkdown(latestRecord?.ai_nutrition_plan || "Hệ thống AI hiện chưa đưa ra lời khuyên cụ thể cho hồ sơ này. Vui lòng cập nhật thêm chỉ số.")}
+                            </p>
                         </div>
-                        <button onClick={() => navigate(`/history/${latestRecord?.id}`)} className="w-full py-3.5 bg-white text-slate-900 rounded-xl text-[11px] font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm relative z-10">
-                            Xem chi tiết phác đồ
+                        
+                        <button onClick={() => navigate(`/history/${latestRecord?.id}`)} className="w-full py-4 bg-white text-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-cyan-50 transition-all active:scale-95 shadow-lg relative z-10 flex items-center justify-center gap-2">
+                            Mở Phác Đồ Chi Tiết
                         </button>
                     </div>
                 </div>

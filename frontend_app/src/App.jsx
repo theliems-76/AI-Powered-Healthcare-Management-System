@@ -9,7 +9,9 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
+import VerifyEmail from './pages/Auth/VerifyEmail';
 import Landing from './pages/Landing/index';
+import Guide from './pages/Guide/index';
 import Assessment from './pages/Assessment/index';
 import Meals from './pages/Meals/index';
 import Exercises from './pages/Exercises/index';
@@ -36,10 +38,12 @@ function App() {
         <Routes>
           {}
           <Route path="/" element={<Landing />} />
+          <Route path="/guide" element={<Guide />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
             <Route path="/dashboard" element={<Dashboard />} /> {}
@@ -58,15 +62,17 @@ function App() {
         </Routes>
         <ToastContainer 
           position="bottom-right" 
-          autoClose={3000} 
-          hideProgressBar={false}
-          newestOnTop={true}
+          autoClose={3500} 
+          hideProgressBar={true}
+          newestOnTop={false}
           closeOnClick
           rtl={false}
           pauseOnFocusLoss
           draggable
           pauseOnHover
           theme="dark"
+          toastClassName="!bg-[#252526] !text-[#cccccc] !rounded-md !shadow-2xl !border !border-[#454545] !font-sans !text-[13px] !mb-3 !min-h-0 !py-2 !px-3"
+          bodyClassName="!m-0 !p-1 !font-medium"
         />
       </Router>
     </AuthProvider>

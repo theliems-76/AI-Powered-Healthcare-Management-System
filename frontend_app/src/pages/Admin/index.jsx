@@ -9,6 +9,7 @@ import AdminExerciseTab from './components/AdminExerciseTab';
 import AdminDishTab from './components/AdminDishTab';
 import AuditLogsTab from './components/AuditLogsTab';
 import AdminNotificationsTab from './components/AdminNotificationsTab';
+import AdminFeedbacksTab from './components/AdminFeedbacksTab';
 import { Loader2, ShieldCheck, Search } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 20;
@@ -133,6 +134,12 @@ export default function AdminDashboard() {
                 >
                     Thông Báo Hệ Thống
                 </button>
+                <button
+                    onClick={() => setActiveTab('feedbacks')}
+                    className={`px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'feedbacks' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-900'}`}
+                >
+                    Đánh Giá Người Dùng
+                </button>
             </div>
 
             {/* TAB: NGƯỜI DÙNG */}
@@ -202,6 +209,9 @@ export default function AdminDashboard() {
 
             {/* TAB: THÔNG BÁO HỆ THỐNG */}
             {activeTab === 'notifications' && <AdminNotificationsTab />}
+
+            {/* TAB: ĐÁNH GIÁ NGƯỜI DÙNG */}
+            {activeTab === 'feedbacks' && <AdminFeedbacksTab />}
         </div>
     );
 }

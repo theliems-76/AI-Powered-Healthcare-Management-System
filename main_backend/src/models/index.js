@@ -18,7 +18,8 @@ db.User = sequelize.define('User', {
   phone: { type: DataTypes.STRING },
   is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
   reset_token: { type: DataTypes.STRING },
-  reset_token_expires: { type: DataTypes.DATE }
+  reset_token_expires: { type: DataTypes.DATE },
+  verification_token: { type: DataTypes.STRING }
 }, { timestamps: true });
 
 db.PatientProfile = sequelize.define('PatientProfile', {
@@ -127,7 +128,8 @@ db.Appointment = sequelize.define('Appointment', {
   appointment_time: { type: DataTypes.TIME, allowNull: false },
   status: { type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED'), defaultValue: 'PENDING' },
   reason: { type: DataTypes.STRING },
-  notes: { type: DataTypes.TEXT }
+  notes: { type: DataTypes.TEXT },
+  created_by_role: { type: DataTypes.STRING, defaultValue: 'DOCTOR' }
 }, { timestamps: true });
 
 db.User.hasOne(db.PatientProfile, { foreignKey: 'user_id', as: 'Profile' });
@@ -175,5 +177,16 @@ db.Appointment.belongsTo(db.User, { foreignKey: 'doctor_id', as: 'Doctor' });
 
 db.PatientProfile.hasMany(db.Appointment, { foreignKey: 'patient_profile_id' });
 db.Appointment.belongsTo(db.PatientProfile, { foreignKey: 'patient_profile_id', as: 'Patient' });
+
+db.Feedback = sequelize.define('Feedback', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  user_id: { type: DataTypes.UUID, allowNull: false },
+  rating: { type: DataTypes.INTEGER, allowNull: false },
+  content: { type: DataTypes.TEXT },
+  is_read: { type: DataTypes.BOOLEAN, defaultValue: false }
+}, { timestamps: true });
+
+db.User.hasMany(db.Feedback, { foreignKey: 'user_id' });
+db.Feedback.belongsTo(db.User, { foreignKey: 'user_id', as: 'Patient' });
 
 module.exports = db;

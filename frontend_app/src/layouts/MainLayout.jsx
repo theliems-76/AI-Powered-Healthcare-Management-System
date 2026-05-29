@@ -1,9 +1,10 @@
-﻿import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 import Sidebar from './Sidebar';
 import Header from './Header';
+import FeedbackWidget from '../components/ui/FeedbackWidget';
 
 export default function MainLayout() {
     const { user, logout } = useContext(AuthContext);
@@ -37,6 +38,9 @@ export default function MainLayout() {
                 </div>
                 
             </main>
+            
+            {/* Global Floating Actions */}
+            {user?.role === 'PATIENT' && <FeedbackWidget />}
         </div>
     );
 }

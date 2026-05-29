@@ -15,6 +15,7 @@ const doctorRoutes = require('./routes/doctorRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 const path = require('path');
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/doctor', doctorRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/feedbacks', feedbackRoutes);
 app.get('/', (req, res) => {
     res.json({ message: "Main Backend (Node.js) is running smoothly!" });
 });

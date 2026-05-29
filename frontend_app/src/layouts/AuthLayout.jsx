@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity } from 'lucide-react';
+import Logo from '../components/ui/Logo';
 
 export default function AuthLayout({ children, title, subtitle }) {
   return (
@@ -15,9 +15,9 @@ export default function AuthLayout({ children, title, subtitle }) {
         </div>
         
         {/* Glassmorphism Card */}
-        <div className="relative z-10 p-12 max-w-lg">
-          <div className="w-20 h-20 bg-white/10 backdrop-blur-xl rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl mb-12">
-            <Activity className="w-10 h-10 text-cyan-400" />
+        <div className="relative z-10 p-12 max-w-lg flex flex-col items-center text-center">
+          <div className="mb-5">
+            <Logo className="w-32 h-32 drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]" />
           </div>
           
           <h1 className="text-5xl font-black text-white mb-6 tracking-tight leading-[1.1]">
@@ -37,10 +37,10 @@ export default function AuthLayout({ children, title, subtitle }) {
           
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-             <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center">
-                 <Activity className="w-6 h-6 text-cyan-400" />
+             <div className="flex items-center justify-center">
+                 <Logo className="w-12 h-12" />
              </div>
-             <span className="text-2xl font-black text-slate-900 tracking-tight">Clinical AI</span>
+             <span className="text-2xl font-black text-slate-900 tracking-tight">Hiệp Sĩ Tiểu Đường</span>
           </div>
 
           <div className="space-y-3">

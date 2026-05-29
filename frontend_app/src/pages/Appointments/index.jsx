@@ -1,28 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { createPortal } from 'react-dom';
+import { AuthContext } from '../../context/AuthContext';
 import { Calendar, Clock, User, CheckCircle, XCircle, FileText, ChevronRight, Search } from 'lucide-react';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 export default function Appointments() {
+    const { user } = useContext(AuthContext);
+    
+    // Sửa lỗi Timezone (Múi giờ UTC) khi lấy ngày hiện tại
+    const getLocalDateString = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     const [appointments, setAppointments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+    const [filterDate, setFilterDate] = useState(getLocalDateString());
     const [patients, setPatients] = useState([]);
     const [patientSearch, setPatientSearch] = useState('');
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         patient_profile_id: '',
-        appointment_date: new Date().toISOString().split('T')[0],
+        appointment_date: getLocalDateString(),
         appointment_time: '09:00',
         reason: ''
     });
 
     useEffect(() => {
         fetchAppointments();
-        fetchPatients();
-    }, [filterDate]);
+        if (user?.role === 'DOCTOR') {
+            fetchPatients();
+        }
+    }, [filterDate, user]);
 
     const fetchAppointments = async () => {
         setIsLoading(true);
@@ -85,6 +99,29 @@ export default function Appointments() {
         }
     };
 
+    const getStatusText = (status) => {
+        switch (status) {
+            case 'PENDING': return 'Chờ duyệt';
+            case 'CONFIRMED': return 'Đã xác nhận';
+            case 'CANCELLED': return 'Đã hủy';
+            case 'COMPLETED': return 'Hoàn tất';
+            default: return status;
+        }
+    };
+
+    if (user?.role === 'PATIENT' && !user?.Profile?.managed_by_doctor_id) {
+        return (
+            <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
+                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-12 text-center">
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Chưa có Bác sĩ phụ trách</h3>
+                    <p className="text-sm font-medium text-slate-500 max-w-lg mx-auto">
+                        Tính năng lịch hẹn hiện chỉ dành cho các bệnh nhân đã được bác sĩ tiếp nhận và đưa vào danh sách quản lý.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
             {/* Header */}
@@ -136,20 +173,26 @@ export default function Appointments() {
                                     <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
                                         <span>{app.reason || 'Khám tổng quát'}</span>
                                         <span className={`px-2.5 py-0.5 rounded border text-[10px] uppercase font-bold tracking-widest ${getStatusStyle(app.status)}`}>
-                                            {app.status}
+                                            {getStatusText(app.status)}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 flex-shrink-0">
                                     {app.status === 'PENDING' && (
-                                        <>
-                                            <button onClick={() => handleStatusChange(app.id, 'CONFIRMED')} className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-colors" title="Xác nhận">
-                                                <CheckCircle className="w-5 h-5" />
-                                            </button>
-                                            <button onClick={() => handleStatusChange(app.id, 'CANCELLED')} className="p-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-colors" title="Hủy">
-                                                <XCircle className="w-5 h-5" />
-                                            </button>
-                                        </>
+                                        app.created_by_role === user?.role ? (
+                                            <span className="px-3 py-1.5 bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-widest rounded-xl border border-amber-200">
+                                                Đợi {user?.role === 'DOCTOR' ? 'bệnh nhân' : 'bác sĩ'} duyệt
+                                            </span>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => handleStatusChange(app.id, 'CONFIRMED')} className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-colors" title="Xác nhận">
+                                                    <CheckCircle className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => handleStatusChange(app.id, 'CANCELLED')} className="p-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-colors" title="Từ chối">
+                                                    <XCircle className="w-5 h-5" />
+                                                </button>
+                                            </>
+                                        )
                                     )}
                                     {app.status === 'CONFIRMED' && (
                                         <button onClick={() => handleStatusChange(app.id, 'COMPLETED')} className="px-4 py-2.5 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold uppercase tracking-widest rounded-xl transition-colors">
@@ -172,41 +215,43 @@ export default function Appointments() {
                             <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-900"><XCircle className="w-6 h-6" /></button>
                         </div>
                         <form onSubmit={handleCreateAppointment} className="p-6 space-y-6">
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Bệnh nhân</label>
-                                <div className="border border-slate-200 rounded-xl overflow-hidden focus-within:border-slate-900 focus-within:ring-1 focus-within:ring-slate-900 transition-all">
-                                    <div className="flex items-center px-4 py-2 bg-white border-b border-slate-100">
-                                        <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
-                                        <input 
-                                            type="text" 
-                                            placeholder="Tìm tên hoặc số điện thoại..."
-                                            value={patientSearch}
-                                            onChange={e => setPatientSearch(e.target.value)}
-                                            className="w-full bg-transparent text-sm font-bold outline-none placeholder:font-medium placeholder:text-slate-400"
-                                        />
+                            {user?.role === 'DOCTOR' && (
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Bệnh nhân</label>
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden focus-within:border-slate-900 focus-within:ring-1 focus-within:ring-slate-900 transition-all">
+                                        <div className="flex items-center px-4 py-2 bg-white border-b border-slate-100">
+                                            <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                                            <input 
+                                                type="text" 
+                                                placeholder="Tìm tên hoặc số điện thoại..."
+                                                value={patientSearch}
+                                                onChange={e => setPatientSearch(e.target.value)}
+                                                className="w-full bg-transparent text-sm font-bold outline-none placeholder:font-medium placeholder:text-slate-400"
+                                            />
+                                        </div>
+                                        <select 
+                                            required size="4"
+                                            value={formData.patient_profile_id}
+                                            onChange={e => {
+                                                const selectedId = e.target.value;
+                                                const selectedPatient = patients.find(p => p.id === selectedId);
+                                                setFormData({...formData, patient_profile_id: selectedId});
+                                                if (selectedPatient) {
+                                                    setPatientSearch(selectedPatient.full_name);
+                                                }
+                                            }}
+                                            className="w-full px-2 py-2 bg-slate-50 text-sm font-bold outline-none custom-scrollbar cursor-pointer"
+                                        >
+                                            {patients.filter(p => 
+                                                (p.full_name || '').toLowerCase().includes(patientSearch.toLowerCase()) || 
+                                                (p.phone || '').includes(patientSearch)
+                                            ).map(p => (
+                                                <option key={p.id} value={p.id} className="py-2.5 px-3 rounded-lg hover:bg-white mb-1">{p.full_name} {p.phone ? `- ${p.phone}` : ''}</option>
+                                            ))}
+                                        </select>
                                     </div>
-                                    <select 
-                                        required size="4"
-                                        value={formData.patient_profile_id}
-                                        onChange={e => {
-                                            const selectedId = e.target.value;
-                                            const selectedPatient = patients.find(p => p.id === selectedId);
-                                            setFormData({...formData, patient_profile_id: selectedId});
-                                            if (selectedPatient) {
-                                                setPatientSearch(selectedPatient.full_name);
-                                            }
-                                        }}
-                                        className="w-full px-2 py-2 bg-slate-50 text-sm font-bold outline-none custom-scrollbar cursor-pointer"
-                                    >
-                                        {patients.filter(p => 
-                                            (p.full_name || '').toLowerCase().includes(patientSearch.toLowerCase()) || 
-                                            (p.phone || '').includes(patientSearch)
-                                        ).map(p => (
-                                            <option key={p.id} value={p.id} className="py-2.5 px-3 rounded-lg hover:bg-white mb-1">{p.full_name} {p.phone ? `- ${p.phone}` : ''}</option>
-                                        ))}
-                                    </select>
                                 </div>
-                            </div>
+                            )}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Ngày khám</label>

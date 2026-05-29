@@ -35,7 +35,7 @@ const MedicalReportTemplate = forwardRef(({ result }, ref) => {
                     <div className="flex items-center gap-3">
                         <Logo className="w-10 h-10" />
                         <div>
-                            <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Clinical AI</h1>
+                            <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Hiệp Sĩ Tiểu Đường</h1>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Hồ sơ Y tế Điện tử</p>
                         </div>
                     </div>

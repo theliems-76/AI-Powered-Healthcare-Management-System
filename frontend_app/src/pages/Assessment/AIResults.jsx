@@ -12,7 +12,7 @@ export default function AIResults({ result, userRole }) {
 
    const handleDownloadPDF = useReactToPrint({
     contentRef: componentRef,
-    documentTitle: `Clinical_AI_Report_${new Date().toISOString().split('T')[0]}`,
+    documentTitle: `HSTD_Report_${new Date().toISOString().split('T')[0]}`,
     onBeforePrint: () => {
         toast.info("Đang mở cửa sổ in PDF...", { autoClose: 2000 });
         return Promise.resolve(); 
