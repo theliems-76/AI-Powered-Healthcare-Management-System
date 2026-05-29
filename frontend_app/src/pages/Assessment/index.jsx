@@ -1,9 +1,9 @@
-﻿import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 import { analyzeHealthRisk } from '../../services/aiService';
 import { AuthContext } from '../../context/AuthContext';
 import AssessmentForm from './AssessmentForm';
-import AIResults from './AiResults';
+import AIResults from './AIResults';
 
 export default function Assessment() {
     const { user } = useContext(AuthContext);
