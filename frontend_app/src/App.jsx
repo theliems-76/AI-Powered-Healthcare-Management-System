@@ -5,24 +5,26 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import MainLayout from './layouts/MainLayout';
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
-import ForgotPassword from './pages/Auth/ForgotPassword';
-import ResetPassword from './pages/Auth/ResetPassword';
-import VerifyEmail from './pages/Auth/VerifyEmail';
-import Landing from './pages/Landing/index';
-import Guide from './pages/Guide/index';
-import Assessment from './pages/Assessment/index';
-import Meals from './pages/Meals/index';
-import Exercises from './pages/Exercises/index';
-import History from './pages/History/index';
-import Patients from './pages/Patients/index';
-import CalendarSchedule from './pages/Calendar/index';
-import Admin from './pages/Admin/index';
-import Dashboard from './pages/Dashboard/index';
-import RecordDetail from './pages/History/RecordDetail';
-import Profile from './pages/Profile/index';
-import Appointments from './pages/Appointments/index';
+
+// Lazy loading cho tất cả các Pages (Tối ưu Code Splitting)
+const Login = React.lazy(() => import('./pages/Auth/Login'));
+const Register = React.lazy(() => import('./pages/Auth/Register'));
+const ForgotPassword = React.lazy(() => import('./pages/Auth/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./pages/Auth/ResetPassword'));
+const VerifyEmail = React.lazy(() => import('./pages/Auth/VerifyEmail'));
+const Landing = React.lazy(() => import('./pages/Landing/index'));
+const Guide = React.lazy(() => import('./pages/Guide/index'));
+const Assessment = React.lazy(() => import('./pages/Assessment/index'));
+const Meals = React.lazy(() => import('./pages/Meals/index'));
+const Exercises = React.lazy(() => import('./pages/Exercises/index'));
+const History = React.lazy(() => import('./pages/History/index'));
+const Patients = React.lazy(() => import('./pages/Patients/index'));
+const CalendarSchedule = React.lazy(() => import('./pages/Calendar/index'));
+const Admin = React.lazy(() => import('./pages/Admin/index'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard/index'));
+const RecordDetail = React.lazy(() => import('./pages/History/RecordDetail'));
+const Profile = React.lazy(() => import('./pages/Profile/index'));
+const Appointments = React.lazy(() => import('./pages/Appointments/index'));
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   
@@ -35,31 +37,33 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          {}
-          <Route path="/" element={<Landing />} />
-          <Route path="/guide" element={<Guide />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
+        <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold text-slate-400">Đang tải trang...</div>}>
+          <Routes>
+            {/* ... */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/guide" element={<Guide />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
 
-          <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-            <Route path="/dashboard" element={<Dashboard />} /> {}
-            <Route path="/assessment" element={<Assessment />} /> {}
-            <Route path="/meals" element={<Meals />} />
-            <Route path="/exercises" element={<Exercises />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/history/:recordId" element={<RecordDetail />} />    
-            <Route path="/patients" element={<Patients />} /> 
-            <Route path="/calendar" element={<CalendarSchedule />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/appointments" element={<Appointments />} />
-          </Route>
+            <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+              <Route path="/dashboard" element={<Dashboard />} /> {/* ... */}
+              <Route path="/assessment" element={<Assessment />} /> {/* ... */}
+              <Route path="/meals" element={<Meals />} />
+              <Route path="/exercises" element={<Exercises />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/history/:recordId" element={<RecordDetail />} />    
+              <Route path="/patients" element={<Patients />} /> 
+              <Route path="/calendar" element={<CalendarSchedule />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/appointments" element={<Appointments />} />
+            </Route>
 
-        </Routes>
+          </Routes>
+        </React.Suspense>
         <ToastContainer 
           position="bottom-right" 
           autoClose={3500} 
