@@ -27,8 +27,8 @@ export default function Register() {
 
         setIsLoading(true);
         try {
-            await registerAPI(formData.email, formData.password, formData.full_name, formData.phone);
-            toast.success('🎉 Đăng ký thành công! Vui lòng đăng nhập.');
+            const res = await registerAPI(formData.email, formData.password, formData.full_name, formData.phone);
+            toast.success(res.message || '🎉 Đăng ký thành công! Vui lòng KIỂM TRA EMAIL (cả hộp thư Rác/Spam) để xác thực tài khoản trước khi đăng nhập.', { autoClose: 10000 });
             navigate('/login');
         } catch (error) {
             toast.error(`❌ ${error}`);
