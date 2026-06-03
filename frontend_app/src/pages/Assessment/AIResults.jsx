@@ -382,7 +382,21 @@ export default function AIResults({ result, userRole }) {
                         </div>
                     
                     <div className="prose prose-slate max-w-none prose-headings:font-black prose-headings:tracking-tight prose-a:text-slate-900 prose-p:font-medium prose-p:text-slate-600 text-sm">
-                        <ReactMarkdown>{result.ai_nutrition_plan}</ReactMarkdown>
+                        {result.ai_nutrition_plan === 'PROCESSING' ? (
+                            <div className="space-y-4 animate-pulse py-4">
+                                <div className="h-4 bg-slate-200 rounded-full w-3/4"></div>
+                                <div className="h-4 bg-slate-200 rounded-full w-1/2"></div>
+                                <div className="h-4 bg-slate-200 rounded-full w-5/6"></div>
+                                <div className="h-4 bg-slate-200 rounded-full w-full"></div>
+                                <div className="h-4 bg-slate-200 rounded-full w-2/3"></div>
+                                <p className="text-xs text-indigo-600 font-bold mt-6 flex items-center gap-2">
+                                    <span className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></span>
+                                    Bác sĩ AI đang hội chẩn chuyên sâu và thiết kế phác đồ. Vui lòng không làm mới trang...
+                                </p>
+                            </div>
+                        ) : (
+                            <ReactMarkdown>{result.ai_nutrition_plan}</ReactMarkdown>
+                        )}
                     </div>
 
                     <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-3 print:hidden">

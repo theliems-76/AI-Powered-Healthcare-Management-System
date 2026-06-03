@@ -45,6 +45,27 @@ export default function Assessment() {
         }
     }, [result]);
 
+    React.useEffect(() => {
+        let interval;
+        if (result && result.ai_nutrition_plan === 'PROCESSING') {
+            interval = setInterval(async () => {
+                try {
+                    // Cần import api từ src/services/api
+                    const { default: api } = await import('../../services/api');
+                    const response = await api.get(`/records/${result.id}`);
+                    if (response.data && response.data.data && response.data.data.ai_nutrition_plan !== 'PROCESSING') {
+                        setResult(response.data.data);
+                        clearInterval(interval);
+                        toast.success("Bác sĩ AI đã thiết kế xong phác đồ Dinh dưỡng & Tập luyện!", { icon: "🩺" });
+                    }
+                } catch (error) {
+                    console.error("Lỗi cập nhật phác đồ:", error);
+                }
+            }, 3000); // Polling mỗi 3 giây
+        }
+        return () => clearInterval(interval);
+    }, [result]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ 

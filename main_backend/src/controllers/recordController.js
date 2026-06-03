@@ -4,6 +4,117 @@ const { MedicalRecord, PatientProfile, Dish, Exercise, Ingredient, DishIngredien
 const { Sequelize, Op } = require('sequelize');
 const { logAction } = require('./auditController');
 
+// Background Job xử lý Gemini (Bất đồng bộ)
+const runGeminiBackgroundJob = async (recordId, userId, aiResult, hashInput) => {
+    let aiFullResponse = {}, aiNutritionPlan = "", recommendedFoods = [], recommendedActivities = [];
+    
+    try {
+        console.log("🥗 [BACKGROUND] Đang gọi Bác sĩ Dinh dưỡng AI (Gemini)...");
+        const nutritionResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/generate-plan', aiResult, { timeout: 120000 });
+        aiFullResponse = nutritionResponse.data;
+    } catch (geminiError) {
+        console.error("⚠️ [BACKGROUND] Lỗi gọi Gemini AI (Hết Quota/Rate Limit), dùng phác đồ mặc định:", geminiError.message);
+        aiFullResponse = {
+            ai_nutritionist_plan: "Hệ thống AI Dinh dưỡng hiện đang quá tải. Dưới đây là phác đồ tham khảo cơ bản:\n\n1. Duy trì chế độ ăn nhiều rau xanh.\n2. Hạn chế đường và tinh bột nhanh.\n3. Tập thể dục ít nhất 30 phút mỗi ngày.",
+            recommended_foods: [],
+            recommended_activities: []
+        };
+    }
+
+    if (typeof aiFullResponse === 'object' && aiFullResponse.ai_nutritionist_plan) {
+        aiNutritionPlan = aiFullResponse.ai_nutritionist_plan;
+        recommendedFoods = aiFullResponse.recommended_foods || [];
+        recommendedActivities = aiFullResponse.recommended_activities || [];
+    } else {
+        try {
+            const text = typeof aiFullResponse === 'string' ? aiFullResponse : JSON.stringify(aiFullResponse);
+            const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+            if (jsonMatch) {
+                const jsonData = JSON.parse(jsonMatch[1].trim());
+                recommendedFoods = jsonData.recommended_foods || [];
+                recommendedActivities = jsonData.recommended_activities || [];
+                aiNutritionPlan = text.replace(jsonMatch[0], '').trim();
+            } else {
+                aiNutritionPlan = text;
+            }
+        } catch (parseError) {
+            console.error("❌ [BACKGROUND] Lỗi bóc tách JSON từ AI:", parseError);
+            aiNutritionPlan = typeof aiFullResponse === 'string' ? aiFullResponse : "Lỗi bóc tách thực đơn.";
+        }
+    }
+
+    // 1. Update MedicalRecord
+    try {
+        await MedicalRecord.update({ ai_nutrition_plan: aiNutritionPlan }, { where: { id: recordId } });
+        console.log("✅ [BACKGROUND] Đã cập nhật Phác đồ cho Bệnh án:", recordId);
+    } catch (err) {
+        console.error("❌ [BACKGROUND] Lỗi cập nhật Bệnh án:", err);
+    }
+
+    // 2. Lưu vào Cache
+    try {
+        await AICache.create({
+            input_hash: hashInput,
+            ai_risk_score: aiResult.risk_probability,
+            ai_diagnosis: aiResult.diagnosis,
+            ai_explanation: aiResult.explanation,
+            ai_nutrition_plan: aiNutritionPlan,
+            recommended_foods: recommendedFoods,
+            recommended_activities: recommendedActivities
+        });
+        console.log("💾 [BACKGROUND] Đã lưu kết quả mới vào AI Cache!");
+    } catch (cacheErr) {
+        console.error("❌ [BACKGROUND] Lỗi lưu Cache:", cacheErr.message);
+    }
+
+    // 3. Tạo Foods & Exercises
+    if (recommendedFoods.length > 0 && userId) {
+        for (let food of recommendedFoods) {
+            try {
+                const existingDish = await Dish.findOne({ 
+                    where: {[Op.and]:[
+                        Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), (food.name || "").toLowerCase()),
+                        { [Op.or]:[{ user_id: null }, { user_id: userId }] }
+                    ]} 
+                });
+                if (!existingDish) {
+                    const newDish = await Dish.create({
+                        name: food.name, category: food.category || 'Tự chọn', user_id: userId, is_ai_generated: true,
+                        calories_per_100g: food.calories_per_100g || 0, carbs_per_100g: food.carbs_per_100g || 0,
+                        protein_per_100g: food.protein_per_100g || 0, fat_per_100g: food.fat_per_100g || 0, serving_size_g: food.serving_size_g || 100
+                    });
+                    if (food.ingredients && Array.isArray(food.ingredients)) {
+                        for (let ing of food.ingredients) {
+                            let [dbIng] = await Ingredient.findOrCreate({
+                                where: { name: ing.name },
+                                defaults: {
+                                    calories_per_100g: ing.calories_per_100g, carbs_per_100g: ing.carbs_per_100g,
+                                    protein_per_100g: ing.protein_per_100g, fat_per_100g: ing.fat_per_100g, is_ai_generated: true
+                                }
+                            });
+                            await DishIngredient.create({ dish_id: newDish.id, ingredient_id: dbIng.id, weight_grams: ing.weight_g || 100 });
+                        }
+                    }
+                }
+            } catch (e) { console.error("Lỗi tạo món ăn", e); }
+        }
+    }
+
+    if (recommendedActivities.length > 0 && userId) {
+        for (let activity of recommendedActivities) {
+            try {
+                const existingActivity = await Exercise.findOne({ where: { name: activity.name, user_id: userId } });
+                if (!existingActivity) {
+                    await Exercise.create({
+                        name: activity.name, category: activity.category || 'Khác',
+                        met_value: activity.met_value || 4.0, user_id: userId, is_ai_generated: true
+                    });
+                }
+            } catch (e) { console.error("Lỗi tạo bài tập", e); }
+        }
+    }
+};
+
 exports.createDiagnosticRecord = async (req, res) => {
     try {
         const patientData = req.body;
@@ -13,9 +124,11 @@ exports.createDiagnosticRecord = async (req, res) => {
         featureKeys.forEach(k => hashPayload[k] = patientData[k]);
         const hashInput = crypto.createHash('md5').update(JSON.stringify(hashPayload)).digest('hex');
 
-        let aiResult, aiFullResponse = {}, aiNutritionPlan = "", recommendedFoods = [], recommendedActivities = [];
+        let aiResult, aiNutritionPlan = "PROCESSING";
 
+        // 1. Kiểm tra Cache
         const cached = await AICache.findOne({ where: { input_hash: hashInput } });
+        let isCached = false;
         
         if (cached) {
             console.log("⚡ [CACHE HIT] Đã tìm thấy kết quả AI trong Cache!");
@@ -24,69 +137,17 @@ exports.createDiagnosticRecord = async (req, res) => {
                 diagnosis: cached.ai_diagnosis,
                 explanation: typeof cached.ai_explanation === 'string' ? JSON.parse(cached.ai_explanation) : cached.ai_explanation
             };
-            aiNutritionPlan = cached.ai_nutrition_plan;
-            recommendedFoods = typeof cached.recommended_foods === 'string' ? JSON.parse(cached.recommended_foods) : (cached.recommended_foods || []);
-            recommendedActivities = typeof cached.recommended_activities === 'string' ? JSON.parse(cached.recommended_activities) : (cached.recommended_activities || []);
+            aiNutritionPlan = cached.ai_nutrition_plan; // Đã có sẵn phác đồ
+            isCached = true;
         } else {
             console.log("📥 Đã nhận dữ liệu, đang gọi AI dự đoán...");
             const predictResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/predict', hashPayload);
             aiResult = predictResponse.data;
             console.log("🤖 AI đã chẩn đoán xong nguy cơ!");
-
-            console.log("🥗 Đang gọi Bác sĩ Dinh dưỡng AI (Gemini)...");
-            try {
-                const nutritionResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/generate-plan', aiResult, {
-                    timeout: 120000
-                });
-                aiFullResponse = nutritionResponse.data;
-            } catch (geminiError) {
-                console.error("⚠️ Lỗi gọi Gemini AI (Hết Quota/Rate Limit), dùng phác đồ mặc định:", geminiError.message);
-                aiFullResponse = {
-                    ai_nutritionist_plan: "Hệ thống AI Dinh dưỡng hiện đang quá tải. Dưới đây là phác đồ tham khảo cơ bản:\n\n1. Duy trì chế độ ăn nhiều rau xanh.\n2. Hạn chế đường và tinh bột nhanh.\n3. Tập thể dục ít nhất 30 phút mỗi ngày.",
-                    recommended_foods: [],
-                    recommended_activities: []
-                };
-            }
-
-            if (typeof aiFullResponse === 'object' && aiFullResponse.ai_nutritionist_plan) {
-                aiNutritionPlan = aiFullResponse.ai_nutritionist_plan;
-                recommendedFoods = aiFullResponse.recommended_foods ||[];
-                recommendedActivities = aiFullResponse.recommended_activities ||[];
-            } else {
-                try {
-                    const text = typeof aiFullResponse === 'string' ? aiFullResponse : JSON.stringify(aiFullResponse);
-                    const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
-                    
-                    if (jsonMatch) {
-                        const jsonData = JSON.parse(jsonMatch[1].trim());
-                        recommendedFoods = jsonData.recommended_foods || [];
-                        recommendedActivities = jsonData.recommended_activities ||[];
-                        aiNutritionPlan = text.replace(jsonMatch[0], '').trim();
-                    } else {
-                        aiNutritionPlan = text;
-                    }
-                } catch (parseError) {
-                    console.error("❌ Lỗi bóc tách JSON từ AI:", parseError);
-                    aiNutritionPlan = typeof aiFullResponse === 'string' ? aiFullResponse : "Lỗi bóc tách thực đơn.";
-                }
-            }
-
-            try {
-                await AICache.create({
-                    input_hash: hashInput,
-                    ai_risk_score: aiResult.risk_probability,
-                    ai_diagnosis: aiResult.diagnosis,
-                    ai_explanation: aiResult.explanation,
-                    ai_nutrition_plan: aiNutritionPlan,
-                    recommended_foods: recommendedFoods,
-                    recommended_activities: recommendedActivities
-                });
-                console.log("💾 Đã lưu kết quả mới vào AI Cache!");
-            } catch (cacheErr) {
-                console.error("Lỗi lưu Cache:", cacheErr.message);
-            }
+            // Chưa có phác đồ, đánh dấu là PROCESSING
         }
 
+        // 2. Lưu Bệnh án (Trả kết quả ngay lập tức cho Frontend)
         let pId = req.body.patientProfileId || null;
         let dId = null;
 
@@ -110,75 +171,18 @@ exports.createDiagnosticRecord = async (req, res) => {
             ai_nutrition_plan: aiNutritionPlan,
         });
 
-        if (recommendedFoods.length > 0) {
-            for (let food of recommendedFoods) {
-                const existingDish = await Dish.findOne({ 
-                    where: {[Op.and]:[
-                            Sequelize.where(
-                                Sequelize.fn('LOWER', Sequelize.col('name')), 
-                                (food.name || "").toLowerCase()
-                            ),
-                            { [Op.or]:[{ user_id: null }, { user_id: req.user.id }] }
-                        ]
-                    } 
-                });
-
-                if (!existingDish) {
-                    const newDish = await Dish.create({
-                        name: food.name,
-                        category: food.category || 'Tự chọn',
-                        user_id: req.user.id,
-                        is_ai_generated: true,
-                        calories_per_100g: food.calories_per_100g || 0,
-                        carbs_per_100g: food.carbs_per_100g || 0,
-                        protein_per_100g: food.protein_per_100g || 0,
-                        fat_per_100g: food.fat_per_100g || 0,
-                        serving_size_g: food.serving_size_g || 100
-                    });
-
-                    if (food.ingredients && Array.isArray(food.ingredients)) {
-                        for (let ing of food.ingredients) {
-                            let [dbIng] = await Ingredient.findOrCreate({
-                                where: { name: ing.name },
-                                defaults: {
-                                    calories_per_100g: ing.calories_per_100g,
-                                    carbs_per_100g: ing.carbs_per_100g,
-                                    protein_per_100g: ing.protein_per_100g,
-                                    fat_per_100g: ing.fat_per_100g,
-                                    is_ai_generated: true
-                                }
-                            });
-
-                            await DishIngredient.create({
-                                dish_id: newDish.id,
-                                ingredient_id: dbIng.id,
-                                weight_grams: ing.weight_g || 100
-                            });
-                        }
-                    }
-                }
-            }
+        // 3. Kích hoạt Background Job nếu CHƯA có Cache
+        if (!isCached) {
+            // Không `await` để Frontend nhận kết quả ngay!
+            runGeminiBackgroundJob(newRecord.id, req.user.id, aiResult, hashInput).catch(e => console.error("Background Job Failed:", e));
+        } else {
+            // Nếu có cache, giả vờ gọi background job để tạo món ăn (nếu thiếu) nhưng thực ra ta có thể bỏ qua.
         }
 
-        if (recommendedActivities.length > 0) {
-            for (let activity of recommendedActivities) {
-                const existingActivity = await Exercise.findOne({ where: { name: activity.name, user_id: req.user.id } });
-                if (!existingActivity) {
-                    await Exercise.create({
-                        name: activity.name,
-                        category: activity.category || 'Khác',
-                        met_value: activity.met_value || 4.0,
-                        user_id: req.user.id,
-                        is_ai_generated: true
-                    });
-                }
-            }
-        }
-
-        // Kích hoạt chuông thông báo cho bác sĩ nếu nguy cơ cao (>66)
+        // 4. Kích hoạt chuông thông báo cho bác sĩ nếu nguy cơ cao (>66)
         if (aiResult.risk_probability > 66 && dId) {
             await Notification.create({
-                user_id: dId, // Gửi cho bác sĩ quản lý
+                user_id: dId,
                 title: 'Cảnh báo Bệnh nhân Rủi ro cao!',
                 message: `Hệ thống vừa phát hiện nguy cơ cao (${aiResult.risk_probability}%) ở một bệnh nhân của bạn. Vui lòng kiểm tra.`,
                 type: 'URGENT_RISK',
@@ -188,7 +192,7 @@ exports.createDiagnosticRecord = async (req, res) => {
 
         res.status(200).json({
             status: "success",
-            message: "Đã phân tích AI và lưu vào Hồ sơ bệnh án thành công!",
+            message: isCached ? "Đã lấy dữ liệu từ Cache thành công!" : "Đã phân tích xong Ma trận, đang sinh Phác đồ nền...",
             data: newRecord
         });
 
