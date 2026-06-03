@@ -189,4 +189,15 @@ db.Feedback = sequelize.define('Feedback', {
 db.User.hasMany(db.Feedback, { foreignKey: 'user_id' });
 db.Feedback.belongsTo(db.User, { foreignKey: 'user_id', as: 'Patient' });
 
+db.AICache = sequelize.define('AICache', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  input_hash: { type: DataTypes.STRING, allowNull: false, unique: true, comment: 'MD5 hash của 21 chỉ số sinh tồn' },
+  ai_risk_score: { type: DataTypes.FLOAT },
+  ai_diagnosis: { type: DataTypes.STRING },
+  ai_explanation: { type: DataTypes.JSON },
+  ai_nutrition_plan: { type: DataTypes.TEXT },
+  recommended_foods: { type: DataTypes.JSON },
+  recommended_activities: { type: DataTypes.JSON }
+}, { timestamps: true });
+
 module.exports = db;

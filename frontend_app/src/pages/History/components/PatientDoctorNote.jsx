@@ -23,8 +23,8 @@ export default function PatientDoctorNote({ doctorNotes }) {
             {/* Content Section */}
             <div className="p-8 md:p-10 bg-white">
                 <div 
-                    className="prose prose-slate prose-headings:font-black prose-p:font-medium max-w-none text-slate-800 text-sm md:text-base leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(doctorNotes) }}
+                    className="prose prose-slate prose-headings:font-black prose-p:font-medium max-w-none text-slate-800 text-sm md:text-base leading-relaxed [&_a]:text-indigo-600 [&_a]:underline"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(doctorNotes, { ADD_ATTR: ['target'] }).replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ') }}
                 />
             </div>
         </div>

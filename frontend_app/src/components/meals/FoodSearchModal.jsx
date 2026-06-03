@@ -206,7 +206,7 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
                                             <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 focus-within:bg-white focus-within:border-slate-400 transition-all">
                                                 <input 
                                                     type="number"
-                                                    min="1"
+                                                    min="1" max="5000"
                                                     value={weights[dish.id] !== undefined ? weights[dish.id] : (dish.serving_size_g || 100)}
                                                     onChange={(e) => setWeights({ ...weights, [dish.id]: e.target.value })}
                                                     className="w-12 text-sm font-black text-slate-900 bg-transparent text-center outline-none"

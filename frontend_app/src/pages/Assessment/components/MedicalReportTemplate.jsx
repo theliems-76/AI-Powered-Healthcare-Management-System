@@ -11,6 +11,84 @@ const MedicalReportTemplate = forwardRef(({ result }, ref) => {
         hour: '2-digit', minute: '2-digit'
     });
 
+    const mapFeatureToSuperCategory = (featureName) => {
+        const f = featureName.toLowerCase();
+        if (f.includes('hút thuốc') || f.includes('rượu') || f.includes('thể dục') || f.includes('vận động') || 
+            f.includes('trái cây') || f.includes('rau')) {
+            return 'Ngoại lai';
+        }
+        return 'Nội tại';
+    };
+
+    const getBioLevel = (burden) => {
+        if (burden <= 0.1) return 0;
+        if (burden <= 0.6) return 1;
+        if (burden <= 1.5) return 2;
+        return 3;
+    };
+
+    const getLifeLevel = (burden) => {
+        if (burden <= 0.01) return 0;
+        if (burden <= 0.04) return 1;
+        if (burden <= 0.08) return 2;
+        return 3;
+    };
+
+    let bioBurden = 0;
+    let lifeBurden = 0;
+
+    let factorsToProcess = [];
+    if (result.ai_explanation?.all_factors) {
+        factorsToProcess = result.ai_explanation.all_factors.map(f => ({
+            ...f,
+            isWarning: f.contribution > 0
+        }));
+    } else if (result.ai_explanation) {
+        factorsToProcess = [
+            ...(result.ai_explanation.warning_factors || []).map(f => ({...f, isWarning: true})),
+            ...(result.ai_explanation.good_factors || []).map(f => ({...f, isWarning: false}))
+        ];
+    }
+
+    const indicators = typeof result.health_indicators === 'string' 
+        ? JSON.parse(result.health_indicators) 
+        : (result.health_indicators || {});
+
+    factorsToProcess.forEach(f => {
+        const cat = mapFeatureToSuperCategory(f.feature);
+        let impact = f.contribution;
+
+        if (cat === 'Ngoại lai' && impact > 0) {
+            const fLower = f.feature.toLowerCase();
+            if (fLower.includes('hút thuốc') && indicators.Smoker === 0) impact = 0;
+            if (fLower.includes('rượu') && indicators.HvyAlcoholConsump === 0) impact = 0;
+            if (fLower.includes('thể dục') && indicators.PhysActivity === 1) impact = 0;
+            if (fLower.includes('trái cây') && indicators.Fruits === 1) impact = 0;
+            if (fLower.includes('rau') && indicators.Veggies === 1) impact = 0;
+        }
+
+        if (cat === 'Nội tại') {
+            if (impact > 0) bioBurden += impact;
+        } else {
+            if (impact > 0) lifeBurden += impact;
+        }
+    });
+
+    
+    let clinicalLifePenalty = 0;
+    if (indicators.Smoker === 1) clinicalLifePenalty += 0.05;
+    if (indicators.PhysActivity === 0) clinicalLifePenalty += 0.03;
+    if (indicators.HvyAlcoholConsump === 1) clinicalLifePenalty += 0.04;
+    if (indicators.Fruits === 0) clinicalLifePenalty += 0.01;
+    if (indicators.Veggies === 0) clinicalLifePenalty += 0.01;
+
+    if (clinicalLifePenalty > lifeBurden) {
+        lifeBurden = clinicalLifePenalty;
+    }
+
+    const bioIdx = getBioLevel(bioBurden);
+    const lifeIdx = getLifeLevel(lifeBurden);
+
     return (
         <div ref={ref} className="bg-white text-slate-900 w-full font-sans" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             
@@ -60,6 +138,53 @@ const MedicalReportTemplate = forwardRef(({ result }, ref) => {
                             <span className="text-4xl font-black text-slate-900 tracking-tighter">{riskScore}</span>
                             <span className="text-lg font-bold text-slate-400">%</span>
                         </div>
+                    </div>
+                </div>
+
+                {/* Biểu đồ Ma trận */}
+                <div className="mb-8 print:break-inside-avoid">
+                    <h3 className="text-sm font-bold text-slate-800 uppercase border-b border-slate-200 pb-2 mb-4">Ma trận Rủi ro Lâm sàng</h3>
+                    
+                    <div className="border-2 border-slate-900 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div className="grid grid-cols-[150px_1fr] text-center border-b border-slate-200 bg-slate-50">
+                            <div className="border-r-2 border-slate-900 bg-slate-100"></div>
+                            <div className="py-2 text-[10px] font-black uppercase tracking-widest text-slate-800">
+                                Mức độ Hành vi, Lối sống & Xã hội (Trục X)
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-[150px_1fr_1fr_1fr_1fr] text-[9px] font-black uppercase text-center bg-slate-50 border-b-2 border-slate-900">
+                            <div className="p-2 flex items-center justify-center border-r-2 border-slate-900 bg-slate-100">
+                                <span className="rotate-180" style={{ writingMode: 'vertical-rl' }}>Nội tại (Trục Y)</span>
+                            </div>
+                            <div className="p-2 border-r border-slate-200 flex flex-col justify-center">Lành mạnh<br/><span className="text-slate-400 text-[8px]">Tốt ưu</span></div>
+                            <div className="p-2 border-r border-slate-200 flex flex-col justify-center">Cần cải thiện<br/><span className="text-slate-400 text-[8px]">Theo dõi</span></div>
+                            <div className="p-2 border-r border-slate-200 flex flex-col justify-center">Rủi ro<br/><span className="text-slate-400 text-[8px]">Cảnh báo</span></div>
+                            <div className="p-2 flex flex-col justify-center">Báo động<br/><span className="text-slate-400 text-[8px]">Nguy hiểm</span></div>
+                        </div>
+                        {['Ổn định', 'Suy giảm nhẹ', 'Suy giảm', 'Báo động'].map((yLabel, y) => (
+                            <div key={y} className="grid grid-cols-[150px_1fr_1fr_1fr_1fr] text-[10px] text-center border-b border-slate-200 last:border-b-0">
+                                <div className="p-2 font-bold uppercase border-r-2 border-slate-900 flex items-center justify-center bg-slate-50">{yLabel}</div>
+                                {[0, 1, 2, 3].map(x => {
+                                    const isPatientHere = x === lifeIdx && y === bioIdx;
+                                    const colors = [
+                                        ['bg-[#22c55e]', 'bg-[#22c55e]', 'bg-[#fde047]', 'bg-[#f97316]'],
+                                        ['bg-[#22c55e]', 'bg-[#fde047]', 'bg-[#f97316]', 'bg-[#ef4444]'],
+                                        ['bg-[#fde047]', 'bg-[#f97316]', 'bg-[#ef4444]', 'bg-[#ef4444]'],
+                                        ['bg-[#f97316]', 'bg-[#ef4444]', 'bg-[#ef4444]', 'bg-[#dc2626]']
+                                    ];
+                                    const bgClass = colors[y][x];
+                                    return (
+                                        <div key={x} className={`relative h-14 border-r border-slate-200 last:border-r-0 print:border-white ${bgClass} !print-color-adjust-exact`}>
+                                            {isPatientHere && (
+                                                <div className="absolute inset-0 m-auto w-24 h-6 bg-slate-900 rounded-lg flex items-center justify-center shadow-md print:bg-slate-900 !print-color-adjust-exact border border-white">
+                                                    <span className="text-[9px] font-black text-white uppercase tracking-wider">📍 Bệnh nhân</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ))}
                     </div>
                 </div>
 

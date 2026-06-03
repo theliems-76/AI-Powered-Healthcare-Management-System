@@ -1,0 +1,62 @@
+[
+  {
+    "feature": "Độ tuổi",
+    "contribution": -1.003315024696815
+  },
+  {
+    "feature": "Sức khỏe tổng quát (Tự đánh giá)",
+    "contribution": 0.8563205711713311
+  },
+  {
+    "feature": "Cholesterol cao",
+    "contribution": 0.40808740106248026
+  },
+  {
+    "feature": "Chỉ số khối cơ thể (BMI)",
+    "contribution": 0.29768887716738274
+  },
+  {
+    "feature": "Huyết áp cao",
+    "contribution": 0.2816046964173384
+  },
+  {
+    "feature": "Bệnh lý tim mạch",
+    "contribution": -0.054830849980407895
+  },
+  {
+    "feature": "Mức thu nhập",
+    "contribution": 0.045279006707879675
+  },
+  {
+    "feature": "Khó khăn khi đi lại",
+    "contribution": -0.04148639925972013
+  },
+  {
+    "feature": "Trình độ học vấn",
+    "contribution": -0.030951561472145096
+  },
+  {
+    "feature": "Lạm dụng rượu bia",
+    "contribution": 0.0185056019622958
+  },
+  {
+    "feature": "Căng thẳng tâm lý kéo dài",
+    "contribution": 0.016226871082791233
+  },
+  {
+    "feature": "Ngày ốm yếu thể chất",
+    "contribution": -0.013328568614426863
+  },
+  {
+    "feature": "Tiền sử đột quỵ",
+    "contribution": -0.006556182419158394
+  },
+  {
+    "feature": "Ít vận động thể chất",
+    "contribution": 0.0035215439690027602
+  },
+  {
+    "feature": "Hút thuốc lá",
+    "contribution": 0.0
+  }
+]

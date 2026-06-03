@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { analyzeHealthRisk } from '../../services/aiService';
 import { AuthContext } from '../../context/AuthContext';
 import AssessmentForm from './AssessmentForm';
+import AIThinkingSteps from './AIThinkingSteps';
 import AIResults from './AIResults';
 
 export default function Assessment() {
@@ -11,7 +12,7 @@ export default function Assessment() {
     const [formData, setFormData] = useState(() => {
         const savedData = sessionStorage.getItem('assessment_formData');
         return savedData ? JSON.parse(savedData) : {
-            HighBP: 1, HighChol: 1, CholCheck: 1, BMI: 32.5, Smoker: 1, Stroke: 0,
+            HighBP: 1, HighChol: 1, CholCheck: 1, BMI: "", Smoker: 1, Stroke: 0,
             HeartDiseaseorAttack: 0, PhysActivity: 0, Fruits: 0, Veggies: 1,
             HvyAlcoholConsump: 0, AnyHealthcare: 1, NoDocbcCost: 0, GenHlth: 4,
             MentHlth: 15, PhysHlth: 20, DiffWalk: 1, Sex: 1, Age: 9, Education: 4, Income: 5
@@ -23,11 +24,20 @@ export default function Assessment() {
         return savedResult ? JSON.parse(savedResult) : null;
     });
 
+    const [hw, setHw] = useState(() => {
+        const savedHw = sessionStorage.getItem('assessment_hw');
+        return savedHw ? JSON.parse(savedHw) : { h: '', w: '' };
+    });
+
     const [isLoading, setIsLoading] = useState(false);
 
     React.useEffect(() => {
         sessionStorage.setItem('assessment_formData', JSON.stringify(formData));
     }, [formData]);
+
+    React.useEffect(() => {
+        sessionStorage.setItem('assessment_hw', JSON.stringify(hw));
+    }, [hw]);
 
     React.useEffect(() => {
         if (result) {
@@ -46,6 +56,11 @@ export default function Assessment() {
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
         
+        if (!formData.BMI) {
+            toast.error('Vui lòng nhập đầy đủ Chiều cao và Cân nặng!');
+            return;
+        }
+
         const sanitizedData = Object.keys(formData).reduce((acc, key) => {
             acc[key] = formData[key] === "" ? 0 : formData[key];
             return acc;
@@ -62,7 +77,7 @@ export default function Assessment() {
             }
         } catch (error) {
             console.error(error);
-            toast.error('Lỗi kết nối AI hoặc Node.js!');
+            toast.error('Hệ thống AI đang bận hoặc quá tải, vui lòng thử lại sau ít phút!');
         } finally {
             setIsLoading(false);
         }
@@ -75,14 +90,22 @@ export default function Assessment() {
                 <p className="text-slate-500">Nhập các chỉ số dưới đây để nhận đánh giá rủi ro từ chuyên gia AI.</p>
             </div>
 
-            <AssessmentForm 
-                formData={formData} 
-                handleChange={handleChange} 
-                handleSubmit={handleSubmit} 
-                isLoading={isLoading} 
-            />
-            
-            <AIResults result={result} userRole={user?.role} />
+            {isLoading ? (
+                <AIThinkingSteps />
+            ) : (
+                <>
+                    <AssessmentForm 
+                        formData={formData} 
+                        handleChange={handleChange} 
+                        handleSubmit={handleSubmit} 
+                        isLoading={isLoading} 
+                        hw={hw}
+                        setHw={setHw}
+                    />
+                    
+                    <AIResults result={result} userRole={user?.role} />
+                </>
+            )}
         </div>
     );
 }

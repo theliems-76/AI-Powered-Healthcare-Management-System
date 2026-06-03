@@ -55,7 +55,7 @@ export default function ExerciseSearchModal({ isOpen, onClose, onAddExercise, on
 
     const handleAdd = (exercise) => {
         const mins = parseInt(durations[exercise.id]);
-        if (!mins || mins <= 0) return toast.warning("Vui lòng nhập số phút tập hợp lệ!");
+        if (!mins || mins <= 0 || mins > 600) return toast.warning("Vui lòng nhập số phút tập hợp lệ (1 - 600)!");
         
         onAddExercise(exercise, mins);
         setDurations({ ...durations, [exercise.id]: '' }); 

@@ -2,23 +2,23 @@ import React, { useState } from 'react';
 import { Activity, HeartPulse, History, Loader2 } from 'lucide-react';
 import Tooltip from '../../components/ui/Tooltip'; 
 
-export default function AssessmentForm({ formData, handleChange, handleSubmit, isLoading, readOnly = false }) {
-    const [hw, setHw] = useState({ h: '', w: '' });
+export default function AssessmentForm({ formData, handleChange, handleSubmit, isLoading, hw, setHw, readOnly = false }) {
 
     const handleHWChange = (e) => {
         const { name, value } = e.target;
-        setHw(prev => {
-            const next = { ...prev, [name]: value };
-            if (next.h && next.w) {
-                const heightM = parseFloat(next.h) / 100;
-                const weightKg = parseFloat(next.w);
-                if (heightM > 0) {
-                    const bmi = (weightKg / (heightM * heightM)).toFixed(1);
-                    handleChange({ target: { name: 'BMI', value: parseFloat(bmi) } });
-                }
+        const next = { ...hw, [name]: value };
+        setHw(next);
+        
+        if (next.h && next.w) {
+            const heightM = parseFloat(next.h) / 100;
+            const weightKg = parseFloat(next.w);
+            if (heightM > 0) {
+                const bmi = (weightKg / (heightM * heightM)).toFixed(1);
+                handleChange({ target: { name: 'BMI', value: parseFloat(bmi) } });
             }
-            return next;
-        });
+        } else {
+            handleChange({ target: { name: 'BMI', value: "" } });
+        }
     };
 
     return (
@@ -26,7 +26,7 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 border-b border-slate-100 pb-4">
                 <div>
                     <h2 className="text-2xl font-black tracking-tight text-slate-900 mb-1 uppercase">
-                        {readOnly ? "Hồ sơ khám bệnh chi tiết" : "Khảo Sát Lâm Sàng"}
+                        {readOnly ? "Hồ sơ khám bệnh chi tiết" : "Khảo Sát Lâm Sàng (Type 2 Diabetes)"}
                     </h2>
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                         {readOnly ? "Ghi nhận từ phiên khám trước. Không thể chỉnh sửa." : "Trích xuất 21 đặc trưng cốt lõi (Chi-Square)"}
@@ -84,7 +84,7 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                         {readOnly ? (
                             <div className="space-y-1.5">
                                 <Tooltip text="Dưới 18.5: Gầy | 18.5-24.9: Bình thường | >= 25: Béo phì">
-                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-help border-b border-dashed border-slate-300">Chỉ số BMI</label>
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-help border-b border-dashed border-slate-300">Chỉ số BMI (kg/m²)</label>
                                 </Tooltip>
                                 <input disabled type="number" value={formData.BMI} className="w-full p-3 bg-slate-100 border border-transparent rounded-xl outline-none text-base font-black text-slate-900" />
                             </div>
@@ -92,15 +92,15 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                             <div className="grid grid-cols-3 gap-3">
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Cao (cm)</label>
-                                    <input type="number" name="h" value={hw.h} onChange={handleHWChange} placeholder="170" className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold transition-all" />
+                                    <input type="number" min="50" max="250" name="h" value={hw.h} onChange={handleHWChange} placeholder="170" className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold transition-all" />
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nặng (kg)</label>
-                                    <input type="number" name="w" value={hw.w} onChange={handleHWChange} placeholder="65" className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold transition-all" />
+                                    <input type="number" min="10" max="300" name="w" value={hw.w} onChange={handleHWChange} placeholder="65" className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold transition-all" />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Tooltip text="BMI tự động tính">
-                                        <label className="text-[10px] font-bold text-slate-900 uppercase tracking-widest cursor-help">BMI</label>
+                                    <Tooltip text="BMI tự động tính = Cân nặng / (Chiều cao)²">
+                                        <label className="text-[10px] font-bold text-slate-900 uppercase tracking-widest cursor-help">BMI (kg/m²)</label>
                                     </Tooltip>
                                     <input disabled type="text" value={formData.BMI || "--"} className="w-full p-2.5 bg-slate-900 border border-slate-900 rounded-xl outline-none text-sm font-black text-white text-center" />
                                 </div>
@@ -131,14 +131,20 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                     </div>
                     <div className="space-y-3 flex-1">
                         {[
-                            { name: 'Smoker', label: 'Hút thuốc (>= 100 điếu/đời)' },
-                            { name: 'PhysActivity', label: 'Tập thể dục 30 ngày qua' },
-                            { name: 'Fruits', label: 'Ăn trái cây 1 lần/ngày' },
-                            { name: 'Veggies', label: 'Ăn rau xanh 1 lần/ngày' },
-                            { name: 'HvyAlcoholConsump', label: 'Lạm dụng rượu bia' }
+                            { name: 'Smoker', label: 'Hút thuốc (>= 100 điếu/đời)', tooltip: 'Tiêu chuẩn CDC: Tiêu thụ >= 100 điếu thuốc trong suốt cuộc đời là ngưỡng để xác định tiền sử hút thuốc mang rủi ro y tế.' },
+                            { name: 'PhysActivity', label: 'Tập thể dục 30 ngày qua', tooltip: null },
+                            { name: 'Fruits', label: 'Ăn trái cây (>= 1 lần/ngày)', tooltip: null },
+                            { name: 'Veggies', label: 'Ăn rau xanh (>= 1 lần/ngày)', tooltip: null },
+                            { name: 'HvyAlcoholConsump', label: 'Lạm dụng rượu bia', tooltip: 'Tiêu thụ > 14 ly/tuần đối với nam, hoặc > 7 ly/tuần đối với nữ.' }
                         ].map((item) => (
                             <div key={item.name} className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
-                                <p className="font-bold text-xs text-slate-700 w-2/3">{item.label}</p>
+                                {item.tooltip ? (
+                                    <Tooltip text={item.tooltip}>
+                                        <p className="font-bold text-xs text-slate-700 w-2/3 cursor-help border-b border-dashed border-slate-300 inline-block">{item.label}</p>
+                                    </Tooltip>
+                                ) : (
+                                    <p className="font-bold text-xs text-slate-700 w-2/3">{item.label}</p>
+                                )}
                                 <select disabled={readOnly} name={item.name} value={formData[item.name]} onChange={handleChange} className="text-xs bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-3 outline-none font-black text-slate-900">
                                     <option value={0}>Không</option><option value={1}>Có</option>
                                 </select>
@@ -179,23 +185,25 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Khó leo thang</label>
+                                <Tooltip text="Khó khăn nghiêm trọng khi đi bộ do sức khỏe dai dẳng. KHÔNG tính chấn thương cấp tính như gãy chân.">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-help border-b border-dashed border-slate-300">Khó leo thang / Đi lại</label>
+                                </Tooltip>
                                 <select disabled={readOnly} name="DiffWalk" value={formData.DiffWalk} onChange={handleChange} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold text-slate-900 transition-all"><option value={0}>Không</option><option value={1}>Có</option></select>
                             </div>
                         </div>
                         
                         <div className="flex gap-4">
                             <div className="flex-1 space-y-1.5">
-                                <Tooltip text="Số ngày thấy bất ổn tâm lý trong 30 ngày qua">
+                                <Tooltip text="Số ngày tự cảm thấy tâm lý bất ổn trong 30 ngày qua">
                                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-help border-b border-dashed border-slate-300">Ngày ốm (Tâm lý)</label>
                                 </Tooltip>
-                                <input disabled={readOnly} type="number" min="0" max="30" name="MentHlth" value={formData.MentHlth === 0 ? "" : formData.MentHlth} onChange={handleChange} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold text-center transition-all" />
+                                <input disabled={readOnly} type="number" min="0" max="30" name="MentHlth" value={formData.MentHlth} onChange={handleChange} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold text-center transition-all" />
                             </div>
                             <div className="flex-1 space-y-1.5">
-                                <Tooltip text="Số ngày ốm yếu thể chất trong 30 ngày qua">
+                                <Tooltip text="Số ngày tự cảm thấy thể chất ốm yếu trong 30 ngày qua">
                                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-help border-b border-dashed border-slate-300">Ngày ốm (Thể chất)</label>
                                 </Tooltip>
-                                <input disabled={readOnly} type="number" min="0" max="30" name="PhysHlth" value={formData.PhysHlth === 0 ? "" : formData.PhysHlth} onChange={handleChange} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold text-center transition-all" />
+                                <input disabled={readOnly} type="number" min="0" max="30" name="PhysHlth" value={formData.PhysHlth} onChange={handleChange} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none text-xs font-bold text-center transition-all" />
                             </div>
                         </div>
 
@@ -211,7 +219,9 @@ export default function AssessmentForm({ formData, handleChange, handleSubmit, i
                                 </div>
                                 <div className="col-span-2 grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Học vấn</label>
+                                        <Tooltip text="Chuẩn BRFSS của CDC: Liên quan mật thiết đến nhận thức sức khỏe và nguy cơ tiểu đường.">
+                                            <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1 cursor-help border-b border-dashed border-slate-600 inline-block">Học vấn</label>
+                                        </Tooltip>
                                         <select disabled={readOnly} name="Education" value={formData.Education} onChange={handleChange} className="w-full bg-slate-800 border-none rounded-lg text-[10px] font-bold text-white p-2 outline-none">
                                             <option value={1}>Chưa đi học</option>
                                             <option value={2}>Tiểu học</option>

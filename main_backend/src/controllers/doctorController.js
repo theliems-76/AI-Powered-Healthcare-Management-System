@@ -104,9 +104,9 @@ exports.getHighRiskPatients = async (req, res) => {
 
                 return {
                     id: p.id,
-                    full_name: p.User.full_name,
-                    email: p.User.email,
-                    phone: p.User.phone,
+                    full_name: p.User?.full_name || 'Bệnh nhân chưa xác định',
+                    email: p.User?.email,
+                    phone: p.User?.phone,
                     latest_risk_score: latestRisk.toFixed(1),
                     latest_diagnosis: latest.ai_diagnosis,
                     last_record_id: latest.id,
@@ -131,7 +131,7 @@ exports.getHighRiskPatients = async (req, res) => {
 exports.updateDoctorNotes = async (req, res) => {
     try {
         const { id } = req.params;
-        const { doctor_notes } = req.body;
+        const { doctor_notes, ai_nutrition_plan } = req.body;
 
         const record = await MedicalRecord.findByPk(id);
         if (!record) return res.status(404).json({ error: 'Không tìm thấy bản ghi!' });
@@ -142,7 +142,11 @@ exports.updateDoctorNotes = async (req, res) => {
             return res.status(403).json({ error: 'Bạn không có quyền chỉnh sửa hồ sơ này!' });
         }
 
-        await record.update({ doctor_notes });
+        const updateData = {};
+        if (doctor_notes !== undefined) updateData.doctor_notes = doctor_notes;
+        if (ai_nutrition_plan !== undefined) updateData.ai_nutrition_plan = ai_nutrition_plan;
+
+        await record.update(updateData);
 
         // Tạo thông báo cho bệnh nhân
         await Notification.create({
@@ -171,5 +175,85 @@ exports.updateDoctorNotes = async (req, res) => {
     } catch (error) {
         console.error('Lỗi updateDoctorNotes:', error);
         res.status(500).json({ error: 'Lỗi lưu ghi chú!' });
+    }
+};
+
+// ==========================================
+// 4. HỒ CHỨA BỆNH NHÂN CHỜ (PATIENT POOL)
+// ==========================================
+exports.getPatientPool = async (req, res) => {
+    try {
+        // Lấy các bệnh nhân chưa có bác sĩ quản lý
+        const unassignedProfiles = await PatientProfile.findAll({
+            where: { managed_by_doctor_id: null },
+            include: [
+                {
+                    model: User,
+                    attributes: ['full_name', 'email', 'phone', 'is_active']
+                },
+                {
+                    model: MedicalRecord,
+                    separate: true,
+                    limit: 1,
+                    order: [['createdAt', 'DESC']],
+                    attributes: ['id', 'ai_risk_score', 'ai_diagnosis', 'createdAt']
+                }
+            ]
+        });
+
+        const pool = unassignedProfiles
+            .filter(p => {
+                if (!p.User || !p.User.is_active) return false;
+                const latest = p.MedicalRecords?.[0];
+                if (!latest) return false;
+                return parseFloat(latest.ai_risk_score || 0) > 66; // Chỉ lấy nguy cơ cao
+            })
+            .map(p => {
+                const latest = p.MedicalRecords[0];
+                return {
+                    id: p.id,
+                    user_id: p.user_id,
+                    full_name: p.User.full_name,
+                    email: p.User.email,
+                    phone: p.User.phone,
+                    risk_score: parseFloat(latest.ai_risk_score || 0).toFixed(1),
+                    diagnosis: latest.ai_diagnosis,
+                    last_record_id: latest.id,
+                    created_at: new Date(latest.createdAt).toLocaleDateString('vi-VN')
+                };
+            })
+            .sort((a, b) => parseFloat(b.risk_score) - parseFloat(a.risk_score));
+
+        res.status(200).json({ status: 'success', data: pool });
+    } catch (error) {
+        console.error('Lỗi getPatientPool:', error);
+        res.status(500).json({ error: 'Lỗi lấy danh sách hồ chờ!' });
+    }
+};
+
+exports.claimPatient = async (req, res) => {
+    try {
+        const { patientProfileId } = req.body;
+        const profile = await PatientProfile.findByPk(patientProfileId);
+
+        if (!profile) return res.status(404).json({ error: 'Không tìm thấy hồ sơ bệnh nhân!' });
+        if (profile.managed_by_doctor_id) {
+            return res.status(400).json({ error: 'Bệnh nhân này đã có bác sĩ quản lý!' });
+        }
+
+        await profile.update({ managed_by_doctor_id: req.user.id });
+
+        // Thông báo cho bệnh nhân
+        await Notification.create({
+            user_id: profile.user_id,
+            title: 'Đã có Bác sĩ phụ trách',
+            message: 'Hồ sơ rủi ro cao của bạn đã được Bác sĩ tiếp nhận xử lý. Vui lòng kiểm tra lịch hẹn hoặc liên hệ bác sĩ.',
+            type: 'DOCTOR_ASSIGNED'
+        });
+
+        res.status(200).json({ status: 'success', message: 'Tiếp nhận bệnh nhân thành công!' });
+    } catch (error) {
+        console.error('Lỗi claimPatient:', error);
+        res.status(500).json({ error: 'Lỗi tiếp nhận bệnh nhân!' });
     }
 };

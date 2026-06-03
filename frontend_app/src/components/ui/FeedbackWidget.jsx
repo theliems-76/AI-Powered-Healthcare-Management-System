@@ -5,7 +5,9 @@ import api from '../../services/api';
 
 export default function FeedbackWidget() {
     const [isOpen, setIsOpen] = useState(false);
-    const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [hasSubmitted, setHasSubmitted] = useState(() => {
+        return localStorage.getItem('feedback_submitted') === 'true';
+    });
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [feedback, setFeedback] = useState('');
@@ -24,6 +26,7 @@ export default function FeedbackWidget() {
             await api.post('/feedbacks', { rating, content: feedback });
             setIsOpen(false);
             setHasSubmitted(true);
+            localStorage.setItem('feedback_submitted', 'true');
             toast.success("Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi vô cùng trân trọng.");
         } catch (error) {
             console.error(error);
@@ -44,7 +47,7 @@ export default function FeedbackWidget() {
                 title="Góp ý & Đánh giá"
             >
                 <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <MessageSquarePlus size={24} />
+                <Star size={24} className="fill-amber-400 text-amber-400" />
                 <span className="absolute -top-2 -right-2 flex h-4 w-4">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-4 w-4 bg-rose-500"></span>
@@ -66,7 +69,11 @@ export default function FeedbackWidget() {
                         {/* Header Gradient */}
                         <div className="bg-gradient-to-br from-indigo-500 to-cyan-400 p-6 text-white relative overflow-hidden shrink-0">
                             <button 
-                                onClick={() => setIsOpen(false)}
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    setHasSubmitted(true);
+                                    localStorage.setItem('feedback_submitted', 'true');
+                                }}
                                 className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                             >
                                 <X size={20} />

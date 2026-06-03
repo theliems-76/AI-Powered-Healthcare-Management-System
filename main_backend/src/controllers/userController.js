@@ -148,6 +148,10 @@ exports.assignPatient = async (req, res) => {
             return res.status(404).json({ error: "Không tìm thấy bệnh nhân với email này!" });
         }
 
+        if (!targetUser.is_active) {
+            return res.status(403).json({ error: "Tài khoản bệnh nhân này chưa được kích hoạt!" });
+        }
+
         const profile = await PatientProfile.findOne({ where: { user_id: targetUser.id } });
         if (!profile) {
             return res.status(404).json({ error: "Bệnh nhân chưa có hồ sơ y tế!" });

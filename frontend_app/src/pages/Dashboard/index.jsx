@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, Gauge, Stethoscope, Lightbulb, TrendingUp, Users } from 'lucide-react';
+import { Activity, Gauge, Stethoscope, Lightbulb, TrendingUp, Users, FileText } from 'lucide-react';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import StatsCard from './components/StatsCard';
@@ -196,103 +196,123 @@ export default function Dashboard() {
             )}
 
             {user?.role === 'PATIENT' && !latestRecord && (
-                <div className="bg-slate-50 border border-slate-200 rounded-[2rem] p-12 text-center flex flex-col items-center">
-                    <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
-                        <Stethoscope size={40} className="text-slate-300" />
+                <div className="bg-white border border-slate-200 rounded-[2rem] p-8 md:p-14 shadow-sm overflow-hidden relative">
+                    {/* Subtle medical cross or grid background could go here, but keeping it white for minimalism */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                        {/* Left Side: Call to Action */}
+                        <div className="flex flex-col items-start text-left">
+                            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
+                                Bắt đầu hành trình <br/> sức khỏe của bạn
+                            </h2>
+                            <p className="text-[13px] text-slate-600 font-medium leading-relaxed mb-10 max-w-lg">
+                                Để hệ thống có thể cung cấp lộ trình điều trị chuẩn xác, chúng tôi cần thu thập các chỉ số lâm sàng hiện tại của bạn. Toàn bộ dữ liệu được phân tích bởi hệ thống <strong className="text-slate-900">Trí tuệ Nhân tạo XAI</strong> và được giám sát chặt chẽ bởi Bác sĩ chuyên khoa.
+                            </p>
+                            <button onClick={() => navigate('/assessment')} className="px-8 py-4 bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-900/10 flex items-center gap-3">
+                                Bắt Đầu Khảo Sát Y Khoa &rarr;
+                            </button>
+                        </div>
+                        
+                        {/* Right Side: How it works (Typography focus) */}
+                        <div className="flex flex-col space-y-10 pl-6 lg:pl-10">
+                            <div className="relative pl-8 border-l border-slate-200">
+                                <span className="absolute -left-12 top-[-1.5rem] text-[5rem] font-black text-slate-100 select-none -z-10 leading-none">01</span>
+                                <h3 className="text-sm font-black text-slate-900 mb-2 uppercase tracking-widest">Khảo sát Lâm sàng</h3>
+                                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">Cung cấp 21 chỉ số cơ bản về sinh trắc học, bệnh lý nền và thói quen sinh hoạt hàng ngày.</p>
+                            </div>
+                            
+                            <div className="relative pl-8 border-l border-slate-200">
+                                <span className="absolute -left-12 top-[-1.5rem] text-[5rem] font-black text-slate-100 select-none -z-10 leading-none">02</span>
+                                <h3 className="text-sm font-black text-slate-900 mb-2 uppercase tracking-widest">Phân tích Rủi ro XAI</h3>
+                                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">Hệ thống AI sẽ thiết lập Ma trận Tiên lượng Rủi ro và phân tích minh bạch từng yếu tố ảnh hưởng.</p>
+                            </div>
+                            
+                            <div className="relative pl-8 border-l border-slate-200">
+                                <span className="absolute -left-12 top-[-1.5rem] text-[5rem] font-black text-slate-100 select-none -z-10 leading-none">03</span>
+                                <h3 className="text-sm font-black text-slate-900 mb-2 uppercase tracking-widest">Phác đồ Cá nhân hóa</h3>
+                                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">Nhận lộ trình can thiệp dinh dưỡng, tập luyện chuyên sâu và kết nối trực tiếp với bác sĩ chuyên khoa.</p>
+                            </div>
+                        </div>
                     </div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Bắt Đầu Hành Trình Sức Khỏe</h2>
-                    <p className="text-sm font-medium text-slate-500 max-w-md mx-auto mb-8">
-                        Nhập các chỉ số lâm sàng để AI xây dựng lộ trình dinh dưỡng và tập luyện chuẩn y khoa cho riêng bạn.
-                    </p>
-                    <button onClick={() => navigate('/assessment')} className="px-8 py-3.5 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-900/10">
-                        Bắt Đầu Khám Ngay
-                    </button>
                 </div>
             )}
 
             {}
             {user?.role === 'PATIENT' && latestRecord && (
-                <div className="grid grid-cols-12 gap-6 items-stretch">
-                    {/* Unified Health Panel */}
-                    <div className="col-span-12 lg:col-span-8 bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden flex flex-col relative group">
-                        {/* Soft background glow */}
-                        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-50 rounded-full blur-[80px] -z-10 group-hover:bg-blue-100 transition-colors duration-1000"></div>
-                        
-                        {/* Stats Header Area */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-8 md:p-10 z-10">
-                            
-                            {/* Risk Stat - Glowing & Bold */}
-                            <div className="pb-8 md:pb-0 md:pr-10 flex flex-col justify-between">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-rose-100">
-                                        <div className="absolute w-full h-full bg-rose-400 rounded-full animate-ping opacity-20"></div>
-                                        <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-                                    </div>
-                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Rủi ro tiểu đường</p>
-                                </div>
-                                <div className="flex items-baseline gap-2 mt-auto">
-                                    <h2 className="text-[4rem] font-black text-transparent bg-clip-text bg-gradient-to-br from-rose-500 to-orange-400 tracking-tighter leading-none drop-shadow-sm">{latestRecord.risk_score}</h2>
-                                    <span className="text-2xl font-black text-rose-300">%</span>
+                <div className="flex flex-col gap-6">
+                    {/* Section 1: Metrics */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Risk Card */}
+                        <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                    <span className={`w-1.5 h-1.5 rounded-full ${latestRecord.risk_score <= 33 ? 'bg-emerald-500' : latestRecord.risk_score <= 66 ? 'bg-amber-500' : 'bg-rose-500'}`}></span> Tiên lượng rủi ro
+                                </p>
+                                <div className="flex items-baseline gap-2 mt-2">
+                                    <h2 className={`text-4xl md:text-5xl font-black tracking-tighter ${latestRecord.risk_score <= 33 ? 'text-emerald-600' : latestRecord.risk_score <= 66 ? 'text-amber-600' : 'text-rose-600'}`}>
+                                        {latestRecord.risk_score}
+                                    </h2>
+                                    <span className="text-xl font-bold text-slate-400">%</span>
                                 </div>
                             </div>
+                            <div className={`px-4 py-2 rounded-lg border text-xs font-bold uppercase tracking-widest ${latestRecord.risk_score <= 33 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : latestRecord.risk_score <= 66 ? 'bg-amber-50 border-amber-100 text-amber-700' : 'bg-rose-50 border-rose-100 text-rose-700'}`}>
+                                {latestRecord.risk_score <= 33 ? 'Nguy cơ thấp' : latestRecord.risk_score <= 66 ? 'Nguy cơ trung bình' : 'Nguy cơ cao'}
+                            </div>
+                        </div>
 
-                            {/* BMI Stat - Sleek */}
-                            <div className="pt-8 md:pt-0 md:pl-10 flex flex-col justify-between">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
-                                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                                    </div>
-                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Chỉ số khối cơ thể</p>
-                                </div>
-                                <div className="flex items-baseline gap-2 mt-auto">
-                                    <h2 className="text-[4rem] font-black text-slate-800 tracking-tighter leading-none">{latestRecord.bmi}</h2>
+                        {/* BMI Card */}
+                        <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                                    Chỉ số khối cơ thể (BMI)
+                                </p>
+                                <div className="flex items-baseline gap-2 mt-2">
+                                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-800">{latestRecord.bmi}</h2>
                                     <span className="text-xl font-bold text-slate-400">kg/m²</span>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Integrated Chart Area - Edge to Edge */}
-                        <div className="flex-1 bg-gradient-to-b from-slate-50/50 to-white border-t border-slate-100 p-8 md:p-10 relative z-10">
-                            <div className="flex justify-between items-center mb-8">
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                    <TrendingUp size={16} className="text-indigo-400" /> Xu hướng rủi ro (Các lần gần nhất)
-                                </p>
+                            <div className="px-4 py-2 rounded-lg border bg-slate-50 border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-widest">
+                                Thông số gốc
                             </div>
-                            {historyData.length >= 2 ? (
-                                <div className="relative h-48 -mx-4 sm:mx-0">
-                                    <MiniRiskChart data={historyData} className="h-full w-full" />
-                                </div>
-                            ) : (
-                                <div className="h-48 flex flex-col items-center justify-center text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 rounded-3xl bg-white/50">
-                                    <Activity className="w-8 h-8 text-slate-300 mb-3" />
-                                    <span>Cần thêm {2 - historyData.length} lần khám để phân tích xu hướng</span>
-                                </div>
-                            )}
                         </div>
                     </div>
 
-                    {/* AI Advice Panel - Premium Dark Clinical */}
-                    <div className="col-span-12 lg:col-span-4 bg-slate-900 p-8 md:p-10 rounded-[2rem] shadow-2xl shadow-slate-900/20 flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500 border border-slate-800">
-                        {/* Subtle AI Glows (Cinematic Tech Feel) */}
-                        <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-cyan-500/10 blur-[60px] group-hover:bg-cyan-500/20 transition-colors duration-700"></div>
-                        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[40px]"></div>
-                        
-                        <div className="flex items-center gap-3 mb-8 relative z-10">
-                            <div className="p-2.5 bg-slate-800 rounded-xl shadow-inner border border-slate-700">
-                                <Lightbulb size={20} className="text-cyan-400 animate-pulse" />
+                    {/* Section 2: Clinical Summary (Rebranded AI) */}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+                        <div className="bg-slate-50 border-b border-slate-200 px-6 md:px-8 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h3 className="font-black text-slate-800 uppercase tracking-widest text-sm">
+                                    Báo cáo Tổng hợp Y khoa
+                                </h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Đánh giá chuyên sâu bởi hệ thống phân tích</p>
                             </div>
-                            <h3 className="font-black text-xs uppercase tracking-widest text-white drop-shadow-md">Phân tích từ AI</h3>
+                            <button onClick={() => navigate(`/history/${latestRecord?.id}`)} className="text-[11px] font-bold uppercase tracking-widest text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-xl flex items-center gap-2 transition-colors shrink-0">
+                                Xem Phác đồ Chi tiết &rarr;
+                            </button>
                         </div>
-                        
-                        <div className="text-base text-slate-300 leading-relaxed font-medium flex-1 relative z-10 mb-10">
-                            <p className="line-clamp-6">
-                                {stripMarkdown(latestRecord?.ai_nutrition_plan || "Hệ thống AI hiện chưa đưa ra lời khuyên cụ thể cho hồ sơ này. Vui lòng cập nhật thêm chỉ số.")}
-                            </p>
+                        <div className="p-6 md:p-8 bg-white">
+                            <div className="text-[13px] text-slate-700 font-medium leading-loose max-w-4xl whitespace-pre-line">
+                                {stripMarkdown(latestRecord?.ai_nutrition_plan || "Hồ sơ y tế hiện chưa có kết luận đánh giá chuyên sâu. Vui lòng thực hiện thêm các khảo sát hoặc cập nhật thông số lâm sàng.")}
+                            </div>
                         </div>
-                        
-                        <button onClick={() => navigate(`/history/${latestRecord?.id}`)} className="w-full py-4 bg-white text-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-cyan-50 transition-all active:scale-95 shadow-lg relative z-10 flex items-center justify-center gap-2">
-                            Mở Phác Đồ Chi Tiết
-                        </button>
+                    </div>
+
+                    {/* Section 3: Trend Chart */}
+                    <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                                Phân tích Xu hướng Rủi ro
+                            </h3>
+                        </div>
+                        {historyData.length >= 2 ? (
+                            <div className="h-72 w-full">
+                                <MiniRiskChart data={historyData} className="h-full w-full" />
+                            </div>
+                        ) : (
+                            <div className="h-48 flex flex-col items-center justify-center text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                                <Activity className="w-8 h-8 text-slate-300 mb-3" />
+                                <span>Cần tối thiểu 2 lần kiểm tra để theo dõi diễn tiến sức khỏe</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

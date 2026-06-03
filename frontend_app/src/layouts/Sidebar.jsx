@@ -25,12 +25,7 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
     const menuItems = allMenuItems.filter(item => {
         if (!item.roles.includes(currentRole)) return false;
         
-        // Bệnh nhân chưa có bác sĩ phụ trách sẽ không thấy tab Lịch hẹn
-        if (currentRole === 'PATIENT' && item.path === '/appointments') {
-            if (!user?.Profile?.managed_by_doctor_id) {
-                return false;
-            }
-        }
+        // Cho phép hiển thị tab Lịch hẹn cho tất cả, trang Appointments sẽ tự xử lý thông báo nếu chưa có bác sĩ
         
         return true;
     });

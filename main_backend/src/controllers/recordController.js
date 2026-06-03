@@ -1,47 +1,89 @@
+const crypto = require('crypto');
 const axios = require('axios');
-const { MedicalRecord, PatientProfile, Dish, Exercise, Ingredient, DishIngredient, Notification } = require('../models');
+const { MedicalRecord, PatientProfile, Dish, Exercise, Ingredient, DishIngredient, Notification, AICache } = require('../models');
 const { Sequelize, Op } = require('sequelize');
 const { logAction } = require('./auditController');
 
 exports.createDiagnosticRecord = async (req, res) => {
     try {
         const patientData = req.body;
-        console.log("📥 Đã nhận dữ liệu, đang gọi AI dự đoán...");
+        
+        const featureKeys = ['HighBP', 'HighChol', 'CholCheck', 'BMI', 'Smoker', 'Stroke', 'HeartDiseaseorAttack', 'PhysActivity', 'Fruits', 'Veggies', 'HvyAlcoholConsump', 'AnyHealthcare', 'NoDocbcCost', 'GenHlth', 'MentHlth', 'PhysHlth', 'DiffWalk', 'Sex', 'Age', 'Education', 'Income'];
+        let hashPayload = {};
+        featureKeys.forEach(k => hashPayload[k] = patientData[k]);
+        const hashInput = crypto.createHash('md5').update(JSON.stringify(hashPayload)).digest('hex');
 
-        const predictResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/predict', patientData);
-        const aiResult = predictResponse.data;
-        console.log("🤖 AI đã chẩn đoán xong nguy cơ!");
+        let aiResult, aiFullResponse = {}, aiNutritionPlan = "", recommendedFoods = [], recommendedActivities = [];
 
-        console.log("🥗 Đang gọi Bác sĩ Dinh dưỡng AI (Gemini)...");
-        const nutritionResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/generate-plan', aiResult, {
-            timeout: 120000
-        });
-
-        let aiFullResponse = nutritionResponse.data;
-        let aiNutritionPlan = "";
-        let recommendedFoods = [];
-        let recommendedActivities =[];
-
-        if (typeof aiFullResponse === 'object' && aiFullResponse.ai_nutritionist_plan) {
-            aiNutritionPlan = aiFullResponse.ai_nutritionist_plan;
-            recommendedFoods = aiFullResponse.recommended_foods ||[];
-            recommendedActivities = aiFullResponse.recommended_activities ||[];
+        const cached = await AICache.findOne({ where: { input_hash: hashInput } });
+        
+        if (cached) {
+            console.log("⚡ [CACHE HIT] Đã tìm thấy kết quả AI trong Cache!");
+            aiResult = {
+                risk_probability: cached.ai_risk_score,
+                diagnosis: cached.ai_diagnosis,
+                explanation: typeof cached.ai_explanation === 'string' ? JSON.parse(cached.ai_explanation) : cached.ai_explanation
+            };
+            aiNutritionPlan = cached.ai_nutrition_plan;
+            recommendedFoods = typeof cached.recommended_foods === 'string' ? JSON.parse(cached.recommended_foods) : (cached.recommended_foods || []);
+            recommendedActivities = typeof cached.recommended_activities === 'string' ? JSON.parse(cached.recommended_activities) : (cached.recommended_activities || []);
         } else {
+            console.log("📥 Đã nhận dữ liệu, đang gọi AI dự đoán...");
+            const predictResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/predict', hashPayload);
+            aiResult = predictResponse.data;
+            console.log("🤖 AI đã chẩn đoán xong nguy cơ!");
+
+            console.log("🥗 Đang gọi Bác sĩ Dinh dưỡng AI (Gemini)...");
             try {
-                const text = typeof aiFullResponse === 'string' ? aiFullResponse : JSON.stringify(aiFullResponse);
-                const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
-                
-                if (jsonMatch) {
-                    const jsonData = JSON.parse(jsonMatch[1].trim());
-                    recommendedFoods = jsonData.recommended_foods || [];
-                    recommendedActivities = jsonData.recommended_activities ||[];
-                    aiNutritionPlan = text.replace(jsonMatch[0], '').trim();
-                } else {
-                    aiNutritionPlan = text;
+                const nutritionResponse = await axios.post('http://127.0.0.1:8000/api/v1/ai/generate-plan', aiResult, {
+                    timeout: 120000
+                });
+                aiFullResponse = nutritionResponse.data;
+            } catch (geminiError) {
+                console.error("⚠️ Lỗi gọi Gemini AI (Hết Quota/Rate Limit), dùng phác đồ mặc định:", geminiError.message);
+                aiFullResponse = {
+                    ai_nutritionist_plan: "Hệ thống AI Dinh dưỡng hiện đang quá tải. Dưới đây là phác đồ tham khảo cơ bản:\n\n1. Duy trì chế độ ăn nhiều rau xanh.\n2. Hạn chế đường và tinh bột nhanh.\n3. Tập thể dục ít nhất 30 phút mỗi ngày.",
+                    recommended_foods: [],
+                    recommended_activities: []
+                };
+            }
+
+            if (typeof aiFullResponse === 'object' && aiFullResponse.ai_nutritionist_plan) {
+                aiNutritionPlan = aiFullResponse.ai_nutritionist_plan;
+                recommendedFoods = aiFullResponse.recommended_foods ||[];
+                recommendedActivities = aiFullResponse.recommended_activities ||[];
+            } else {
+                try {
+                    const text = typeof aiFullResponse === 'string' ? aiFullResponse : JSON.stringify(aiFullResponse);
+                    const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+                    
+                    if (jsonMatch) {
+                        const jsonData = JSON.parse(jsonMatch[1].trim());
+                        recommendedFoods = jsonData.recommended_foods || [];
+                        recommendedActivities = jsonData.recommended_activities ||[];
+                        aiNutritionPlan = text.replace(jsonMatch[0], '').trim();
+                    } else {
+                        aiNutritionPlan = text;
+                    }
+                } catch (parseError) {
+                    console.error("❌ Lỗi bóc tách JSON từ AI:", parseError);
+                    aiNutritionPlan = typeof aiFullResponse === 'string' ? aiFullResponse : "Lỗi bóc tách thực đơn.";
                 }
-            } catch (parseError) {
-                console.error("❌ Lỗi bóc tách JSON từ AI:", parseError);
-                aiNutritionPlan = typeof aiFullResponse === 'string' ? aiFullResponse : "Lỗi bóc tách thực đơn.";
+            }
+
+            try {
+                await AICache.create({
+                    input_hash: hashInput,
+                    ai_risk_score: aiResult.risk_probability,
+                    ai_diagnosis: aiResult.diagnosis,
+                    ai_explanation: aiResult.explanation,
+                    ai_nutrition_plan: aiNutritionPlan,
+                    recommended_foods: recommendedFoods,
+                    recommended_activities: recommendedActivities
+                });
+                console.log("💾 Đã lưu kết quả mới vào AI Cache!");
+            } catch (cacheErr) {
+                console.error("Lỗi lưu Cache:", cacheErr.message);
             }
         }
 

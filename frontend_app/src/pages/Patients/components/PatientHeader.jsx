@@ -3,8 +3,11 @@ import { Users, UserPlus, X, Loader2, Mail } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../../services/api';
 
+import PatientPoolModal from './PatientPoolModal';
+
 export default function PatientHeader({ onAssigned }) {
     const [showModal, setShowModal] = useState(false);
+    const [showPool, setShowPool] = useState(false);
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -37,6 +40,12 @@ export default function PatientHeader({ onAssigned }) {
                 </div>
                 <div className="flex gap-3 mt-4 sm:mt-0">
                     <button
+                        onClick={() => setShowPool(true)}
+                        className="flex items-center gap-2 px-6 py-3 font-black text-rose-600 bg-rose-50 border border-rose-100 rounded-xl hover:bg-rose-100 transition-all active:scale-95 text-[11px] uppercase tracking-widest"
+                    >
+                        Hồ sơ chờ tiếp nhận
+                    </button>
+                    <button
                         onClick={() => setShowModal(true)}
                         className="flex items-center gap-2 px-6 py-3 font-black text-white bg-slate-900 rounded-xl hover:bg-slate-800 shadow-xl shadow-slate-900/10 transition-all active:scale-95 text-[11px] uppercase tracking-widest"
                     >
@@ -45,7 +54,14 @@ export default function PatientHeader({ onAssigned }) {
                 </div>
             </div>
 
-            {}
+            {/* Modal Pool */}
+            <PatientPoolModal 
+                isOpen={showPool} 
+                onClose={() => setShowPool(false)} 
+                onAssigned={onAssigned} 
+            />
+
+            {/* Modal Thêm */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 animate-in zoom-in-95 duration-200">

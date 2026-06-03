@@ -16,6 +16,7 @@ export default function RecordDetail() {
     const [record, setRecord] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [doctorNotes, setDoctorNotes] = useState('');
+    const [aiPlan, setAiPlan] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
@@ -25,6 +26,9 @@ export default function RecordDetail() {
                 setRecord(res.data.data);
                 if (res.data.data.doctor_notes) {
                     setDoctorNotes(res.data.data.doctor_notes);
+                }
+                if (res.data.data.ai_nutrition_plan) {
+                    setAiPlan(res.data.data.ai_nutrition_plan);
                 }
             } catch (err) {
                 console.error("Lỗi lấy chi tiết:", err);
@@ -38,10 +42,13 @@ export default function RecordDetail() {
     const handleSaveNotes = async () => {
         setIsSaving(true);
         try {
-            const res = await api.put(`/doctor/records/${recordId}/notes`, { doctor_notes: doctorNotes });
+            const res = await api.put(`/doctor/records/${recordId}/notes`, { 
+                doctor_notes: doctorNotes,
+                ai_nutrition_plan: aiPlan 
+            });
             if (res.data.status === 'success') {
                 toast.success("Đã lưu nhận xét lâm sàng và duyệt phác đồ!");
-                setRecord({ ...record, doctor_notes: doctorNotes });
+                setRecord({ ...record, doctor_notes: doctorNotes, ai_nutrition_plan: aiPlan });
             }
         } catch (error) {
             toast.error("Lỗi khi lưu nhận xét.");
@@ -95,6 +102,16 @@ export default function RecordDetail() {
                                             ['clean']
                                         ],
                                     }}
+                                />
+                            </div>
+
+                            <div className="mt-8">
+                                <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-2">Chỉnh sửa Phác đồ AI (Hiển thị cho bệnh nhân)</label>
+                                <textarea 
+                                    className="w-full p-4 rounded-xl border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 outline-none text-sm font-medium text-slate-700 min-h-[250px] whitespace-pre-wrap"
+                                    value={aiPlan}
+                                    onChange={(e) => setAiPlan(e.target.value)}
+                                    placeholder="Chỉnh sửa nội dung phác đồ do AI tạo..."
                                 />
                             </div>
                             

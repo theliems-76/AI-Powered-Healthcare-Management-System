@@ -8,9 +8,9 @@ import BMIChart from './components/BMIChart';
 import InsightsTimeline from './components/InsightsTimeline';
 
 const TIME_RANGES = [
-    { label: '3T', value: 3 },
-    { label: '6T', value: 6 },
-    { label: '1N', value: 12 },
+    { label: '3 Tháng', value: 3 },
+    { label: '6 Tháng', value: 6 },
+    { label: '1 Năm', value: 12 },
     { label: 'Tất cả', value: 0 },
 ];
 

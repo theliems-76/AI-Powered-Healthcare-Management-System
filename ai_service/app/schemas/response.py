@@ -6,6 +6,7 @@ class Factor(BaseModel):
     contribution: float
 
 class Explanation(BaseModel):
+    all_factors: List[Factor]
     warning_factors: List[Factor]
     good_factors: List[Factor]
 

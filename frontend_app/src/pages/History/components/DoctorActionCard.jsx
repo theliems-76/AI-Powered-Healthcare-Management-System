@@ -78,6 +78,13 @@ export default function DoctorActionCard({ recordId, initialNotes }) {
                                 input.onchange = async (e) => {
                                     const file = e.target.files[0];
                                     if (!file) return;
+                                    
+                                    // Giới hạn 5MB
+                                    if (file.size > 5 * 1024 * 1024) {
+                                        toast.error('Kích thước file vượt quá 5MB!');
+                                        return;
+                                    }
+
                                     const uploadData = new FormData();
                                     uploadData.append('file', file);
                                     const toastId = toast.loading('Đang tải lên...');
@@ -102,7 +109,7 @@ export default function DoctorActionCard({ recordId, initialNotes }) {
                             }}
                             className="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-white/90 hover:bg-white px-4 py-2.5 rounded-xl transition shadow-sm border border-slate-200"
                         >
-                            📎 Đính kèm File
+                            📎 Đính kèm File (Tối đa 5MB)
                         </button>
 
                         <button
@@ -128,8 +135,8 @@ export default function DoctorActionCard({ recordId, initialNotes }) {
                     <div className="flex items-start gap-2">
                         <CheckCircle className="w-4 h-4 text-emerald-300 mt-0.5 flex-shrink-0" />
                         <div 
-                            className="text-sm text-white leading-relaxed prose prose-invert max-w-none"
-                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(notes) }}
+                            className="text-sm text-white leading-relaxed prose prose-invert max-w-none [&_a]:text-cyan-300 [&_a]:underline"
+                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(notes, { ADD_ATTR: ['target'] }).replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ') }}
                         />
                     </div>
                 </div>

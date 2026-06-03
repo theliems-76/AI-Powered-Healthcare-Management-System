@@ -1,4 +1,4 @@
-﻿import os
+import os
 import joblib
 import pandas as pd
 import shap
@@ -73,6 +73,7 @@ def predict_and_explain(input_data: dict) -> dict:
         "diagnosis": diagnosis,
         "risk_probability": round(risk_prob * 100, 2),
         "explanation": {
+            "all_factors": shap_dict_sorted,
             "warning_factors": warning_factors,
             "good_factors": good_factors
         }
