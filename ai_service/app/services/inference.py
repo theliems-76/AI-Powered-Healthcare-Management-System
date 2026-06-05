@@ -39,7 +39,7 @@ try:
     explainer = shap.TreeExplainer(cat_model)
     print("Tải AI Model thành công!")
 except Exception as e:
-    print(f"LỖI TẢI MÔ HÌNH: {e}. Vui lòng kiểm tra lại thư mục models/")
+    print(f"ERROR LOADING MODEL: {e}. Please check the models/ directory.")
 
 def predict_and_explain(input_data: dict) -> dict:
     input_df = pd.DataFrame([input_data], columns=original_features)

@@ -1,0 +1,22 @@
+[
+    {
+        "title": "Phác đồ Hạ đường huyết",
+        "content": "Hạ đường huyết (đường huyết dưới 70 mg/dL): Bệnh nhân cần ăn ngay 15g carbohydrate hấp thu nhanh (ví dụ: 3 viên đường, 1/2 cốc nước trái cây, hoặc 1 thìa canh mật ong). Đợi 15 phút và đo lại đường huyết. Nếu vẫn dưới 70 mg/dL, lặp lại bước trên. Tránh ăn sô cô la vì chất béo làm chậm hấp thu đường."
+    },
+    {
+        "title": "Lưu ý khi dùng Metformin",
+        "content": "Metformin là thuốc đầu tay cho đái tháo đường type 2. Tác dụng phụ thường gặp nhất là rối loạn tiêu hóa (tiêu chảy, buồn nôn). Bệnh nhân nên uống Metformin ngay sau bữa ăn để giảm kích ứng dạ dày. Không được tự ý ngưng thuốc mà không có chỉ định của bác sĩ."
+    },
+    {
+        "title": "Chỉ định tiêm Insulin",
+        "content": "Insulin được chỉ định khi HbA1c > 10%, hoặc đường huyết đói > 250 mg/dL kèm theo các triệu chứng sụt cân, mệt mỏi nhiều. Bệnh nhân cần tiêm đúng giờ, luân phiên vị trí tiêm (bụng, đùi, cánh tay) để tránh loạn dưỡng mỡ."
+    },
+    {
+        "title": "Khuyến cáo Vận động cho bệnh nhân Tiểu đường",
+        "content": "Người bệnh tiểu đường nên tập thể dục ít nhất 150 phút/tuần, cường độ trung bình (đi bộ nhanh, bơi lội, đạp xe). Không tập khi đường huyết đói > 250 mg/dL có xeton niệu, hoặc > 300 mg/dL không có xeton niệu. Luôn mang theo kẹo hoặc đường khi tập để phòng hạ đường huyết."
+    },
+    {
+        "title": "Chế độ dinh dưỡng (Quy tắc đĩa thức ăn)",
+        "content": "Theo Hiệp hội Đái tháo đường Hoa Kỳ (ADA), quy tắc đĩa thức ăn lý tưởng: 1/2 đĩa là rau xanh không tinh bột (rau cải, súp lơ), 1/4 đĩa là protein nạc (cá, thịt gà, đậu phụ), 1/4 đĩa là tinh bột phức (gạo lứt, khoai lang). Tránh tuyệt đối nước ngọt có ga và bánh kẹo ngọt."
+    }
+]

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { User, Phone, Mail, Calendar, MapPin, Weight, Ruler, Save, Loader2, Activity, Lock } from 'lucide-react';
+import { User, Phone, Mail, Calendar, MapPin, Weight, Ruler, Save, Loader2, Activity, Lock, Stethoscope, XCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
@@ -13,6 +13,11 @@ export default function Profile() {
     const [passwordData, setPasswordData] = useState({
         current_password: '', new_password: '', confirm_password: ''
     });
+    
+    const [doctors, setDoctors] = useState([]);
+    const [selectedDoctor, setSelectedDoctor] = useState('');
+    const [doctorInfo, setDoctorInfo] = useState(null);
+    const [isRequestingDoctor, setIsRequestingDoctor] = useState(false);
     
     const [formData, setFormData] = useState({
         full_name: '', phone: '', date_of_birth: '', 
@@ -34,12 +39,32 @@ export default function Profile() {
                     weight_kg: data.Profile?.weight_kg || '',
                     height_cm: data.Profile?.height_cm || ''
                 });
+
+                if (data.role === 'PATIENT') {
+                    if (data.Profile?.Doctor) {
+                        setDoctorInfo(data.Profile.Doctor);
+                    } else {
+                        fetchDoctors();
+                    }
+                }
             } catch (error) {
                 toast.error("Lỗi khi tải thông tin hồ sơ!");
             } finally {
                 setIsLoading(false);
             }
         };
+        
+        const fetchDoctors = async () => {
+            try {
+                const res = await api.get('/users/doctors');
+                if (res.data.status === 'success') {
+                    setDoctors(res.data.data);
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải danh sách bác sĩ", error);
+            }
+        };
+
         fetchProfile();
     }, []);
 
@@ -79,6 +104,31 @@ export default function Profile() {
             toast.error(error.response?.data?.error || "Lỗi khi đổi mật khẩu!");
         } finally {
             setIsChangingPassword(false);
+        }
+    };
+
+    const handleRequestDoctor = async () => {
+        if (!selectedDoctor) return toast.error("Vui lòng chọn một Bác sĩ!");
+        setIsRequestingDoctor(true);
+        try {
+            await api.post('/users/request-doctor', { doctor_id: selectedDoctor });
+            toast.success("Đã gửi yêu cầu kết nối! Vui lòng chờ Bác sĩ xác nhận.");
+        } catch (error) {
+            toast.error(error.response?.data?.error || "Lỗi khi gửi yêu cầu!");
+        } finally {
+            setIsRequestingDoctor(false);
+        }
+    };
+
+    const handleRemoveDoctor = async () => {
+        if (!window.confirm("Bạn có chắc chắn muốn hủy kết nối với Bác sĩ này?")) return;
+        try {
+            await api.delete('/users/remove-doctor');
+            toast.success("Đã hủy kết nối thành công!");
+            setDoctorInfo(null);
+            fetchDoctors(); // Tải lại danh sách để chọn bác sĩ mới
+        } catch (error) {
+            toast.error("Lỗi khi hủy kết nối!");
         }
     };
 
@@ -172,8 +222,70 @@ export default function Profile() {
 
                     <div className="w-full h-px bg-slate-100"></div>
 
-                    {/* Section 3 */}
+                    {/* Section 3: Bác sĩ phụ trách */}
+                    {user?.role === 'PATIENT' && (
+                        <div>
+                            <div className="mb-6 border-l-2 border-slate-900 pl-3">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">03.</p>
+                                <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Bác Sĩ Phụ Trách</h3>
+                            </div>
+                            
+                            {doctorInfo ? (
+                                <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-200">
+                                            <Stethoscope className="w-6 h-6 text-slate-700" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-slate-900">BS. {doctorInfo.full_name}</h4>
+                                            <p className="text-xs font-medium text-slate-500">{doctorInfo.email} • {doctorInfo.phone || 'Chưa cập nhật SĐT'}</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        type="button" 
+                                        onClick={handleRemoveDoctor}
+                                        className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-100 flex items-center gap-2"
+                                    >
+                                        <XCircle className="w-4 h-4" /> Hủy Kết Nối
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl space-y-4">
+                                    <p className="text-sm text-slate-600 font-medium">Bạn chưa có Bác sĩ phụ trách. Vui lòng chọn Bác sĩ để được tư vấn sức khỏe và đặt lịch khám.</p>
+                                    <div className="flex gap-3">
+                                        <select 
+                                            value={selectedDoctor} 
+                                            onChange={(e) => setSelectedDoctor(e.target.value)}
+                                            className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900"
+                                        >
+                                            <option value="">-- Chọn Bác sĩ --</option>
+                                            {doctors.map(doc => (
+                                                <option key={doc.id} value={doc.id}>BS. {doc.full_name} ({doc.email})</option>
+                                            ))}
+                                        </select>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleRequestDoctor}
+                                            disabled={isRequestingDoctor || !selectedDoctor}
+                                            className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-xl shadow-slate-900/10 hover:bg-slate-800 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2"
+                                        >
+                                            {isRequestingDoctor ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                                            Gửi Yêu Cầu
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="w-full h-px bg-slate-100"></div>
+
+                    {/* Section 4 */}
                     <div>
+                        <div className="mb-6 border-l-2 border-slate-900 pl-3">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">04.</p>
+                            <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Thông tin liên hệ</h3>
+                        </div>
                         <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Địa chỉ thường trú</label>
                         <div className="relative">
                             <MapPin className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -195,7 +307,7 @@ export default function Profile() {
                 <form onSubmit={handlePasswordSubmit} className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
                     <div className="p-8 md:p-10 space-y-8">
                         <div className="mb-6 border-l-2 border-slate-900 pl-3">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">04.</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">05.</p>
                             <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Bảo mật tài khoản</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

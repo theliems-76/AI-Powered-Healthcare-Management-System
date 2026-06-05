@@ -16,7 +16,7 @@ const getRiskStyle = (score) => {
     return { bg: 'bg-emerald-50 text-emerald-600 border-emerald-200', label: 'Thấp' };
 };
 
-export default function PatientList({ loading, patients, onPatientClick }) {
+export default function PatientList({ loading, patients, onPatientClick, onRemovePatient }) {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white rounded-[2rem] border-2 border-slate-200">
@@ -113,7 +113,15 @@ export default function PatientList({ loading, patients, onPatientClick }) {
                                     </td>
 
                                     {}
-                                    <td className="pr-5 py-4"></td>
+                                    <td className="pr-5 py-4 text-right">
+                                        <button 
+                                            onClick={(e) => onRemovePatient(e, patient)}
+                                            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                                            title="Ngừng quản lý"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </td>
                                 </tr>
                             );
                         })}

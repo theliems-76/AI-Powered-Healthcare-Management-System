@@ -1,0 +1,2 @@
+[text: "Bạn vui lòng cho tôi biết cụ thể ngày thứ Hai tuần sau là ngày mấy (VD: 2024-12-25) để tôi đặt lịch hẹn nhé."
+]

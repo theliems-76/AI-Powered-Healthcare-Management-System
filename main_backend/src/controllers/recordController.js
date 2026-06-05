@@ -198,7 +198,7 @@ exports.createDiagnosticRecord = async (req, res) => {
 
     } catch (error) {
         console.error("❌ Lỗi Hệ thống Microservice:", error.message);
-        res.status(500).json({ error: "Lỗi kết nối đến AI Service hoặc Database." });
+        res.status(500).json({ error: "Hệ thống AI đang bảo trì hoặc quá tải, vui lòng thử lại sau." });
     }
 };
 
@@ -206,6 +206,19 @@ exports.getRecordById = async (req, res) => {
     try {
         const record = await MedicalRecord.findByPk(req.params.id);
         if (!record) return res.status(404).json({ error: "Không tìm thấy hồ sơ!" });
+        
+        // Kiểm tra quyền truy cập (IDOR Fix)
+        if (req.user.role === 'DOCTOR') {
+            const profile = await PatientProfile.findByPk(record.patient_id);
+            if (!profile || profile.managed_by_doctor_id !== req.user.id) {
+                return res.status(403).json({ error: "Yêu cầu không hợp lệ. Bạn không có quyền truy cập." });
+            }
+        } else if (req.user.role === 'PATIENT') {
+            const profile = await PatientProfile.findOne({ where: { user_id: req.user.id } });
+            if (!profile || record.patient_id !== profile.id) {
+                return res.status(403).json({ error: "Yêu cầu không hợp lệ. Bạn không có quyền truy cập." });
+            }
+        }
         
         let responseData = record.toJSON();
         if (typeof responseData.health_indicators === 'string') {
@@ -226,7 +239,8 @@ exports.getRecordById = async (req, res) => {
 
         res.status(200).json({ status: "success", data: responseData });
     } catch (error) {
-        res.status(500).json({ error: "Lỗi hệ thống" });
+        console.error("Lỗi getRecordById:", error.message);
+        res.status(500).json({ error: "Yêu cầu không thể thực hiện, vui lòng thử lại sau." });
     }
 };
 
@@ -245,7 +259,13 @@ exports.getPatientHistory = async (req, res) => {
         } else if (role === 'DOCTOR' || role === 'ADMIN') {
             const { patientId } = req.query;
             if (!patientId) {
-                return res.status(400).json({ error: "Bác sĩ cần cung cấp patientId để xem lịch sử." });
+                return res.status(400).json({ error: "Thông tin không đầy đủ." });
+            }
+            if (role === 'DOCTOR') {
+                const profile = await PatientProfile.findByPk(patientId);
+                if (!profile || profile.managed_by_doctor_id !== userId) {
+                    return res.status(403).json({ error: "Yêu cầu không hợp lệ. Bạn không có quyền xem hồ sơ này." });
+                }
             }
             targetPatientProfileId = patientId;
         }
@@ -284,6 +304,6 @@ exports.getPatientHistory = async (req, res) => {
         res.status(200).json({ status: "success", data: chartData });
     } catch (error) {
         console.error("❌ Lỗi API History:", error);
-        res.status(500).json({ error: "Lỗi lấy dữ liệu lịch sử!" });
+        res.status(500).json({ error: "Hệ thống đang bận, vui lòng thử lại sau." });
     }
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Bell, Check, Loader2, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../services/api';
 
 export default function NotificationDropdown() {
@@ -49,15 +50,35 @@ export default function NotificationDropdown() {
                 setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, is_read: true } : n));
             }
             
-            if (notification.link) {
+            // Nếu là yêu cầu kết nối, luôn mở Modal để hiện nút Chấp nhận/Từ chối
+            if (notification.type === 'DOCTOR_REQUEST' || notification.type === 'PATIENT_REQUEST') {
+                setSelectedNotification(notification);
+                setIsOpen(false);
+            } 
+            // Nếu có link và link là một đường dẫn hợp lệ (bắt đầu bằng '/')
+            else if (notification.link && notification.link.startsWith('/')) {
                 navigate(notification.link);
                 setIsOpen(false);
-            } else {
+            } 
+            // Các trường hợp còn lại mở Modal
+            else {
                 setSelectedNotification(notification);
                 setIsOpen(false);
             }
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const handleRequestAction = async (id, action) => {
+        try {
+            await api.post(`/users/${action}-request/${id}`);
+            toast.success(action === 'accept' ? 'Đã chấp nhận kết nối!' : 'Đã từ chối kết nối!');
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            setSelectedNotification(null);
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            toast.error(error.response?.data?.error || "Lỗi xử lý yêu cầu!");
         }
     };
 
@@ -171,12 +192,28 @@ export default function NotificationDropdown() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+                        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                            {(selectedNotification.type === 'DOCTOR_REQUEST' || selectedNotification.type === 'PATIENT_REQUEST') && (
+                                <>
+                                    <button 
+                                        onClick={() => handleRequestAction(selectedNotification.id, 'reject')}
+                                        className="px-6 py-2.5 bg-white border border-slate-200 text-rose-600 text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-50 transition-colors shadow-sm active:scale-95"
+                                    >
+                                        Từ Chối
+                                    </button>
+                                    <button 
+                                        onClick={() => handleRequestAction(selectedNotification.id, 'accept')}
+                                        className="px-6 py-2.5 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20 active:scale-95"
+                                    >
+                                        Chấp Nhận
+                                    </button>
+                                </>
+                            )}
                             <button 
                                 onClick={() => setSelectedNotification(null)}
                                 className="px-6 py-2.5 bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 active:scale-95"
                             >
-                                Đóng Thông Báo
+                                Đóng
                             </button>
                         </div>
                     </div>

@@ -200,4 +200,14 @@ db.AICache = sequelize.define('AICache', {
   recommended_activities: { type: DataTypes.JSON }
 }, { timestamps: true });
 
+db.ChatHistory = sequelize.define('ChatHistory', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  user_id: { type: DataTypes.UUID, allowNull: false },
+  role: { type: DataTypes.ENUM('user', 'model'), allowNull: false },
+  content: { type: DataTypes.TEXT, allowNull: false }
+}, { timestamps: true });
+
+db.User.hasMany(db.ChatHistory, { foreignKey: 'user_id' });
+db.ChatHistory.belongsTo(db.User, { foreignKey: 'user_id' });
+
 module.exports = db;

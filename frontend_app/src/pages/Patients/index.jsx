@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
@@ -52,6 +52,19 @@ export default function Patients() {
         navigate('/history', { state: { patientId: patient.id, patientName: patient.full_name } });
     };
 
+    const handleRemovePatient = async (e, patient) => {
+        e.stopPropagation();
+        if (!window.confirm(`Bạn có chắc chắn muốn ngừng quản lý bệnh nhân ${patient.full_name}?`)) return;
+        
+        try {
+            await api.delete(`/users/patients/${patient.id}`);
+            toast.success("Đã ngừng quản lý bệnh nhân!");
+            fetchPatients(currentPage);
+        } catch (error) {
+            toast.error("Lỗi khi xóa bệnh nhân.");
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500 pb-12">
             <PatientHeader onAssigned={() => fetchPatients(1)} />
@@ -64,6 +77,7 @@ export default function Patients() {
                 loading={loading}
                 patients={filteredPatients}
                 onPatientClick={handlePatientClick}
+                onRemovePatient={handleRemovePatient}
             />
             {}
             {!search && pagination && (

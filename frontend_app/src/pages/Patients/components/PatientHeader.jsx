@@ -49,7 +49,7 @@ export default function PatientHeader({ onAssigned }) {
                         onClick={() => setShowModal(true)}
                         className="flex items-center gap-2 px-6 py-3 font-black text-white bg-slate-900 rounded-xl hover:bg-slate-800 shadow-xl shadow-slate-900/10 transition-all active:scale-95 text-[11px] uppercase tracking-widest"
                     >
-                        Thêm bệnh nhân
+                        Gửi Yêu Cầu
                     </button>
                 </div>
             </div>
@@ -68,7 +68,7 @@ export default function PatientHeader({ onAssigned }) {
                         {/* Modal Header */}
                         <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
                             <div>
-                                <h2 className="text-lg font-black text-slate-900 uppercase tracking-wide">Thêm Bệnh Nhân Mới</h2>
+                                <h2 className="text-lg font-black text-slate-900 uppercase tracking-wide">Yêu Cầu Kết Nối</h2>
                                 <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Nhập email tài khoản bệnh nhân</p>
                             </div>
                             <button
@@ -114,7 +114,7 @@ export default function PatientHeader({ onAssigned }) {
                                     disabled={isLoading}
                                     className="flex-1 py-3.5 rounded-xl bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-xl shadow-slate-900/10"
                                 >
-                                    {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang xử lý</> : 'Xác nhận thêm'}
+                                    {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang xử lý</> : 'Gửi Yêu Cầu'}
                                 </button>
                             </div>
                         </form>

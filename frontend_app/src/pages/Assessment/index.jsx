@@ -1,10 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, Suspense, lazy } from 'react';
 import { toast } from 'react-toastify';
 import { analyzeHealthRisk } from '../../services/aiService';
 import { AuthContext } from '../../context/AuthContext';
 import AssessmentForm from './AssessmentForm';
 import AIThinkingSteps from './AIThinkingSteps';
-import AIResults from './AIResults';
+import api from '../../services/api';
+
+const AIResults = lazy(() => import('./AIResults'));
 
 export default function Assessment() {
     const { user } = useContext(AuthContext);
@@ -50,8 +52,6 @@ export default function Assessment() {
         if (result && result.ai_nutrition_plan === 'PROCESSING') {
             interval = setInterval(async () => {
                 try {
-                    // Cần import api từ src/services/api
-                    const { default: api } = await import('../../services/api');
                     const response = await api.get(`/records/${result.id}`);
                     if (response.data && response.data.data && response.data.data.ai_nutrition_plan !== 'PROCESSING') {
                         setResult(response.data.data);
@@ -123,8 +123,9 @@ export default function Assessment() {
                         hw={hw}
                         setHw={setHw}
                     />
-                    
-                    <AIResults result={result} userRole={user?.role} />
+                    <Suspense fallback={<div className="animate-pulse bg-slate-100 h-64 rounded-3xl w-full"></div>}>
+                        {result && <AIResults result={result} userRole={user?.role} />}
+                    </Suspense>
                 </>
             )}
         </div>
