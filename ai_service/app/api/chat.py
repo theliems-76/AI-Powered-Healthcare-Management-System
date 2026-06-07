@@ -153,3 +153,33 @@ async def chat_with_ai(request: ChatRequest):
         error_details = traceback.format_exc()
         print(f"ERROR Chatbot API: {error_details}")
         raise HTTPException(status_code=500, detail=str(e))
+
+class KnowledgeEmbedRequest(BaseModel):
+    document_id: str
+    file_path: str
+    filename: str
+
+@router.post("/knowledge/embed")
+async def embed_knowledge(request: KnowledgeEmbedRequest):
+    current_api_key = get_random_api_key()
+    if not current_api_key:
+        raise HTTPException(status_code=500, detail="Thiếu cấu hình API Key.")
+    
+    genai.configure(api_key=current_api_key)
+    
+    try:
+        if not os.path.exists(request.file_path):
+            raise HTTPException(status_code=404, detail="File không tồn tại.")
+            
+        added_count = rag_system.add_document(request.file_path, request.filename)
+        
+        return {
+            "status": "success",
+            "message": f"Đã nhúng thành công {added_count} đoạn văn bản.",
+            "chunks_added": added_count
+        }
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"ERROR Knowledge Embed API: {error_details}")
+        raise HTTPException(status_code=500, detail=str(e))

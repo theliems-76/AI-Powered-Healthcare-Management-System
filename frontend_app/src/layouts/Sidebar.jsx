@@ -18,7 +18,21 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
     { path: '/exercises', name: 'Tập luyện', icon: Dumbbell, roles: ['PATIENT'] },
     { path: '/patients', name: 'Hồ sơ Bệnh nhân', icon: Users, roles: ['DOCTOR'] },
     { path: '/appointments', name: 'Lịch hẹn (Khám bệnh)', icon: Calendar, roles: ['DOCTOR', 'PATIENT'] },
-    { path: '/admin', name: 'Quản trị Dữ liệu', icon: Database, roles: ['ADMIN'] },
+    { 
+        path: '/admin', 
+        name: 'Quản trị Dữ liệu', 
+        icon: Database, 
+        roles: ['ADMIN'],
+        subItems: [
+            { path: '/admin/users', name: 'Người dùng' },
+            { path: '/admin/exercises', name: 'Kho bài tập' },
+            { path: '/admin/dishes', name: 'Kho món ăn' },
+            { path: '/admin/knowledge', name: 'Cơ sở Tri thức AI' },
+            { path: '/admin/logs', name: 'Nhật ký bảo mật' },
+            { path: '/admin/notifications', name: 'Thông báo hệ thống' },
+            { path: '/admin/feedbacks', name: 'Đánh giá' },
+        ]
+    },
 ];
 
     const currentRole = user?.role || 'PATIENT';
@@ -66,21 +80,47 @@ export default function Sidebar({ user, isMobileOpen, setIsMobileOpen }) {
                 <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
                     {menuItems.map((item) => {
                         const Icon = item.icon;
-                        const isActive = location.pathname === item.path;
+                        const isParentActive = location.pathname.startsWith(item.path);
+                        const isExactActive = location.pathname === item.path;
+
                         return (
-                            <Link 
-                                key={item.path} 
-                                to={item.path}
-                                onClick={() => setIsMobileOpen(false)}
-                                className={`flex items-center px-3 py-2.5 rounded-lg transition-all text-sm group ${
-                                    isActive 
-                                        ? 'bg-slate-100 text-slate-900 font-bold' 
-                                        : 'text-slate-500 font-semibold hover:bg-slate-50 hover:text-slate-900'
-                                }`}
-                            >
-                                <Icon className={`w-4 h-4 mr-3 transition-transform ${isActive ? 'text-slate-900' : 'text-slate-400 group-hover:text-slate-600'}`} />
-                                {item.name}
-                            </Link>
+                            <div key={item.path} className="mb-1">
+                                <Link 
+                                    to={item.subItems ? item.subItems[0].path : item.path}
+                                    onClick={() => !item.subItems && setIsMobileOpen(false)}
+                                    className={`flex items-center px-3 py-2.5 rounded-lg transition-all text-sm group ${
+                                        (item.subItems ? isParentActive : isExactActive)
+                                            ? 'bg-slate-100 text-slate-900 font-bold' 
+                                            : 'text-slate-500 font-semibold hover:bg-slate-50 hover:text-slate-900'
+                                    }`}
+                                >
+                                    <Icon className={`w-4 h-4 mr-3 transition-transform ${(item.subItems ? isParentActive : isExactActive) ? 'text-slate-900' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                                    {item.name}
+                                </Link>
+                                
+                                {/* SubItems Rendering */}
+                                {item.subItems && isParentActive && (
+                                    <div className="ml-7 mt-1 space-y-1 border-l-2 border-slate-100 pl-2">
+                                        {item.subItems.map(sub => {
+                                            const isSubActive = location.pathname === sub.path;
+                                            return (
+                                                <Link 
+                                                    key={sub.path}
+                                                    to={sub.path}
+                                                    onClick={() => setIsMobileOpen(false)}
+                                                    className={`block px-3 py-2 rounded-md text-xs font-medium transition-colors ${
+                                                        isSubActive
+                                                            ? 'bg-emerald-50 text-emerald-700 font-bold'
+                                                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                                    }`}
+                                                >
+                                                    {sub.name}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
                         );
                     })}
                 </nav>

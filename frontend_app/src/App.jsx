@@ -25,6 +25,15 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard/index'));
 const RecordDetail = React.lazy(() => import('./pages/History/RecordDetail'));
 const Profile = React.lazy(() => import('./pages/Profile/index'));
 const Appointments = React.lazy(() => import('./pages/Appointments/index'));
+
+// Sub-pages của Admin
+const AdminUsers = React.lazy(() => import('./pages/Admin/Users'));
+const AdminExerciseTab = React.lazy(() => import('./pages/Admin/components/AdminExerciseTab'));
+const AdminDishTab = React.lazy(() => import('./pages/Admin/components/AdminDishTab'));
+const AuditLogsTab = React.lazy(() => import('./pages/Admin/components/AuditLogsTab'));
+const AdminNotificationsTab = React.lazy(() => import('./pages/Admin/components/AdminNotificationsTab'));
+const AdminFeedbacksTab = React.lazy(() => import('./pages/Admin/components/AdminFeedbacksTab'));
+const AdminKnowledgeTab = React.lazy(() => import('./pages/Admin/components/AdminKnowledgeTab'));
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   
@@ -57,7 +66,16 @@ function App() {
               <Route path="/history/:recordId" element={<RecordDetail />} />    
               <Route path="/patients" element={<Patients />} /> 
               <Route path="/calendar" element={<CalendarSchedule />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin" element={<Admin />}>
+                  <Route index element={<Navigate to="/admin/users" replace />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="exercises" element={<AdminExerciseTab />} />
+                  <Route path="dishes" element={<AdminDishTab />} />
+                  <Route path="logs" element={<AuditLogsTab />} />
+                  <Route path="notifications" element={<AdminNotificationsTab />} />
+                  <Route path="feedbacks" element={<AdminFeedbacksTab />} />
+                  <Route path="knowledge" element={<AdminKnowledgeTab />} />
+              </Route>
               <Route path="/profile" element={<Profile />} />
               <Route path="/appointments" element={<Appointments />} />
             </Route>

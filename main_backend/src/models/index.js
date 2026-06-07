@@ -210,4 +210,17 @@ db.ChatHistory = sequelize.define('ChatHistory', {
 db.User.hasMany(db.ChatHistory, { foreignKey: 'user_id' });
 db.ChatHistory.belongsTo(db.User, { foreignKey: 'user_id' });
 
+db.KnowledgeDocument = sequelize.define('KnowledgeDocument', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  filename: { type: DataTypes.STRING, allowNull: false },
+  original_name: { type: DataTypes.STRING, allowNull: false },
+  file_path: { type: DataTypes.STRING, allowNull: false },
+  file_type: { type: DataTypes.STRING },
+  status: { type: DataTypes.ENUM('PROCESSING', 'COMPLETED', 'FAILED'), defaultValue: 'PROCESSING' },
+  uploaded_by: { type: DataTypes.UUID, allowNull: true }
+}, { timestamps: true });
+
+db.User.hasMany(db.KnowledgeDocument, { foreignKey: 'uploaded_by' });
+db.KnowledgeDocument.belongsTo(db.User, { foreignKey: 'uploaded_by' });
+
 module.exports = db;

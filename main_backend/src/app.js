@@ -17,6 +17,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const knowledgeRoutes = require('./routes/knowledgeRoutes');
 const path = require('path');
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/feedbacks', feedbackRoutes);
+app.use('/api/admin/knowledge', knowledgeRoutes);
 app.get('/', (req, res) => {
     res.json({ message: "Main Backend (Node.js) is running smoothly!" });
 });

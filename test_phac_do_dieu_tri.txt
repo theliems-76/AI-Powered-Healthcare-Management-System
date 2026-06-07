@@ -1,0 +1,21 @@
+PHÁC ĐỒ ĐIỀU TRỊ BỆNH TIỂU ĐƯỜNG TYPE 2 (RAG MOCK TEST)
+Nguồn: Bộ Y tế 2026
+
+1. Nguyên tắc chung:
+- Mục tiêu điều trị là duy trì đường huyết lúc đói ở mức 4.4 - 7.2 mmol/L.
+- HbA1c mục tiêu < 7.0% đối với bệnh nhân trẻ, không có biến chứng. Đối với người cao tuổi, mục tiêu có thể nới lỏng lên < 8.0%.
+
+2. Hướng dẫn dùng thuốc:
+- Bệnh nhân mới chẩn đoán: Bắt đầu với Metformin 500mg, uống 1 lần vào bữa tối. Tăng liều dần sau mỗi 1-2 tuần nếu dung nạp tốt, liều tối đa 2000mg/ngày.
+- Tác dụng phụ thường gặp của Metformin: Rối loạn tiêu hóa, tiêu chảy, đầy hơi. Nên dặn bệnh nhân uống thuốc NGAY SAU KHI ĂN để giảm tác dụng phụ này. Tuyệt đối không tự ý ngưng thuốc.
+- Nếu bệnh nhân dị ứng Metformin, cân nhắc chuyển sang nhóm DPP-4 inhibitor (như Sitagliptin 100mg/ngày).
+
+3. Chế độ dinh dưỡng đặc biệt:
+- Hạn chế tối đa tinh bột trắng (cơm trắng, bún, phở). Chuyển sang gạo lứt, khoai lang.
+- Tăng cường rau xanh lên ít nhất 400g/ngày.
+- Bệnh nhân tiểu đường có kèm bệnh thận (eGFR < 45) phải hạn chế đạm động vật và tuyệt đối không ăn các loại trái cây giàu Kali như Chuối, Bơ, Sầu riêng.
+
+4. Xử trí hạ đường huyết:
+- Nếu bệnh nhân có dấu hiệu bủn rủn chân tay, vã mồ hôi, chóng mặt (đường huyết < 3.9 mmol/L): Ngay lập tức cho uống 1 cốc nước đường (khoảng 15g đường) hoặc 1/2 lon nước ngọt, 3 viên kẹo.
+- Đợi 15 phút sau đo lại đường huyết, nếu chưa lên > 4.0 mmol/L thì tiếp tục ăn thêm đường.
+- Khi đường huyết đã ổn định, cho bệnh nhân ăn nhẹ một ít tinh bột phức tạp (như 1 lát bánh mì) để tránh hạ đường huyết tái phát. Mọi sự cố hạ đường huyết đều phải ghi chép lại và báo cho Bác sĩ phụ trách trong lần khám tiếp theo.

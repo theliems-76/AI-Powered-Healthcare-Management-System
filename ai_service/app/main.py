@@ -1,6 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List, Dict, Optional
+import os
 from app.api import predict, nutrition, chat
+
+class ChatRequest(BaseModel):
+    messages: List[Dict[str, str]]
+    user_info: Optional[Dict] = {}
+
+class KnowledgeEmbedRequest(BaseModel):
+    document_id: str
+    file_path: str
+    filename: str
 
 app = FastAPI(
     title="Healthcare AI Microservice",
