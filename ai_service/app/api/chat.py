@@ -92,6 +92,9 @@ async def chat_with_ai(request: ChatRequest):
         Định dạng văn bản: KHÔNG SỬ DỤNG BẤT KỲ ĐỊNH DẠNG MARKDOWN NÀO (Không dùng * hay #). Chỉ trả về văn bản thuần túy (Plain text). Dùng dấu gạch ngang (-) nếu cần liệt kê.
         Nhiệm vụ: Tư vấn sức khỏe, giải đáp thắc mắc về tiểu đường type 2.
         
+        QUY TẮC TỐI QUAN TRỌNG ĐỐI VỚI BẠN (AI):
+        Tuyệt đối KHÔNG ĐƯỢC in ra các bước suy luận, suy nghĩ, hay kế hoạch của bạn. BẠN PHẢI TRẢ LỜI TRỰC TIẾP VÀO VẤN ĐỀ NGAY LẬP TỨC. Người dùng chỉ muốn đọc câu trả lời cuối cùng dành cho họ.
+        
         Quy tắc Trả lời về Thuốc kê đơn:
         1. NẾU trong phần "THÔNG TIN Y KHOA CHUẨN ĐỂ THAM KHẢO" có nhắc đến thuốc đó (ví dụ cách uống, tác dụng phụ), BẮT BUỘC phải trích dẫn thông tin đó ra để hướng dẫn bệnh nhân.
         2. SAU KHI hướng dẫn xong, luôn chốt lại bằng 1 câu chối bỏ trách nhiệm (ví dụ: "Tuy nhiên, bạn không được tự ý đổi liều lượng hay ngưng thuốc, hãy hỏi lại bác sĩ thật của bạn nhé").
@@ -130,10 +133,10 @@ async def chat_with_ai(request: ChatRequest):
                 return f"Lỗi hệ thống khi đặt lịch: {str(e)}"
 
         model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
+            model_name="models/gemini-3.1-flash-lite",
             system_instruction=system_instruction,
             tools=[book_appointment_tool],
-            generation_config={"temperature": 0.5, "max_output_tokens": 1000}
+            generation_config={"temperature": 0.5, "max_output_tokens": 1500}
         )
 
         history = format_history_for_gemini(request.messages)

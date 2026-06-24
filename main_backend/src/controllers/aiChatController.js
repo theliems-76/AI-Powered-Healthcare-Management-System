@@ -46,6 +46,38 @@ exports.processChat = async (req, res) => {
                     };
                 }
             }
+        } else if (req.user.role === 'DOCTOR' || req.user.role === 'ADMIN') {
+            const reqPatientId = req.body.patient_profile_id;
+            if (reqPatientId) {
+                const whereCondition = req.user.role === 'ADMIN' ? { id: reqPatientId } : { id: reqPatientId, managed_by_doctor_id: req.user.id };
+                const profile = await PatientProfile.findOne({ where: whereCondition });
+                
+                if (profile) {
+                    patient_profile_id = profile.id;
+                    doctor_id = req.user.id;
+                    doctor_name = req.user.name;
+
+                    const latestRecord = await MedicalRecord.findOne({
+                        where: { patient_id: profile.id },
+                        order: [['createdAt', 'DESC']]
+                    });
+
+                    if (latestRecord) {
+                        const indicators = typeof latestRecord.health_indicators === 'string' 
+                            ? JSON.parse(latestRecord.health_indicators) 
+                            : (latestRecord.health_indicators || {});
+
+                        medical_context = {
+                            bmi: indicators.BMI,
+                            risk_score: latestRecord.ai_risk_score,
+                            diagnosis: latestRecord.ai_diagnosis,
+                            general_health: indicators.GenHlth,
+                            physical_activity: indicators.PhysActivity,
+                            last_updated: latestRecord.createdAt
+                        };
+                    }
+                }
+            }
         }
 
         // Lưu tin nhắn của User vào Database TRƯỚC KHI gọi AI

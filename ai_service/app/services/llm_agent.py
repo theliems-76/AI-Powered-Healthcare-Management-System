@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 
 _env_path = Path(__file__).resolve().parents[2] / ".env"
 load_dotenv(dotenv_path=_env_path)
+# Cấu hình API Key
+# Cấu hình API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-model = genai.GenerativeModel("gemini-2.5-flash")
+model = genai.GenerativeModel("models/gemini-3.1-flash-lite")
 
 def generate_nutrition_plan(diagnosis_data: dict) -> str:
     """

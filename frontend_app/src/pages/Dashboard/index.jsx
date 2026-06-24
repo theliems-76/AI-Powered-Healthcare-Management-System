@@ -16,6 +16,8 @@ export default function Dashboard() {
     const [adminStats, setAdminStats] = useState(null);
     const [todayAppointments, setTodayAppointments] = useState([]);
     const [recentUpdates, setRecentUpdates] = useState([]);
+    const [totalPatients, setTotalPatients] = useState(0);
+    const [highRiskPatients, setHighRiskPatients] = useState(0);
 
     // Helper to strip markdown for excerpts
     const stripMarkdown = (text) => {
@@ -58,9 +60,12 @@ export default function Dashboard() {
                         setTodayAppointments(res.data.data);
                     }
                     
-                    const resPatients = await api.get('/users/patients?limit=5');
+                    const resPatients = await api.get('/users/patients?limit=1000');
                     if (resPatients.data.status === 'success') {
-                        setRecentUpdates(resPatients.data.data.filter(p => p.latest_risk_score !== null));
+                        const allPatients = resPatients.data.data;
+                        setTotalPatients(resPatients.data.pagination.total);
+                        setHighRiskPatients(allPatients.filter(p => p.latest_risk_score > 66).length);
+                        setRecentUpdates(allPatients.filter(p => p.latest_risk_score !== null).slice(0, 10));
                     }
                 } catch (e) { console.error(e); }
             };
@@ -95,28 +100,28 @@ export default function Dashboard() {
                         
                         <div className="space-y-4">
                             {/* Architectural Metric 1 */}
-                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-slate-300 transition-colors">
+                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-slate-300 transition-colors cursor-pointer" onClick={() => navigate('/patients')}>
                                 <div className="mb-4 flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 rounded-full bg-slate-900"></div>
                                     <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tổng hồ sơ quản lý</h3>
                                 </div>
                                 <div className="flex items-end gap-2 border-l-2 border-slate-900 pl-4">
-                                    <p className="text-5xl font-black text-slate-900 tracking-tighter leading-none">24</p>
+                                    <p className="text-5xl font-black text-slate-900 tracking-tighter leading-none">{totalPatients}</p>
                                     <div className="flex flex-col pb-1">
                                         <span className="text-xs font-bold text-slate-400">bệnh nhân</span>
-                                        <span className="text-[9px] font-black text-emerald-500 uppercase mt-0.5">+2 TRONG TUẦN</span>
+                                        <span className="text-[9px] font-black text-emerald-500 uppercase mt-0.5">TỔNG QUAN</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Architectural Metric 2 */}
-                            <div className="bg-white p-6 rounded-2xl border border-rose-100 shadow-sm hover:border-rose-200 transition-colors">
+                            <div className="bg-white p-6 rounded-2xl border border-rose-100 shadow-sm hover:border-rose-200 transition-colors cursor-pointer" onClick={() => navigate('/patients')}>
                                 <div className="mb-4 flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></div>
                                     <h3 className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Rủi ro lâm sàng cao</h3>
                                 </div>
                                 <div className="flex items-end gap-2 border-l-2 border-rose-500 pl-4">
-                                    <p className="text-5xl font-black text-rose-600 tracking-tighter leading-none">3</p>
+                                    <p className="text-5xl font-black text-rose-600 tracking-tighter leading-none">{highRiskPatients}</p>
                                     <div className="flex flex-col pb-1">
                                         <span className="text-xs font-bold text-rose-400">trường hợp</span>
                                         <span className="text-[9px] font-black text-rose-500 uppercase mt-0.5">CẦN CHÚ Ý GẤP</span>
@@ -170,7 +175,7 @@ export default function Dashboard() {
                         
                         <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                             {recentUpdates.length > 0 ? recentUpdates.map((p, i) => (
-                                <div key={i} className="group relative pl-4 border-l-2 hover:border-slate-800 border-slate-100 transition-colors cursor-pointer py-2" onClick={() => navigate(`/patients/${p.id}`)}>
+                                <div key={i} className="group relative pl-4 border-l-2 hover:border-slate-800 border-slate-100 transition-colors cursor-pointer py-2" onClick={() => navigate('/history', { state: { patientId: p.id, patientName: p.full_name } })}>
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <h4 className="font-black text-slate-900 text-base tracking-tight group-hover:text-slate-600 transition-colors">{p.full_name}</h4>

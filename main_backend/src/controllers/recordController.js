@@ -156,9 +156,30 @@ exports.createDiagnosticRecord = async (req, res) => {
             if (profile) {
                 pId = profile.id;
                 dId = profile.managed_by_doctor_id; 
+                
+                if (req.body.weight_kg && req.body.height_cm) {
+                    await profile.update({
+                        weight_kg: parseFloat(req.body.weight_kg),
+                        height_cm: parseFloat(req.body.height_cm)
+                    });
+                }
             }
         } else if (req.user.role === 'DOCTOR') {
-            dId = req.user.id; 
+            if (!pId) return res.status(400).json({ error: "Thiếu ID hồ sơ bệnh nhân." });
+            
+            const profile = await PatientProfile.findByPk(pId);
+            if (!profile || profile.managed_by_doctor_id !== req.user.id) {
+                return res.status(403).json({ error: "Lỗi bảo mật: Bệnh nhân không thuộc quyền quản lý của bạn." });
+            }
+            
+            dId = req.user.id;
+            
+            if (req.body.weight_kg && req.body.height_cm) {
+                await profile.update({
+                    weight_kg: parseFloat(req.body.weight_kg),
+                    height_cm: parseFloat(req.body.height_cm)
+                });
+            }
         }
 
         const newRecord = await MedicalRecord.create({

@@ -87,9 +87,15 @@ export default function Assessment() {
             return acc;
         }, {});
 
+        const payload = {
+            ...sanitizedData,
+            weight_kg: hw?.w || null,
+            height_cm: hw?.h || null
+        };
+
         setIsLoading(true);
         try {
-            const response = await analyzeHealthRisk(sanitizedData);
+            const response = await analyzeHealthRisk(payload);
             if (response.status === 'success') {
                 setResult(response.data);
                 toast.success('Phân tích thành công!');
