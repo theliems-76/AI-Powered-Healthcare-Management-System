@@ -1,19 +1,46 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
 
-export default function Button({ children, isLoading, className = '', ...props }) {
+const Button = React.forwardRef(({ 
+  className = '', 
+  variant = 'primary', 
+  size = 'md', 
+  isLoading = false, 
+  children, 
+  ...props 
+}, ref) => {
+  const baseStyles = 'inline-flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium disabled:opacity-50 disabled:pointer-events-none';
+  
+  const variants = {
+    primary: 'bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container focus:ring-primary',
+    secondary: 'bg-surface-container text-on-surface hover:bg-surface-container-high focus:ring-secondary',
+    ghost: 'bg-transparent text-primary hover:bg-surface-container-low focus:ring-primary',
+    danger: 'bg-error text-on-error hover:bg-error-container hover:text-on-error-container focus:ring-error',
+  };
+
+  const sizes = {
+    sm: 'h-8 px-3 text-xs',
+    md: 'h-10 px-4 text-sm',
+    lg: 'h-12 px-6 text-base',
+  };
+
   return (
     <button
-      disabled={isLoading}
+      ref={ref}
+      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+      disabled={isLoading || props.disabled}
       {...props}
-      className={`w-full py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
-        isLoading 
-          ? 'bg-slate-200 text-slate-500 cursor-not-allowed shadow-none' 
-          : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/20 hover:shadow-slate-900/30'
-      } ${className}`}
     >
-      {isLoading && <Loader2 className="animate-spin" size={16} />}
+      {isLoading ? (
+        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      ) : null}
       {children}
     </button>
   );
-}
+});
+
+Button.displayName = 'Button';
+
+export default Button;

@@ -79,45 +79,46 @@ export default function Login() {
                             type="checkbox" 
                             checked={rememberMe}
                             onChange={(e) => setRememberMe(e.target.checked)}
-                            className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" 
+                            className="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4 cursor-pointer" 
                         />
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest select-none">Ghi nhớ phiên</span>
+                        <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider select-none">Ghi nhớ phiên</span>
                     </label>
                     {}
-                    <Link to="/forgot-password" className="text-[10px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-colors">
+                    <Link to="/forgot-password" className="text-xs font-semibold text-primary hover:text-primary-container uppercase tracking-wider transition-colors">
                         Quên mật khẩu?
                     </Link>
                 </div>
 
                 <div className="pt-2 flex flex-col gap-3">
-                    <Button type="submit" isLoading={isLoading}>
+                    <Button type="submit" isLoading={isLoading} className="w-full">
                         {isLoading ? 'Đang xác thực...' : 'Đăng Nhập Hệ Thống'}
                     </Button>
                     
                     {needsVerification && (
-                        <button 
+                        <Button 
                             type="button"
+                            variant="secondary"
                             onClick={handleResendVerification}
                             disabled={isResending}
-                            className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-amber-500 text-amber-600 font-black text-[11px] uppercase tracking-widest hover:bg-amber-50 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
+                            className="w-full uppercase tracking-wider text-xs font-semibold"
                         >
                             {isResending ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                <RefreshCw className="w-4 h-4 animate-spin mr-2" />
                             ) : (
-                                <Mail className="w-4 h-4" />
+                                <Mail className="w-4 h-4 mr-2" />
                             )}
                             {isResending ? 'Đang gửi lại...' : 'Gửi lại Email Xác Thực'}
-                        </button>
+                        </Button>
                     )}
                 </div>
 
                 <div className="pt-6 space-y-3">
-                    <p className="text-center text-[11px] text-slate-500 font-bold uppercase tracking-widest">
-                        Chưa có tài khoản? <Link to="/register" className="font-black text-indigo-600 hover:underline">Đăng ký ngay</Link>
+                    <p className="text-center text-xs text-on-surface-variant font-semibold uppercase tracking-wider">
+                        Chưa có tài khoản? <Link to="/register" className="text-primary hover:underline">Đăng ký ngay</Link>
                     </p>
-                    <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                    <p className="text-center text-xs text-outline font-semibold uppercase tracking-wider">
                         <a href="mailto:admin@hiepsitieuduong.online?subject=Yêu cầu cấp tài khoản Y Tế" 
-                           className="hover:text-slate-600 transition-colors">
+                           className="hover:text-on-surface transition-colors">
                            Liên hệ Quản trị viên
                         </a>
                     </p>

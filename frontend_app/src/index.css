@@ -6,13 +6,13 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #fafafc; /* Màu nền trắng sữa siêu nhạt, sang hơn xám lạnh f8f9fb */
-    color: #1a1d20; /* Màu chữ chính không đen hoàn toàn */
+    font-family: 'Inter', sans-serif;
+    background-color: #faf8ff; /* Stitch background token */
+    color: #191b24; /* Stitch on-background token */
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     letter-spacing: -0.02em; /* Ép chữ tiêu đề khít lại một chút cho hiện đại */
   }
 

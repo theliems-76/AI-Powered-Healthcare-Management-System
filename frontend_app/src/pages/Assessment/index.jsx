@@ -111,10 +111,10 @@ export default function Assessment() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-in fade-in duration-500">
-            <div className="space-y-2">
-                <h1 className="text-3xl font-black text-slate-800">Khám sức khỏe AI</h1>
-                <p className="text-slate-500">Nhập các chỉ số dưới đây để nhận đánh giá rủi ro từ chuyên gia AI.</p>
+        <div className="max-w-7xl mx-auto space-y-10 pb-12 animate-in fade-in duration-500">
+            <div className="space-y-2 border-b border-outline-variant pb-6">
+                <h1 className="text-3xl font-semibold text-on-surface tracking-tight">Khám sức khỏe lâm sàng</h1>
+                <p className="text-sm text-on-surface-variant font-normal">Hệ thống Đánh giá Rủi ro Đái tháo đường & Khuyến nghị Y khoa.</p>
             </div>
 
             {isLoading ? (
