@@ -99,7 +99,7 @@ export default function History() {
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
-                <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-outline animate-spin" />
             </div>
         );
     }
@@ -113,33 +113,33 @@ export default function History() {
                     {patientName && (
                         <button
                             onClick={() => navigate('/patients')}
-                            className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-700 mb-3 transition-colors"
+                            className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant hover:text-on-surface mb-3 transition-colors"
                         >
                             <ArrowLeft className="w-3.5 h-3.5" /> Quay lại danh sách
                         </button>
                     )}
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                    <h1 className="text-2xl font-bold text-on-surface tracking-tight">
                         {patientName ? `Tiến trình: ${patientName}` : 'Tiến Trình Sức Khỏe'}
                     </h1>
-                    <p className="text-sm font-medium text-slate-400 mt-1">Phân tích dọc AI & Chỉ số lâm sàng</p>
+                    <p className="text-sm font-medium text-on-surface-variant mt-1">Phân tích dọc y khoa & Chỉ số lâm sàng</p>
                 </div>
             </div>
 
             {/* Charts Unified Panel */}
             {chartData.length > 0 ? (
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden">
                     {/* Panel header with time range filter */}
-                    <div className="flex items-center justify-between px-8 py-5 border-b border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Biểu đồ theo thời gian</p>
-                        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                    <div className="flex items-center justify-between px-8 py-5 border-b border-outline-variant">
+                        <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Biểu đồ theo thời gian</p>
+                        <div className="flex items-center gap-1 bg-surface-container-low p-1 rounded-lg">
                             {TIME_RANGES.map(r => (
                                 <button
                                     key={r.value}
                                     onClick={() => setTimeRange(r.value)}
-                                    className={`px-3 py-1 text-xs font-black rounded-lg transition-all ${
+                                    className={`px-3 py-1.5 text-xs font-bold rounded transition-all ${
                                         timeRange === r.value
-                                            ? 'bg-slate-900 text-white'
-                                            : 'text-slate-500 hover:text-slate-700'
+                                            ? 'bg-primary text-on-primary'
+                                            : 'text-on-surface-variant hover:text-on-surface'
                                     }`}
                                 >
                                     {r.label}
@@ -149,7 +149,7 @@ export default function History() {
                     </div>
 
                     {/* Two charts side by side, divided */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-100 p-8 gap-8 lg:gap-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-outline-variant p-8 gap-8 lg:gap-0">
                         <div className="lg:pr-8">
                             <RiskChart data={chartData} />
                         </div>
@@ -159,8 +159,8 @@ export default function History() {
                     </div>
                 </div>
             ) : (
-                <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center">
-                    <p className="text-sm font-medium text-slate-400">Chưa có dữ liệu để hiển thị biểu đồ.</p>
+                <div className="bg-surface-container-lowest rounded-lg border border-outline-variant p-12 text-center">
+                    <p className="text-sm font-medium text-on-surface-variant">Chưa có dữ liệu để hiển thị biểu đồ.</p>
                 </div>
             )}
 

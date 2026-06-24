@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { User, Phone, Mail, Calendar, MapPin, Weight, Ruler, Save, Loader2, Activity, Lock, Stethoscope, XCircle, CheckCircle } from 'lucide-react';
+import { User, Phone, Mail, Calendar, MapPin, Weight, Ruler, Save, Loader2, Lock, Stethoscope, XCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 
 export default function Profile() {
     const { user, updateUser } = useContext(AuthContext);
@@ -133,85 +135,104 @@ export default function Profile() {
     };
 
     if (isLoading) {
-        return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
+        return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-12 pb-12 animate-in fade-in duration-500">
-            <div className="pb-6 border-b border-slate-100 flex justify-between items-end">
+        <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
+            {/* Header */}
+            <div className="pb-6 border-b border-outline-variant flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Hồ Sơ Cá Nhân</h1>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">Cập nhật thông tin để AI tính toán chính xác nhất</p>
+                    <h1 className="text-3xl font-black text-on-surface tracking-tight uppercase">Hồ Sơ Cá Nhân</h1>
+                    <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-2">Cập nhật định danh & sinh trắc học</p>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-8 md:p-10 space-y-10">
+            <form onSubmit={handleSubmit} className="bg-surface-container-lowest rounded-lg border border-outline-variant flex flex-col">
+                <div className="p-6 md:p-8 space-y-8">
                     
-                    {/* Section 1 */}
+                    {/* Section 1: Định danh */}
                     <div>
-                        <div className="mb-6 border-l-2 border-slate-900 pl-3">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">01.</p>
-                            <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Thông tin định danh</h3>
+                        <div className="mb-4 border-l-2 border-primary pl-3">
+                            <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider">01. Thông tin định danh</h3>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Họ và tên</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <Input 
+                                label="Họ và tên"
+                                icon={User}
+                                type="text" 
+                                name="full_name" 
+                                value={formData.full_name} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                            <div className="flex flex-col">
+                                <label className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5">Email (Định danh tĩnh)</label>
                                 <div className="relative">
-                                    <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" required />
+                                    <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                                    <input 
+                                        type="email" 
+                                        value={user?.email || ''} 
+                                        disabled 
+                                        className="w-full pl-9 pr-3 py-2 bg-surface-container-low border border-outline-variant rounded text-sm font-semibold text-on-surface-variant cursor-not-allowed outline-none" 
+                                    />
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Email (Định danh tĩnh)</label>
-                                <div className="relative">
-                                    <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input type="email" value={user?.email || ''} disabled className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-400 cursor-not-allowed outline-none" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Số điện thoại liên lạc</label>
-                                <div className="relative">
-                                    <Phone className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" />
-                                </div>
-                            </div>
+                            <Input 
+                                label="Số điện thoại"
+                                icon={Phone}
+                                type="tel" 
+                                name="phone" 
+                                value={formData.phone} 
+                                onChange={handleChange} 
+                            />
                         </div>
                     </div>
 
-                    <div className="w-full h-px bg-slate-100"></div>
+                    <div className="w-full h-px bg-outline-variant/50"></div>
 
-                    {/* Section 2 */}
+                    {/* Section 2: Sinh trắc học */}
                     <div>
-                        <div className="mb-6 border-l-2 border-slate-900 pl-3">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">02.</p>
-                            <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Chỉ số sinh trắc học cơ sở</h3>
+                        <div className="mb-4 border-l-2 border-primary pl-3">
+                            <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider">02. Sinh trắc học cơ sở</h3>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Cân nặng (kg)</label>
-                                <div className="relative">
-                                    <Weight className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input type="number" step="0.1" name="weight_kg" value={formData.weight_kg} onChange={handleChange} className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-black focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" required />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Chiều cao (cm)</label>
-                                <div className="relative">
-                                    <Ruler className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input type="number" step="0.1" name="height_cm" value={formData.height_cm} onChange={handleChange} className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-black focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" required />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Ngày sinh</label>
-                                <div className="relative">
-                                    <Calendar className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input type="date" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Giới tính</label>
-                                <select name="gender" value={formData.gender} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <Input 
+                                label="Cân nặng (kg)"
+                                icon={Weight}
+                                type="number" 
+                                step="0.1" 
+                                name="weight_kg" 
+                                value={formData.weight_kg} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                            <Input 
+                                label="Chiều cao (cm)"
+                                icon={Ruler}
+                                type="number" 
+                                step="0.1" 
+                                name="height_cm" 
+                                value={formData.height_cm} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                            <Input 
+                                label="Ngày sinh"
+                                icon={Calendar}
+                                type="date" 
+                                name="date_of_birth" 
+                                value={formData.date_of_birth} 
+                                onChange={handleChange} 
+                            />
+                            <div className="flex flex-col">
+                                <label className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5">Giới tính</label>
+                                <select 
+                                    name="gender" 
+                                    value={formData.gender} 
+                                    onChange={handleChange} 
+                                    className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded text-sm font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface h-[38px]"
+                                >
                                     <option value="M">Nam</option>
                                     <option value="F">Nữ</option>
                                     <option value="O">Khác</option>
@@ -220,119 +241,131 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    <div className="w-full h-px bg-slate-100"></div>
-
                     {/* Section 3: Bác sĩ phụ trách */}
                     {user?.role === 'PATIENT' && (
-                        <div>
-                            <div className="mb-6 border-l-2 border-slate-900 pl-3">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">03.</p>
-                                <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Bác Sĩ Phụ Trách</h3>
+                        <>
+                            <div className="w-full h-px bg-outline-variant/50"></div>
+                            <div>
+                                <div className="mb-4 border-l-2 border-primary pl-3">
+                                    <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider">03. Bác Sĩ Phụ Trách</h3>
+                                </div>
+                                
+                                {doctorInfo ? (
+                                    <div className="bg-surface-container border border-outline-variant p-4 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 bg-surface-container-lowest rounded flex items-center justify-center border border-outline-variant">
+                                                <Stethoscope className="w-5 h-5 text-on-surface-variant" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm text-on-surface">BS. {doctorInfo.full_name}</h4>
+                                                <p className="text-xs font-medium text-on-surface-variant font-mono">{doctorInfo.email} • {doctorInfo.phone || 'Chưa cập nhật SĐT'}</p>
+                                            </div>
+                                        </div>
+                                        <Button 
+                                            variant="outline"
+                                            onClick={handleRemoveDoctor}
+                                            className="text-error border-error/50 hover:bg-error-container hover:border-error flex items-center gap-2"
+                                        >
+                                            <XCircle className="w-4 h-4" /> Hủy Kết Nối
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="bg-surface-container border border-outline-variant p-4 rounded-lg space-y-4">
+                                        <p className="text-sm text-on-surface-variant font-medium">Bạn chưa có Bác sĩ phụ trách. Vui lòng chọn Bác sĩ để được tư vấn sức khỏe và đặt lịch khám.</p>
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            <select 
+                                                value={selectedDoctor} 
+                                                onChange={(e) => setSelectedDoctor(e.target.value)}
+                                                className="flex-1 px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded text-sm font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface"
+                                            >
+                                                <option value="">-- Chọn Bác sĩ --</option>
+                                                {doctors.map(doc => (
+                                                    <option key={doc.id} value={doc.id}>BS. {doc.full_name} ({doc.email})</option>
+                                                ))}
+                                            </select>
+                                            <Button 
+                                                onClick={handleRequestDoctor}
+                                                disabled={isRequestingDoctor || !selectedDoctor}
+                                                className="flex items-center justify-center gap-2"
+                                            >
+                                                {isRequestingDoctor ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                                                Gửi Yêu Cầu
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            
-                            {doctorInfo ? (
-                                <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-200">
-                                            <Stethoscope className="w-6 h-6 text-slate-700" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-black text-slate-900">BS. {doctorInfo.full_name}</h4>
-                                            <p className="text-xs font-medium text-slate-500">{doctorInfo.email} • {doctorInfo.phone || 'Chưa cập nhật SĐT'}</p>
-                                        </div>
-                                    </div>
-                                    <button 
-                                        type="button" 
-                                        onClick={handleRemoveDoctor}
-                                        className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-100 flex items-center gap-2"
-                                    >
-                                        <XCircle className="w-4 h-4" /> Hủy Kết Nối
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl space-y-4">
-                                    <p className="text-sm text-slate-600 font-medium">Bạn chưa có Bác sĩ phụ trách. Vui lòng chọn Bác sĩ để được tư vấn sức khỏe và đặt lịch khám.</p>
-                                    <div className="flex gap-3">
-                                        <select 
-                                            value={selectedDoctor} 
-                                            onChange={(e) => setSelectedDoctor(e.target.value)}
-                                            className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900"
-                                        >
-                                            <option value="">-- Chọn Bác sĩ --</option>
-                                            {doctors.map(doc => (
-                                                <option key={doc.id} value={doc.id}>BS. {doc.full_name} ({doc.email})</option>
-                                            ))}
-                                        </select>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleRequestDoctor}
-                                            disabled={isRequestingDoctor || !selectedDoctor}
-                                            className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-xl shadow-slate-900/10 hover:bg-slate-800 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2"
-                                        >
-                                            {isRequestingDoctor ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                                            Gửi Yêu Cầu
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        </>
                     )}
 
-                    <div className="w-full h-px bg-slate-100"></div>
+                    <div className="w-full h-px bg-outline-variant/50"></div>
 
-                    {/* Section 4 */}
+                    {/* Section 4: Liên hệ */}
                     <div>
-                        <div className="mb-6 border-l-2 border-slate-900 pl-3">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">04.</p>
-                            <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Thông tin liên hệ</h3>
+                        <div className="mb-4 border-l-2 border-primary pl-3">
+                            <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider">04. Địa chỉ liên hệ</h3>
                         </div>
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Địa chỉ thường trú</label>
-                        <div className="relative">
-                            <MapPin className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                            <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" />
-                        </div>
+                        <Input 
+                            label="Địa chỉ thường trú"
+                            icon={MapPin}
+                            type="text" 
+                            name="address" 
+                            value={formData.address} 
+                            onChange={handleChange} 
+                        />
                     </div>
                 </div>
 
-                <div className="p-6 md:p-10 bg-slate-50/50 border-t border-slate-100 flex justify-end">
-                    <button type="submit" disabled={isSaving} className="flex items-center gap-2 px-8 py-3.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-xl shadow-slate-900/10 hover:bg-slate-800 active:scale-95 transition-all disabled:opacity-50">
+                <div className="p-4 md:p-6 bg-surface-container-low border-t border-outline-variant flex justify-end">
+                    <Button type="submit" disabled={isSaving} className="flex items-center gap-2">
                         {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {isSaving ? 'Đang lưu...' : 'Lưu Hồ Sơ'}
-                    </button>
+                    </Button>
                 </div>
             </form>
             
             {/* Password Form */}
-            <div className="mt-12">
-                <form onSubmit={handlePasswordSubmit} className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="p-8 md:p-10 space-y-8">
-                        <div className="mb-6 border-l-2 border-slate-900 pl-3">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">05.</p>
-                            <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">Bảo mật tài khoản</h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Mật khẩu hiện tại</label>
-                                <input type="password" name="current_password" value={passwordData.current_password} onChange={handlePasswordChange} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" required />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Mật khẩu mới</label>
-                                <input type="password" name="new_password" value={passwordData.new_password} onChange={handlePasswordChange} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" required minLength="6" />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Xác nhận mật khẩu</label>
-                                <input type="password" name="confirm_password" value={passwordData.confirm_password} onChange={handlePasswordChange} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-all text-slate-900" required minLength="6" />
-                            </div>
-                        </div>
+            <form onSubmit={handlePasswordSubmit} className="bg-surface-container-lowest rounded-lg border border-outline-variant flex flex-col">
+                <div className="p-6 md:p-8 space-y-6">
+                    <div className="mb-4 border-l-2 border-primary pl-3">
+                        <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider">05. Bảo mật</h3>
                     </div>
-                    <div className="p-6 md:p-10 bg-slate-50/50 border-t border-slate-100 flex justify-end">
-                        <button type="submit" disabled={isChangingPassword} className="flex items-center gap-2 px-8 py-3.5 bg-slate-200 text-slate-700 rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-slate-300 active:scale-95 transition-all disabled:opacity-50">
-                            {isChangingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-                            {isChangingPassword ? 'Đang đổi...' : 'Đổi Mật Khẩu'}
-                        </button>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Input 
+                            label="Mật khẩu hiện tại"
+                            type="password" 
+                            name="current_password" 
+                            value={passwordData.current_password} 
+                            onChange={handlePasswordChange} 
+                            required 
+                        />
+                        <Input 
+                            label="Mật khẩu mới"
+                            type="password" 
+                            name="new_password" 
+                            value={passwordData.new_password} 
+                            onChange={handlePasswordChange} 
+                            required 
+                            minLength="6" 
+                        />
+                        <Input 
+                            label="Xác nhận mật khẩu"
+                            type="password" 
+                            name="confirm_password" 
+                            value={passwordData.confirm_password} 
+                            onChange={handlePasswordChange} 
+                            required 
+                            minLength="6" 
+                        />
                     </div>
-                </form>
-            </div>
+                </div>
+                <div className="p-4 md:p-6 bg-surface-container-low border-t border-outline-variant flex justify-end">
+                    <Button variant="outline" type="submit" disabled={isChangingPassword} className="flex items-center gap-2">
+                        {isChangingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                        {isChangingPassword ? 'Đang đổi...' : 'Đổi Mật Khẩu'}
+                    </Button>
+                </div>
+            </form>
         </div>
     );
 }

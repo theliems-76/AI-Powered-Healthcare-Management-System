@@ -22,7 +22,9 @@ const diagnosticSchema = Joi.object({
     Age: Joi.number().min(1).max(13).required(),
     Education: Joi.number().min(1).max(6).required(),
     Income: Joi.number().min(1).max(8).required(),
-    patientProfileId: Joi.number().optional().allow(null)
+    patientProfileId: Joi.number().optional().allow(null),
+    weight_kg: Joi.any().optional(),
+    height_cm: Joi.any().optional()
 });
 
 exports.validateDiagnosticInput = (req, res, next) => {

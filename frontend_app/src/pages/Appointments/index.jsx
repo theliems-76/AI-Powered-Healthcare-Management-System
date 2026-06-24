@@ -4,6 +4,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { Calendar, Clock, User, CheckCircle, XCircle, FileText, ChevronRight, Search } from 'lucide-react';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 
 export default function Appointments() {
     const { user } = useContext(AuthContext);
@@ -65,6 +67,10 @@ export default function Appointments() {
 
     const handleCreateAppointment = async (e) => {
         e.preventDefault();
+        if (user?.role === 'DOCTOR' && !formData.patient_profile_id) {
+            toast.warning("Vui lòng chọn một bệnh nhân từ danh sách!");
+            return;
+        }
         try {
             const res = await api.post('/appointments', formData);
             if (res.data.status === 'success') {
@@ -73,7 +79,7 @@ export default function Appointments() {
                 fetchAppointments();
             }
         } catch (error) {
-            toast.error("Lỗi khi tạo lịch hẹn");
+            toast.error(error.response?.data?.error || "Lỗi khi tạo lịch hẹn");
         }
     };
 
@@ -91,11 +97,11 @@ export default function Appointments() {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'PENDING': return 'bg-amber-100 text-amber-700 border-amber-200';
-            case 'CONFIRMED': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-            case 'CANCELLED': return 'bg-rose-100 text-rose-700 border-rose-200';
-            case 'COMPLETED': return 'bg-slate-100 text-slate-700 border-slate-200';
-            default: return 'bg-slate-100 text-slate-700 border-slate-200';
+            case 'PENDING': return 'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20';
+            case 'CONFIRMED': return 'bg-primary-container text-on-primary-container border-primary/20';
+            case 'CANCELLED': return 'bg-error-container text-on-error-container border-error/20';
+            case 'COMPLETED': return 'bg-surface-container text-on-surface-variant border-outline-variant';
+            default: return 'bg-surface-container text-on-surface border-outline-variant';
         }
     };
 
@@ -112,9 +118,9 @@ export default function Appointments() {
     if (user?.role === 'PATIENT' && !user?.Profile?.managed_by_doctor_id) {
         return (
             <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
-                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-12 text-center">
-                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Chưa có Bác sĩ phụ trách</h3>
-                    <p className="text-sm font-medium text-slate-500 max-w-lg mx-auto">
+                <div className="bg-surface-container-lowest rounded-lg border border-outline-variant p-12 text-center">
+                    <h3 className="text-xl font-black text-on-surface uppercase tracking-tight mb-2">Chưa có Bác sĩ phụ trách</h3>
+                    <p className="text-sm font-medium text-on-surface-variant max-w-lg mx-auto">
                         Tính năng lịch hẹn hiện chỉ dành cho các bệnh nhân đã được bác sĩ tiếp nhận và đưa vào danh sách quản lý.
                     </p>
                 </div>
@@ -123,54 +129,54 @@ export default function Appointments() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
+        <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
             {/* Header */}
-            <div className="pb-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 shrink-0">
+            <div className="pb-6 border-b border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 shrink-0">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Quản Lý Lịch Hẹn</h1>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">Sắp xếp thời gian thăm khám bệnh nhân</p>
+                    <h1 className="text-3xl font-black text-on-surface tracking-tight uppercase">Quản Lý Lịch Hẹn</h1>
+                    <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-2">Sắp xếp thời gian thăm khám bệnh nhân</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
                     <input 
                         type="date" 
                         value={filterDate} 
                         onChange={(e) => setFilterDate(e.target.value)}
-                        className="px-4 py-3 text-sm font-bold bg-white border border-slate-200 rounded-xl focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none"
+                        className="px-4 h-[44px] text-sm font-bold bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface"
                     />
-                    <button 
+                    <Button 
                         onClick={() => setIsModalOpen(true)}
-                        className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95 flex items-center gap-2"
+                        className="flex items-center justify-center gap-2 h-[44px]"
                     >
                         Tạo Lịch Khám
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             {/* List */}
-            <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest">Danh sách ngày {new Date(filterDate).toLocaleDateString('vi-VN')}</h2>
+            <div className="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden">
+                <div className="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+                    <h2 className="text-xs font-black text-on-surface uppercase tracking-widest">Danh sách ngày {new Date(filterDate).toLocaleDateString('vi-VN')}</h2>
                 </div>
                 
                 {isLoading ? (
-                    <div className="p-12 text-center text-slate-500"><div className="animate-spin w-6 h-6 border-2 border-slate-900 border-t-transparent rounded-full mx-auto"></div></div>
+                    <div className="p-12 text-center text-on-surface-variant"><div className="animate-spin w-6 h-6 border-2 border-on-surface border-t-transparent rounded-full mx-auto"></div></div>
                 ) : appointments.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24">
-                        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Trống Lịch Hẹn</h3>
-                        <p className="text-sm font-medium text-slate-500">Chưa có bệnh nhân nào được xếp lịch thăm khám trong ngày này.</p>
+                        <h3 className="text-xl font-black text-on-surface uppercase tracking-tight mb-2">Trống Lịch Hẹn</h3>
+                        <p className="text-sm font-medium text-on-surface-variant">Chưa có bệnh nhân nào được xếp lịch thăm khám trong ngày này.</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-slate-100">
+                    <div className="divide-y divide-outline-variant">
                         {appointments.map(app => (
-                            <div key={app.id} className="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:items-center hover:bg-slate-50/50 transition-colors">
+                            <div key={app.id} className="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:items-center hover:bg-surface-container/50 transition-colors">
                                 <div className="flex-shrink-0 w-24">
-                                    <div className="text-2xl font-black text-slate-900 tracking-tight">{app.appointment_time.slice(0, 5)}</div>
+                                    <div className="text-2xl font-black text-on-surface tracking-tight">{app.appointment_time.slice(0, 5)}</div>
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-black text-slate-900 mb-1">
+                                    <h3 className="text-lg font-black text-on-surface mb-1">
                                         {app.Patient?.User?.full_name}
                                     </h3>
-                                    <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
+                                    <div className="flex items-center gap-4 text-sm font-medium text-on-surface-variant">
                                         <span>{app.reason || 'Khám tổng quát'}</span>
                                         <span className={`px-2.5 py-0.5 rounded border text-[10px] uppercase font-bold tracking-widest ${getStatusStyle(app.status)}`}>
                                             {getStatusText(app.status)}
@@ -180,24 +186,24 @@ export default function Appointments() {
                                 <div className="flex items-center gap-2 flex-shrink-0">
                                     {app.status === 'PENDING' && (
                                         app.created_by_role === user?.role ? (
-                                            <span className="px-3 py-1.5 bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-widest rounded-xl border border-amber-200">
+                                            <span className="px-3 py-1.5 bg-[#f97316]/10 text-[#f97316] text-[10px] font-bold uppercase tracking-widest rounded-xl border border-[#f97316]/20">
                                                 Đợi {user?.role === 'DOCTOR' ? 'bệnh nhân' : 'bác sĩ'} duyệt
                                             </span>
                                         ) : (
                                             <>
-                                                <button onClick={() => handleStatusChange(app.id, 'CONFIRMED')} className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-colors" title="Xác nhận">
+                                                <button onClick={() => handleStatusChange(app.id, 'CONFIRMED')} className="p-2.5 bg-primary-container text-on-primary-container hover:bg-primary-container/80 rounded-xl transition-colors" title="Xác nhận">
                                                     <CheckCircle className="w-5 h-5" />
                                                 </button>
-                                                <button onClick={() => handleStatusChange(app.id, 'CANCELLED')} className="p-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-colors" title="Từ chối">
+                                                <button onClick={() => handleStatusChange(app.id, 'CANCELLED')} className="p-2.5 bg-error-container text-on-error-container hover:bg-error-container/80 rounded-xl transition-colors" title="Từ chối">
                                                     <XCircle className="w-5 h-5" />
                                                 </button>
                                             </>
                                         )
                                     )}
                                     {app.status === 'CONFIRMED' && (
-                                        <button onClick={() => handleStatusChange(app.id, 'COMPLETED')} className="px-4 py-2.5 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold uppercase tracking-widest rounded-xl transition-colors">
+                                        <Button onClick={() => handleStatusChange(app.id, 'COMPLETED')}>
                                             Hoàn tất
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -208,25 +214,25 @@ export default function Appointments() {
 
             {/* Modal Tạo lịch */}
             {isModalOpen && createPortal(
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h2 className="text-lg font-black text-slate-900 uppercase tracking-wide">Thêm Lịch Khám</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-900"><XCircle className="w-6 h-6" /></button>
+                <div className="fixed inset-0 bg-scrim/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface-container-lowest rounded-lg w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-outline-variant">
+                        <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+                            <h2 className="text-lg font-black text-on-surface uppercase tracking-wide">Thêm Lịch Khám</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="text-on-surface-variant hover:text-on-surface"><XCircle className="w-6 h-6" /></button>
                         </div>
                         <form onSubmit={handleCreateAppointment} className="p-6 space-y-6">
                             {user?.role === 'DOCTOR' && (
                                 <div>
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Bệnh nhân</label>
-                                    <div className="border border-slate-200 rounded-xl overflow-hidden focus-within:border-slate-900 focus-within:ring-1 focus-within:ring-slate-900 transition-all">
-                                        <div className="flex items-center px-4 py-2 bg-white border-b border-slate-100">
-                                            <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Bệnh nhân</label>
+                                    <div className="border border-outline-variant rounded-xl overflow-hidden focus-within:border-on-surface focus-within:ring-1 focus-within:ring-on-surface transition-all bg-surface-container-lowest">
+                                        <div className="flex items-center px-4 py-2 border-b border-outline-variant bg-surface-container-lowest">
+                                            <Search className="w-4 h-4 text-on-surface-variant mr-2 shrink-0" />
                                             <input 
                                                 type="text" 
                                                 placeholder="Tìm tên hoặc số điện thoại..."
                                                 value={patientSearch}
                                                 onChange={e => setPatientSearch(e.target.value)}
-                                                className="w-full bg-transparent text-sm font-bold outline-none placeholder:font-medium placeholder:text-slate-400"
+                                                className="w-full bg-transparent text-sm font-bold outline-none placeholder:font-medium placeholder:text-on-surface-variant text-on-surface"
                                             />
                                         </div>
                                         <select 
@@ -240,13 +246,13 @@ export default function Appointments() {
                                                     setPatientSearch(selectedPatient.full_name);
                                                 }
                                             }}
-                                            className="w-full px-2 py-2 bg-slate-50 text-sm font-bold outline-none custom-scrollbar cursor-pointer"
+                                            className="w-full px-2 py-2 bg-surface-container-low text-sm font-bold outline-none custom-scrollbar cursor-pointer text-on-surface"
                                         >
                                             {patients.filter(p => 
                                                 (p.full_name || '').toLowerCase().includes(patientSearch.toLowerCase()) || 
                                                 (p.phone || '').includes(patientSearch)
                                             ).map(p => (
-                                                <option key={p.id} value={p.id} className="py-2.5 px-3 rounded-lg hover:bg-white mb-1">{p.full_name} {p.phone ? `- ${p.phone}` : ''}</option>
+                                                <option key={p.id} value={p.id} className="py-2.5 px-3 rounded-lg hover:bg-surface-container mb-1">{p.full_name} {p.phone ? `- ${p.phone}` : ''}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -254,37 +260,37 @@ export default function Appointments() {
                             )}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Ngày khám</label>
+                                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Ngày khám</label>
                                     <input 
                                         type="date" required
                                         value={formData.appointment_date}
                                         onChange={e => setFormData({...formData, appointment_date: e.target.value})}
-                                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none"
+                                        className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Giờ khám</label>
+                                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Giờ khám</label>
                                     <input 
                                         type="time" required
                                         value={formData.appointment_time}
                                         onChange={e => setFormData({...formData, appointment_time: e.target.value})}
-                                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none"
+                                        className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface"
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Lý do khám / Triệu chứng</label>
+                                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Lý do khám / Triệu chứng</label>
                                 <input 
                                     type="text"
                                     placeholder="Khám định kỳ, Đau bụng..."
                                     value={formData.reason}
                                     onChange={e => setFormData({...formData, reason: e.target.value})}
-                                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none"
+                                    className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface placeholder:text-on-surface-variant"
                                 />
                             </div>
                             <div className="pt-4 flex justify-end gap-3">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-3 font-bold text-slate-500 bg-slate-50 rounded-xl hover:bg-slate-100 text-xs uppercase tracking-widest">Hủy</button>
-                                <button type="submit" className="px-6 py-3 font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 shadow-xl shadow-slate-900/10 text-xs uppercase tracking-widest">Tạo Lịch</button>
+                                <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>Hủy</Button>
+                                <Button type="submit">Tạo Lịch</Button>
                             </div>
                         </form>
                     </div>

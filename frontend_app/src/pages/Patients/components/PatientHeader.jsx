@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import api from '../../../services/api';
 
 import PatientPoolModal from './PatientPoolModal';
+import Button from '../../../components/ui/Button';
+import Input from '../../../components/ui/Input';
 
 export default function PatientHeader({ onAssigned }) {
     const [showModal, setShowModal] = useState(false);
@@ -29,28 +31,29 @@ export default function PatientHeader({ onAssigned }) {
 
     return (
         <>
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-6 border-b border-slate-100 mb-8 gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-6 border-b border-outline-variant mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">
+                    <h1 className="text-3xl font-black text-on-surface tracking-tight uppercase">
                         Quản Lý Bệnh Nhân
                     </h1>
-                    <p className="text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-widest">
+                    <p className="text-xs text-on-surface-variant mt-2 font-bold uppercase tracking-widest">
                         Danh sách hồ sơ bệnh nhân đang được bạn theo dõi và điều trị
                     </p>
                 </div>
                 <div className="flex gap-3 mt-4 sm:mt-0">
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => setShowPool(true)}
-                        className="flex items-center gap-2 px-6 py-3 font-black text-rose-600 bg-rose-50 border border-rose-100 rounded-xl hover:bg-rose-100 transition-all active:scale-95 text-[11px] uppercase tracking-widest"
+                        className="flex items-center gap-2"
                     >
                         Hồ sơ chờ tiếp nhận
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => setShowModal(true)}
-                        className="flex items-center gap-2 px-6 py-3 font-black text-white bg-slate-900 rounded-xl hover:bg-slate-800 shadow-xl shadow-slate-900/10 transition-all active:scale-95 text-[11px] uppercase tracking-widest"
+                        className="flex items-center gap-2"
                     >
                         Gửi Yêu Cầu
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -63,17 +66,17 @@ export default function PatientHeader({ onAssigned }) {
 
             {/* Modal Thêm */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 animate-in zoom-in-95 duration-200">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-scrim/40 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-surface-container-lowest rounded-lg w-full max-w-md p-8 animate-in zoom-in-95 duration-200 border border-outline-variant">
                         {/* Modal Header */}
-                        <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
+                        <div className="flex justify-between items-center mb-8 border-b border-outline-variant pb-4">
                             <div>
-                                <h2 className="text-lg font-black text-slate-900 uppercase tracking-wide">Yêu Cầu Kết Nối</h2>
-                                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Nhập email tài khoản bệnh nhân</p>
+                                <h2 className="text-lg font-black text-on-surface uppercase tracking-wide">Yêu Cầu Kết Nối</h2>
+                                <p className="text-[10px] font-bold text-on-surface-variant mt-1 uppercase tracking-widest">Nhập email tài khoản bệnh nhân</p>
                             </div>
                             <button
                                 onClick={() => { setShowModal(false); setEmail(''); }}
-                                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors"
+                                className="p-2 rounded-xl hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -82,40 +85,37 @@ export default function PatientHeader({ onAssigned }) {
                         {/* Modal Body */}
                         <form onSubmit={handleAssign} className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
-                                    Email bệnh nhân
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="patient@example.com"
-                                        required
-                                        autoFocus
-                                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400"
-                                    />
-                                </div>
-                                <p className="text-[10px] font-bold text-slate-400 mt-2">
+                                <Input
+                                    label="Email bệnh nhân"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="patient@example.com"
+                                    required
+                                    autoFocus
+                                    icon={Mail}
+                                />
+                                <p className="text-[10px] font-bold text-on-surface-variant mt-2">
                                     * Bệnh nhân phải có tài khoản trong hệ thống.
                                 </p>
                             </div>
 
                             <div className="flex gap-3 pt-4">
-                                <button
+                                <Button
+                                    variant="outline"
                                     type="button"
                                     onClick={() => { setShowModal(false); setEmail(''); }}
-                                    className="flex-1 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                                    className="flex-1"
                                 >
                                     Huỷ
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="flex-1 py-3.5 rounded-xl bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-xl shadow-slate-900/10"
+                                    className="flex-1"
                                 >
                                     {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang xử lý</> : 'Gửi Yêu Cầu'}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>

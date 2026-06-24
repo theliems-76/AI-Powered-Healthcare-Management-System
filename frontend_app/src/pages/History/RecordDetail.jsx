@@ -8,6 +8,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import Button from '../../components/ui/Button';
 
 export default function RecordDetail() {
     const { recordId } = useParams();
@@ -57,37 +58,37 @@ export default function RecordDetail() {
         }
     };
 
-    if (isLoading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin w-8 h-8 text-slate-900" /></div>;
+    if (isLoading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin w-8 h-8 text-outline" /></div>;
 
     const isDoctor = user?.role === 'DOCTOR' || user?.role === 'ADMIN';
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
-            <button onClick={() => navigate(-1)} className="flex items-center text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm w-fit">
+            <button onClick={() => navigate(-1)} className="flex items-center text-xs font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors bg-surface-container-lowest px-4 py-2 rounded border border-outline-variant shadow-sm w-fit">
                 <ArrowLeft size={16} className="mr-2" /> Quay lại
             </button>
             
             {/* Doctor Clinical Panel */}
             {isDoctor && (
-                <div className="bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/50 flex flex-col overflow-hidden">
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm flex flex-col overflow-hidden">
                     {/* Header Section */}
-                    <div className="bg-slate-900 p-6 md:p-8 flex items-center gap-5 md:gap-6">
-                        <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shrink-0 p-1 shadow-inner relative overflow-hidden">
-                            <div className="w-full h-full bg-slate-50 rounded-full flex items-center justify-center border border-slate-200">
-                                <Stethoscope className="w-8 h-8 md:w-10 md:h-10 text-slate-900" strokeWidth={1.5} />
+                    <div className="bg-primary p-6 md:p-8 flex items-center gap-5 md:gap-6">
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-surface-container-lowest rounded-full flex items-center justify-center shrink-0 p-1 shadow-inner relative overflow-hidden">
+                            <div className="w-full h-full bg-surface-container-low rounded-full flex items-center justify-center border border-outline-variant">
+                                <Stethoscope className="w-8 h-8 md:w-10 md:h-10 text-primary" strokeWidth={1.5} />
                             </div>
                         </div>
                         <div>
-                            <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">Bảng Điều Khiển Lâm Sàng</h2>
-                            <p className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Khu vực dành riêng cho Bác sĩ điều trị</p>
+                            <h2 className="text-xl md:text-2xl font-bold text-on-primary uppercase tracking-tight">Bảng Điều Khiển Lâm Sàng</h2>
+                            <p className="text-xs font-semibold text-on-primary uppercase tracking-wider mt-1 opacity-80">Khu vực dành riêng cho Bác sĩ điều trị</p>
                         </div>
                     </div>
                     
                     {/* Content Section */}
                     <div className="p-8 md:p-10 flex-1">
                         <div className="space-y-4">
-                            <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest">Nhận xét & Chẩn đoán bổ sung</label>
-                            <div className="bg-white rounded-xl [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-slate-200 [&_.ql-editor]:min-h-[250px] [&_.ql-editor]:text-sm [&_.ql-editor]:font-medium">
+                            <label className="block text-xs font-bold text-on-surface uppercase tracking-wider">Nhận xét & Chẩn đoán bổ sung</label>
+                            <div className="bg-surface-container-lowest rounded [&_.ql-toolbar]:rounded-t [&_.ql-toolbar]:border-outline-variant [&_.ql-toolbar]:bg-surface-container-low [&_.ql-container]:rounded-b [&_.ql-container]:border-outline-variant [&_.ql-editor]:min-h-[250px] [&_.ql-editor]:text-sm [&_.ql-editor]:font-medium text-on-surface">
                                 <ReactQuill 
                                     bounds={'body'}
                                     theme="snow"
@@ -106,18 +107,18 @@ export default function RecordDetail() {
                             </div>
 
                             <div className="mt-8">
-                                <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-2">Chỉnh sửa Phác đồ AI (Hiển thị cho bệnh nhân)</label>
+                                <label className="block text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Chỉnh sửa Phác đồ Lâm sàng (Hiển thị cho bệnh nhân)</label>
                                 <textarea 
-                                    className="w-full p-4 rounded-xl border border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 outline-none text-sm font-medium text-slate-700 min-h-[250px] whitespace-pre-wrap"
+                                    className="w-full p-4 rounded border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm font-medium text-on-surface min-h-[250px] whitespace-pre-wrap bg-surface-container-lowest transition-colors"
                                     value={aiPlan}
                                     onChange={(e) => setAiPlan(e.target.value)}
-                                    placeholder="Chỉnh sửa nội dung phác đồ do AI tạo..."
+                                    placeholder="Chỉnh sửa nội dung phác đồ do hệ thống tạo..."
                                 />
                             </div>
                             
                             <div className="flex justify-end gap-3 mt-8">
-                                <button
-                                    type="button"
+                                <Button
+                                    variant="ghost"
                                     onClick={() => {
                                         const input = document.createElement('input');
                                         input.type = 'file';
@@ -143,19 +144,20 @@ export default function RecordDetail() {
                                         };
                                         input.click();
                                     }}
-                                    className="px-6 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-black text-[11px] uppercase tracking-widest rounded-xl transition-colors flex items-center gap-2 shadow-sm active:scale-95"
+                                    className="flex items-center gap-2"
                                 >
                                     📎 Đính kèm File
-                                </button>
+                                </Button>
                                 
-                                <button 
+                                <Button 
                                     onClick={handleSaveNotes}
                                     disabled={isSaving}
-                                    className="px-8 py-4 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-colors flex items-center gap-2 shadow-xl shadow-slate-900/10 active:scale-95 disabled:opacity-50"
+                                    isLoading={isSaving}
+                                    className="flex items-center gap-2"
                                 >
-                                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                    <Save className="w-4 h-4" />
                                     Lưu & Duyệt Kết Quả
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
