@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight, Flame, Utensils, Activity, ArrowDown, ArrowUp, AlertCircle, Info } from 'lucide-react';
+import { 
+    MdCalendarMonth as CalendarIcon, 
+    MdChevronLeft as ChevronLeft, 
+    MdChevronRight as ChevronRight, 
+    MdLocalFireDepartment as Flame, 
+    MdRestaurant as Utensils, 
+    MdFitnessCenter as Activity, 
+    MdArrowDownward as ArrowDown, 
+    MdArrowUpward as ArrowUp, 
+    MdInfo as Info 
+} from 'react-icons/md';
 import api from '../../services/api';
 import { getLocalDateString } from '../../utils/dateUtils';
 
@@ -117,41 +127,46 @@ export default function CalendarSchedule() {
     const isWeightLoss = selectedDayData.deficit > 0;
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500 pb-12">
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
             
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2 pt-4">
                 <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lịch sử Hoạt động</p>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-                        Lịch Hoạt Động & Dinh Dưỡng
-                    </h1>
-                    <p className="text-sm text-slate-500 mt-1 font-medium">Theo dõi nhật ký nạp và tiêu hao năng lượng mỗi ngày.</p>
+                    <h1 className="text-4xl md:text-5xl font-display font-bold text-on-surface tracking-tight leading-tight">Lịch Trình <br/><span className="text-primary">Dinh Dưỡng</span></h1>
+                    <p className="text-sm text-on-surface-variant mt-2 max-w-md">Theo dõi nhật ký nạp và tiêu hao năng lượng mỗi ngày của bạn.</p>
                 </div>
             </div>
 
+            {/* Bento Grid Layout 12 Cols */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                {}
-                <div className="lg:col-span-7 space-y-6">
-                    
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="font-bold text-xl text-slate-800">
+                {/* Left Column - Calendar (8 Cols) */}
+                <div className="lg:col-span-8 flex flex-col h-full">
+                    <div className="bg-surface-container-lowest p-8 rounded-3xl flex-1 shadow-[0_12px_40px_rgba(0,24,72,0.06)] border-none">
+                        {/* Calendar Header */}
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="font-display font-bold text-2xl text-on-surface">
                                 {monthNames[currentDate.getMonth()]}, {currentDate.getFullYear()}
                             </h3>
-                            <div className="flex gap-2">
-                                <button onClick={prevMonth} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"><ChevronLeft className="w-5 h-5"/></button>
-                                <button onClick={nextMonth} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"><ChevronRight className="w-5 h-5"/></button>
+                            <div className="flex gap-3">
+                                <button onClick={prevMonth} className="p-3 bg-surface-container-low hover:bg-surface-container rounded-2xl text-on-surface-variant hover:text-on-surface transition-colors">
+                                    <ChevronLeft className="w-6 h-6"/>
+                                </button>
+                                <button onClick={nextMonth} className="p-3 bg-surface-container-low hover:bg-surface-container rounded-2xl text-on-surface-variant hover:text-on-surface transition-colors">
+                                    <ChevronRight className="w-6 h-6"/>
+                                </button>
                             </div>
                         </div>
                         
-                        <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-4">
+                        {/* Days Header */}
+                        <div className="grid grid-cols-7 gap-3 text-center text-xs font-bold text-outline uppercase tracking-wider mb-6">
                             <div>T2</div><div>T3</div><div>T4</div><div>T5</div><div>T6</div><div>T7</div><div>CN</div>
                         </div>
                         
-                        <div className="grid grid-cols-7 gap-2">
+                        {/* Grid */}
+                        <div className="grid grid-cols-7 gap-3">
                             {days.map((dayObj, i) => {
-                                if (!dayObj) return <div key={i} className="min-h-[100px] bg-slate-50/50 rounded-xl border border-dashed border-slate-100"></div>;
+                                if (!dayObj) return <div key={i} className="min-h-[110px] bg-transparent"></div>;
                                 
                                 const isSelected = selectedDate === dayObj.dateStr;
                                 const data = monthlyData[dayObj.dateStr];
@@ -162,31 +177,31 @@ export default function CalendarSchedule() {
                                     <div 
                                         key={i} 
                                         onClick={() => setSelectedDate(dayObj.dateStr)}
-                                        className={`h-28 sm:h-32 p-2 sm:p-2.5 rounded-2xl border transition-all cursor-pointer relative flex flex-col overflow-hidden group
-                                            ${isSelected ? 'bg-white border-transparent ring-2 ring-slate-900 shadow-md' : 
-                                              isToday ? 'bg-slate-50 border-slate-300' : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'}`}
+                                        className={`h-28 sm:h-32 p-3 rounded-2xl transition-all cursor-pointer relative flex flex-col overflow-hidden group
+                                            ${isSelected ? 'bg-gradient-to-br from-primary to-primary-container text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)]' : 
+                                              isToday ? 'bg-surface-container-high' : 'bg-surface-container-low hover:bg-surface-container'}`}
                                     >
-                                        <div className={`text-xs font-bold w-7 h-7 flex shrink-0 items-center justify-center rounded-full transition-colors ${isSelected ? 'bg-slate-900 text-white' : 'text-slate-700 group-hover:bg-slate-200'}`}>
+                                        <div className={`text-base font-display font-bold w-8 h-8 flex shrink-0 items-center justify-center rounded-xl transition-colors ${isSelected ? 'text-white' : isToday ? 'text-primary' : 'text-on-surface'}`}>
                                             {dayObj.date.getDate()}
                                         </div>
 
                                         {hasData ? (
-                                            <div className="flex-1 mt-2 space-y-1 overflow-y-auto custom-scrollbar pr-1">
+                                            <div className="flex-1 mt-2 space-y-2 overflow-y-auto custom-scrollbar pr-1">
                                                 {data.consumed > 0 && (
-                                                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-bold px-1.5 py-1 rounded bg-amber-50 text-amber-600">
-                                                        <Utensils className="w-3 h-3 shrink-0" />
+                                                    <div className={`flex items-center justify-between text-[10px] font-bold px-2 py-1.5 rounded-lg ${isSelected ? 'bg-white/20 text-white' : 'bg-secondary-container text-secondary'}`}>
+                                                        <Utensils className="w-3.5 h-3.5 shrink-0" />
                                                         <span className="truncate ml-1">{data.consumed}</span>
                                                     </div>
                                                 )}
                                                 {data.burned > 0 && (
-                                                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-bold px-1.5 py-1 rounded bg-emerald-50 text-emerald-600">
-                                                        <Activity className="w-3 h-3 shrink-0" />
+                                                    <div className={`flex items-center justify-between text-[10px] font-bold px-2 py-1.5 rounded-lg ${isSelected ? 'bg-white/20 text-white' : 'bg-primary-fixed text-on-primary-fixed'}`}>
+                                                        <Activity className="w-3.5 h-3.5 shrink-0" />
                                                         <span className="truncate ml-1">{data.burned}</span>
                                                     </div>
                                                 )}
                                                 {data.appointments && data.appointments.length > 0 && (
-                                                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-bold px-1.5 py-1 rounded bg-blue-50 text-blue-600">
-                                                        <CalendarIcon className="w-3 h-3 shrink-0" />
+                                                    <div className={`flex items-center justify-between text-[10px] font-bold px-2 py-1.5 rounded-lg ${isSelected ? 'bg-white/20 text-white' : 'bg-tertiary-fixed text-on-tertiary-fixed'}`}>
+                                                        <CalendarIcon className="w-3.5 h-3.5 shrink-0" />
                                                         <span className="truncate ml-1">{data.appointments.length}</span>
                                                     </div>
                                                 )}
@@ -199,81 +214,96 @@ export default function CalendarSchedule() {
                     </div>
                 </div>
 
-                {}
-                <div className="lg:col-span-5 flex flex-col gap-6">
+                {/* Right Column - Stats & Timeline (4 Cols) */}
+                <div className="lg:col-span-4 flex flex-col gap-8">
                     
-                    {}
-                    <div className="bg-slate-900 rounded-3xl p-6 shadow-sm text-white relative overflow-hidden">
-                        <div className="flex justify-between items-start mb-6">
+                    {/* Deficit Card */}
+                    <div className="bg-surface-container-lowest rounded-3xl p-6 lg:p-8 flex flex-col relative overflow-hidden shadow-[0_12px_40px_rgba(0,24,72,0.06)] border-none">
+                        <div className="flex justify-between items-start mb-6 z-10">
                             <div>
-                                <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-1">
+                                <h3 className="text-outline font-bold text-[10px] uppercase tracking-widest mb-1">
                                     Ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}
                                 </h3>
-                                <h2 className="text-2xl font-black tracking-tight text-white">Thâm Hụt Năng Lượng</h2>
+                                <h2 className="text-xl lg:text-2xl font-display font-bold tracking-tight text-on-surface">Cân Bằng Calo</h2>
                             </div>
-                            <div className={`px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 ${isWeightLoss ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                            <div className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 ${isWeightLoss ? 'bg-secondary-container text-secondary' : 'bg-error-container text-error'}`}>
                                 {isWeightLoss ? <ArrowDown className="w-3.5 h-3.5"/> : <ArrowUp className="w-3.5 h-3.5"/>}
                                 {Math.abs(selectedDayData.deficit)} kcal
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4 mb-2">
-                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-colors">
-                                <Flame className="w-5 h-5 text-amber-400 mb-2" />
-                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Nạp vào</div>
-                                <div className="text-xl font-black text-white">{selectedDayData.consumed}</div>
+                        <div className="grid grid-cols-3 gap-3 mb-4 z-10">
+                            <div className="bg-surface-container-low p-3 rounded-2xl flex flex-col items-center text-center">
+                                <Flame className="w-5 h-5 text-secondary mb-1.5" />
+                                <div className="text-[9px] text-outline uppercase font-bold tracking-widest mb-1">Nạp vào</div>
+                                <div className="text-lg font-display font-bold text-on-surface">{selectedDayData.consumed}</div>
                             </div>
-                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-colors">
-                                <Activity className="w-5 h-5 text-emerald-400 mb-2" />
-                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Tiêu hao</div>
-                                <div className="text-xl font-black text-white">{selectedDayData.burned}</div>
+                            <div className="bg-surface-container-low p-3 rounded-2xl flex flex-col items-center text-center">
+                                <Activity className="w-5 h-5 text-primary mb-1.5" />
+                                <div className="text-[9px] text-outline uppercase font-bold tracking-widest mb-1">Tiêu hao</div>
+                                <div className="text-lg font-display font-bold text-on-surface">{selectedDayData.burned}</div>
                             </div>
-                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-colors">
-                                <Info className="w-5 h-5 text-blue-400 mb-2" />
-                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">TDEE / Nền</div>
-                                <div className="text-xl font-black text-white">{targetCalories}</div>
+                            <div className="bg-surface-container-low p-3 rounded-2xl flex flex-col items-center text-center">
+                                <Info className="w-5 h-5 text-outline mb-1.5" />
+                                <div className="text-[9px] text-outline uppercase font-bold tracking-widest mb-1">TDEE Nền</div>
+                                <div className="text-lg font-display font-bold text-on-surface">{targetCalories}</div>
                             </div>
                         </div>
-                        <p className="text-[10px] text-slate-500 font-bold mt-4 uppercase tracking-widest">
-                            Thâm hụt = (TDEE + Tiêu hao) - Nạp vào
-                        </p>
+
+                        <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/30 flex gap-2 items-start z-10">
+                            <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                            <p className="text-[10px] text-on-surface-variant font-medium leading-relaxed">
+                                <strong className="text-on-surface">TDEE Nền</strong> là tổng năng lượng tiêu hao cơ bản. 
+                                <br/> Thâm hụt = <span className="font-mono bg-surface-container-highest px-1 py-0.5 rounded text-primary">(Nạp) - (TDEE + Tiêu hao)</span>.
+                            </p>
+                        </div>
                     </div>
 
-                    {}
-                    <div className="bg-white p-0 rounded-3xl shadow-sm border border-slate-200 flex-1 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/80">
-                            <h3 className="font-bold text-[10px] text-slate-500 uppercase tracking-widest">
-                                Chi tiết hoạt động
+                    {/* Timeline Card */}
+                    <div className="bg-surface-container-lowest rounded-3xl flex-1 overflow-hidden flex flex-col shadow-[0_12px_40px_rgba(0,24,72,0.06)] border-none">
+                        <div className="px-6 py-5 bg-surface-container-low/50">
+                            <h3 className="font-bold text-sm text-on-surface uppercase tracking-widest">
+                                Hoạt Động Trong Ngày
                             </h3>
                         </div>
 
                         {isLoadingDay ? (
-                            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-900"></div></div>
+                            <div className="flex justify-center items-center flex-1 py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-3 border-primary"></div></div>
                         ) : timelineEvents.length === 0 ? (
-                            <div className="text-center py-12">
-                                <p className="text-slate-400 text-sm font-medium">Chưa có dữ liệu trong ngày này.</p>
+                            <div className="text-center py-12 flex-1 flex flex-col items-center justify-center">
+                                <CalendarIcon className="w-10 h-10 text-outline-variant mb-4 opacity-50" />
+                                <p className="text-outline text-sm font-semibold tracking-wide">Chưa có lịch trình</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-slate-100">
-                                {timelineEvents.map((event) => {
+                            <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+                                {timelineEvents.map((event, index) => {
                                     const isMeal = event.type === 'meal';
                                     const isAppt = event.type === 'appointment';
+                                    const Icon = isMeal ? Utensils : isAppt ? CalendarIcon : Activity;
+                                    
+                                    let dotColor = isMeal ? 'bg-secondary-container text-secondary' : isAppt ? 'bg-tertiary-container text-tertiary' : 'bg-primary-container text-primary';
 
                                     return (
-                                        <div key={event.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50/50 transition-colors">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-1.5">
-                                                    <h4 className={`font-bold text-sm tracking-tight ${isAppt ? 'text-blue-700' : 'text-slate-800'}`}>{event.title}</h4>
-                                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-md">
-                                                        {event.time}
-                                                    </span>
-                                                </div>
-                                                <p className="text-[11px] font-medium text-slate-500">{event.desc}</p>
+                                        <div key={event.id} className="flex items-stretch gap-3 lg:gap-4 group min-h-[64px]">
+                                            {/* Time block */}
+                                            <div className="w-[64px] lg:w-[72px] pt-2 flex-shrink-0 text-right">
+                                                <span className="text-[10px] lg:text-[11px] font-bold text-on-surface-variant break-words leading-tight block">{event.time}</span>
                                             </div>
-                                            <div className="mt-3 sm:mt-0 flex-shrink-0">
-                                                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border ${isMeal ? 'border-amber-200 text-amber-600 bg-amber-50' : isAppt ? 'border-blue-200 text-blue-600 bg-blue-50' : 'border-emerald-200 text-emerald-600 bg-emerald-50'}`}>
-                                                    {isMeal ? 'NẠP VÀO' : isAppt ? 'LỊCH HẸN' : 'TIÊU HAO'}
-                                                </span>
+                                            
+                                            {/* Dot & Line Column */}
+                                            <div className="flex flex-col items-center flex-shrink-0 w-8">
+                                                <div className={`z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 ${dotColor}`}>
+                                                    <Icon className="w-4 h-4" />
+                                                </div>
+                                                {index !== timelineEvents.length - 1 && (
+                                                    <div className="w-[2px] flex-1 bg-surface-container-high my-1 rounded-full"></div>
+                                                )}
+                                            </div>
+                                            
+                                            {/* Content Block */}
+                                            <div className="flex-1 min-w-0 bg-surface-container-low p-4 rounded-2xl group-hover:bg-surface-container transition-colors mb-6">
+                                                <h4 className="font-display font-bold text-sm text-on-surface mb-1 truncate">{event.title}</h4>
+                                                <p className="text-[11px] font-medium text-on-surface-variant leading-relaxed break-words">{event.desc}</p>
                                             </div>
                                         </div>
                                     );

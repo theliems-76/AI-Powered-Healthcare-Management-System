@@ -4,7 +4,7 @@ import api from '../../services/api';
 
 import UserTable from './components/UserTable';
 import AdminPagination from './components/AdminPagination';
-import { Loader2, Search } from 'lucide-react';
+import { MdSearch } from 'react-icons/md';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -75,14 +75,14 @@ export default function AdminUsers() {
         }
     };
 
-    if (loading && !users.length) return <div className="flex justify-center p-20"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
+    if (loading && !users.length) return <div className="flex justify-center p-20"><div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-8 h-8  text-primary"></div></div>;
 
     return (
         <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                     Danh sách Tài khoản
-                    {loading && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
+                    {loading && <div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-4 h-4  text-secondary"></div>}
                 </h2>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
@@ -90,7 +90,7 @@ export default function AdminUsers() {
                         <select
                             value={roleFilter}
                             onChange={handleRoleFilterChange}
-                            className="w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none cursor-pointer text-slate-700 font-medium"
+                            className="w-full pl-3 pr-8 py-2 bg-surface border border-outline-variant rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer text-on-surface"
                         >
                             <option value="ALL">Tất cả quyền</option>
                             <option value="ADMIN">Quản trị viên</option>
@@ -98,24 +98,24 @@ export default function AdminUsers() {
                             <option value="PATIENT">Bệnh nhân</option>
                         </select>
                         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg className="w-4 h-4 text-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
 
                     <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-64">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <MdSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm Email, Tên, SĐT..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
+                            className="w-full pl-9 pr-4 py-2 bg-surface border border-outline-variant rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                         />
                     </form>
                 </div>
             </div>
             
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4">
+            <div className="bg-surface border border-outline-variant rounded-xl overflow-hidden flex flex-col">
                 <UserTable 
                     users={users} 
                     onRoleChange={handleRoleChange} 
@@ -123,10 +123,12 @@ export default function AdminUsers() {
                 />
                 
                 {pagination && (
-                    <AdminPagination
-                        pagination={{ ...pagination, limit: ITEMS_PER_PAGE }}
-                        onPageChange={handlePageChange}
-                    />
+                    <div className="p-4 border-t border-outline-variant bg-surface-container-lowest">
+                        <AdminPagination
+                            pagination={{ ...pagination, limit: ITEMS_PER_PAGE }}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
                 )}
             </div>
         </div>

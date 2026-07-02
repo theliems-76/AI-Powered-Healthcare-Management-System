@@ -4,36 +4,46 @@ import { Trash2 } from 'lucide-react';
 export default function ExerciseList({ exercises, onRemoveExercise }) {
     if (exercises.length === 0) {
         return (
-            <div className="text-center py-12 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
-                <p className="text-slate-500 text-sm">Chưa có hoạt động nào được ghi nhận hôm nay.</p>
+            <div className="text-center py-12 bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl">
+                <p className="text-on-surface-variant text-sm font-medium">Chưa có hoạt động nào được ghi nhận hôm nay.</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-3">
-            {exercises.map((ex) => (
-                <div key={ex.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors">
-                    <div className="flex items-center gap-4">
-                        <div className="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[11px] font-bold uppercase tracking-wider">
-                            {ex.duration} PHÚT
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-slate-800 text-sm">{ex.name}</h4>
-                            <p className="text-xs text-slate-500 mt-0.5">Hệ số MET: {ex.met}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="text-right">
-                            <span className="font-bold text-lg text-orange-600">-{ex.calories}</span>
-                            <span className="text-[10px] text-slate-500 ml-1 uppercase">Kcal</span>
-                        </div>
-                        <button onClick={() => onRemoveExercise(ex.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                            <Trash2 className="w-4 h-4" />
-                        </button>
-                    </div>
-                </div>
-            ))}
+        <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+                <thead>
+                    <tr className="bg-surface-container-lowest border-b border-outline-variant">
+                        <th className="px-4 py-3 font-bold text-[10px] text-secondary uppercase tracking-widest w-2/5">Bài Tập</th>
+                        <th className="px-4 py-3 font-bold text-[10px] text-secondary uppercase tracking-widest">Thời Lượng / MET</th>
+                        <th className="px-4 py-3 font-bold text-[10px] text-secondary uppercase tracking-widest text-right">Tiêu Hao</th>
+                        <th className="px-4 py-3 font-bold text-[10px] text-secondary uppercase tracking-widest text-right w-16">Tác vụ</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-outline-variant">
+                    {exercises.map((ex) => (
+                        <tr key={ex.id} className="hover:bg-surface-container-low transition-colors h-14 group">
+                            <td className="px-4 font-semibold text-on-surface text-sm">{ex.name}</td>
+                            <td className="px-4 font-mono text-sm text-secondary">
+                                {ex.duration} phút <span className="text-outline-variant mx-1">•</span> MET: {ex.met}
+                            </td>
+                            <td className="px-4 text-right font-bold text-orange-600 text-sm">
+                                -{ex.calories} <span className="text-[10px] text-secondary uppercase tracking-widest ml-1">kcal</span>
+                            </td>
+                            <td className="px-4 text-right">
+                                <button 
+                                    onClick={() => onRemoveExercise(ex.id)} 
+                                    className="p-1.5 text-on-surface-variant hover:text-error transition-colors sm:opacity-0 group-hover:opacity-100 inline-flex items-center justify-center"
+                                    title="Xóa bài tập"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }

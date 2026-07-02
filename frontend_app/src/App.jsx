@@ -84,17 +84,18 @@ function App() {
         </React.Suspense>
         <ToastContainer 
           position="bottom-right" 
-          autoClose={3500} 
-          hideProgressBar={true}
+          autoClose={4000} 
+          hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
           rtl={false}
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="dark"
-          toastClassName="!bg-[#252526] !text-[#cccccc] !rounded-md !shadow-2xl !border !border-[#454545] !font-sans !text-[13px] !mb-3 !min-h-0 !py-2 !px-3"
-          bodyClassName="!m-0 !p-1 !font-medium"
+          theme="colored"
+          style={{ zIndex: 99999 }}
+          toastClassName="!bg-primary !text-on-primary !rounded-xl !shadow-2xl !shadow-primary/30 !border !border-primary-container !font-sans !text-sm !mb-3 !min-h-0 !py-3 !px-4 overflow-hidden"
+          bodyClassName="!m-0 !p-1 !font-bold"
         />
       </Router>
     </AuthProvider>

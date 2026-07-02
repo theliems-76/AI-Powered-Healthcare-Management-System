@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { createPortal } from 'react-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { Calendar, Clock, User, CheckCircle, XCircle, FileText, ChevronRight, Search } from 'lucide-react';
+import { MdCheckCircle, MdCancel, MdSearch, MdAdd } from 'react-icons/md';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
 
 export default function Appointments() {
     const { user } = useContext(AuthContext);
     
-    // Sửa lỗi Timezone (Múi giờ UTC) khi lấy ngày hiện tại
     const getLocalDateString = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -43,7 +41,11 @@ export default function Appointments() {
     const fetchAppointments = async () => {
         setIsLoading(true);
         try {
-            const res = await api.get(`/appointments?date=${filterDate}`);
+            let url = '/appointments';
+            if (user?.role === 'PATIENT') {
+                url += `?date=${filterDate}`;
+            }
+            const res = await api.get(url);
             if (res.data.status === 'success') {
                 setAppointments(res.data.data);
             }
@@ -68,7 +70,7 @@ export default function Appointments() {
     const handleCreateAppointment = async (e) => {
         e.preventDefault();
         if (user?.role === 'DOCTOR' && !formData.patient_profile_id) {
-            toast.warning("Vui lòng chọn một bệnh nhân từ danh sách!");
+            toast.warning("Vui lòng chọn bệnh nhân!");
             return;
         }
         try {
@@ -79,7 +81,7 @@ export default function Appointments() {
                 fetchAppointments();
             }
         } catch (error) {
-            toast.error(error.response?.data?.error || "Lỗi khi tạo lịch hẹn");
+            toast.error(error.response?.data?.error || "Lỗi tạo lịch hẹn");
         }
     };
 
@@ -87,40 +89,77 @@ export default function Appointments() {
         try {
             const res = await api.put(`/appointments/${id}`, { status });
             if (res.data.status === 'success') {
-                toast.success(`Đã chuyển trạng thái thành ${status}`);
+                toast.success(`Đã cập nhật trạng thái: ${status}`);
                 fetchAppointments();
             }
         } catch (error) {
-            toast.error("Lỗi khi cập nhật trạng thái");
+            toast.error("Lỗi cập nhật trạng thái");
         }
     };
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'PENDING': return 'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20';
-            case 'CONFIRMED': return 'bg-primary-container text-on-primary-container border-primary/20';
-            case 'CANCELLED': return 'bg-error-container text-on-error-container border-error/20';
-            case 'COMPLETED': return 'bg-surface-container text-on-surface-variant border-outline-variant';
-            default: return 'bg-surface-container text-on-surface border-outline-variant';
+            case 'PENDING': return 'bg-[#fff4e5] text-[#bd510b] border-[#ffe8cc]'; 
+            case 'CONFIRMED': return 'bg-secondary-container text-secondary border-[#b8cac9]'; 
+            case 'CANCELLED': return 'bg-error-container text-error border-error-container'; 
+            case 'COMPLETED': return 'bg-surface-container-high text-on-surface-variant border-outline-variant';
+            default: return 'bg-surface-container-high text-on-surface border-outline-variant';
         }
     };
 
     const getStatusText = (status) => {
         switch (status) {
-            case 'PENDING': return 'Chờ duyệt';
-            case 'CONFIRMED': return 'Đã xác nhận';
-            case 'CANCELLED': return 'Đã hủy';
-            case 'COMPLETED': return 'Hoàn tất';
+            case 'PENDING': return 'Chờ Duyệt';
+            case 'CONFIRMED': return 'Xác Nhận';
+            case 'CANCELLED': return 'Đã Hủy';
+            case 'COMPLETED': return 'Hoàn Tất';
             default: return status;
         }
+    };
+
+    const generateWeekDays = (baseDateStr) => {
+        const baseDate = new Date(baseDateStr);
+        let day = baseDate.getDay();
+        day = day === 0 ? 7 : day; // Make Sunday 7
+        const monday = new Date(baseDate);
+        monday.setDate(baseDate.getDate() - day + 1);
+        
+        return Array.from({length: 7}).map((_, i) => {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            return {
+                date: d.toISOString().split('T')[0],
+                dayName: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'][i],
+                dayNum: d.getDate()
+            };
+        });
+    };
+
+    const weekDays = user?.role === 'DOCTOR' ? generateWeekDays(filterDate) : [];
+    const hours = Array.from({ length: 11 }, (_, i) => `${String(i + 7).padStart(2, '0')}:00`); // 07:00 to 17:00
+
+    const prevWeek = () => {
+        const d = new Date(filterDate);
+        d.setDate(d.getDate() - 7);
+        setFilterDate(d.toISOString().split('T')[0]);
+    };
+    
+    const nextWeek = () => {
+        const d = new Date(filterDate);
+        d.setDate(d.getDate() + 7);
+        setFilterDate(d.toISOString().split('T')[0]);
+    };
+
+    const resetToToday = () => {
+        setFilterDate(getLocalDateString());
     };
 
     if (user?.role === 'PATIENT' && !user?.Profile?.managed_by_doctor_id) {
         return (
             <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
-                <div className="bg-surface-container-lowest rounded-lg border border-outline-variant p-12 text-center">
-                    <h3 className="text-xl font-black text-on-surface uppercase tracking-tight mb-2">Chưa có Bác sĩ phụ trách</h3>
-                    <p className="text-sm font-medium text-on-surface-variant max-w-lg mx-auto">
+                <div className="bg-surface-container-lowest rounded-2xl p-16 text-center shadow-[0_12px_40px_rgba(0,24,72,0.06)]">
+                    <h3 className="text-3xl font-display font-bold text-on-surface tracking-tight mb-4">Chưa Có Bác Sĩ Phụ Trách</h3>
+                    <p className="text-base text-on-surface-variant max-w-lg mx-auto">
                         Tính năng lịch hẹn hiện chỉ dành cho các bệnh nhân đã được bác sĩ tiếp nhận và đưa vào danh sách quản lý.
                     </p>
                 </div>
@@ -129,168 +168,247 @@ export default function Appointments() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
-            {/* Header */}
-            <div className="pb-6 border-b border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 shrink-0">
+        <div className="max-w-7xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
+            {/* Header Area - Editorial Layout */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pt-4 px-2">
                 <div>
-                    <h1 className="text-3xl font-black text-on-surface tracking-tight uppercase">Quản Lý Lịch Hẹn</h1>
-                    <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-2">Sắp xếp thời gian thăm khám bệnh nhân</p>
+                    <h1 className="text-4xl md:text-5xl font-display font-bold text-on-surface tracking-tight leading-tight">Lịch Hẹn <br/><span className="text-primary">Lâm Sàng</span></h1>
+                    <p className="text-sm text-on-surface-variant mt-2 max-w-md">Quản lý và sắp xếp lịch thăm khám cho bệnh nhân trong hệ thống.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <input 
-                        type="date" 
-                        value={filterDate} 
-                        onChange={(e) => setFilterDate(e.target.value)}
-                        className="px-4 h-[44px] text-sm font-bold bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface"
-                    />
-                    <Button 
+                <div className="flex items-center gap-4">
+                    {user?.role === 'PATIENT' && (
+                        <input 
+                            type="date" 
+                            value={filterDate} 
+                            onChange={(e) => setFilterDate(e.target.value)}
+                            className="px-5 h-[48px] text-sm font-semibold bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-on-surface shadow-[0_4px_12px_rgba(0,24,72,0.04)] border-none"
+                        />
+                    )}
+                    <button 
                         onClick={() => setIsModalOpen(true)}
-                        className="flex items-center justify-center gap-2 h-[44px]"
+                        className="flex items-center justify-center gap-2 h-[48px] px-6 rounded-xl bg-gradient-to-br from-primary to-primary-container text-white font-semibold text-sm hover:opacity-90 transition-opacity shadow-[0_8px_16px_rgba(37,99,235,0.2)]"
                     >
+                        <MdAdd className="w-5 h-5" />
                         Tạo Lịch Khám
-                    </Button>
+                    </button>
                 </div>
             </div>
 
-            {/* List */}
-            <div className="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden">
-                <div className="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
-                    <h2 className="text-xs font-black text-on-surface uppercase tracking-widest">Danh sách ngày {new Date(filterDate).toLocaleDateString('vi-VN')}</h2>
-                </div>
-                
-                {isLoading ? (
-                    <div className="p-12 text-center text-on-surface-variant"><div className="animate-spin w-6 h-6 border-2 border-on-surface border-t-transparent rounded-full mx-auto"></div></div>
-                ) : appointments.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-24">
-                        <h3 className="text-xl font-black text-on-surface uppercase tracking-tight mb-2">Trống Lịch Hẹn</h3>
-                        <p className="text-sm font-medium text-on-surface-variant">Chưa có bệnh nhân nào được xếp lịch thăm khám trong ngày này.</p>
+            {/* Doctor Calendar Grid */}
+            {user?.role === 'DOCTOR' ? (
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                        <div className="flex items-center gap-4 bg-surface-container-lowest p-2 rounded-2xl shadow-[0_4px_12px_rgba(0,24,72,0.04)]">
+                            <button onClick={prevWeek} className="p-2 hover:bg-surface-container-low rounded-xl text-on-surface-variant transition-colors"><MdSearch className="w-5 h-5 hidden"/> <span className="text-xs font-bold px-2">Tuần trước</span></button>
+                            <button onClick={resetToToday} className="px-4 py-2 bg-surface-container-high rounded-xl text-xs font-bold text-on-surface hover:bg-outline-variant transition-colors">Hôm nay</button>
+                            <button onClick={nextWeek} className="p-2 hover:bg-surface-container-low rounded-xl text-on-surface-variant transition-colors"><span className="text-xs font-bold px-2">Tuần sau</span></button>
+                        </div>
+                        <h2 className="text-sm font-bold text-outline uppercase tracking-widest hidden md:block">
+                            Tuần: {weekDays[0]?.date} đến {weekDays[6]?.date}
+                        </h2>
                     </div>
-                ) : (
-                    <div className="divide-y divide-outline-variant">
-                        {appointments.map(app => (
-                            <div key={app.id} className="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:items-center hover:bg-surface-container/50 transition-colors">
-                                <div className="flex-shrink-0 w-24">
-                                    <div className="text-2xl font-black text-on-surface tracking-tight">{app.appointment_time.slice(0, 5)}</div>
+
+                    <div className="overflow-x-auto custom-scrollbar pb-4">
+                        <div className="min-w-[900px] bg-surface-container-lowest rounded-[2rem] border-none shadow-[0_12px_40px_rgba(0,24,72,0.06)] overflow-hidden flex flex-col">
+                            {/* Header Row */}
+                            <div className="grid grid-cols-8 border-b border-surface-container-highest bg-surface-container-low/30">
+                                <div className="p-4 border-r border-surface-container-highest flex items-center justify-center">
+                                    <span className="text-xs font-bold text-outline uppercase tracking-wider">Giờ / Ngày</span>
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-black text-on-surface mb-1">
-                                        {app.Patient?.User?.full_name}
-                                    </h3>
-                                    <div className="flex items-center gap-4 text-sm font-medium text-on-surface-variant">
-                                        <span>{app.reason || 'Khám tổng quát'}</span>
-                                        <span className={`px-2.5 py-0.5 rounded border text-[10px] uppercase font-bold tracking-widest ${getStatusStyle(app.status)}`}>
-                                            {getStatusText(app.status)}
-                                        </span>
+                                {weekDays.map(d => {
+                                    const isToday = d.date === getLocalDateString();
+                                    return (
+                                        <div key={d.date} className="p-4 text-center border-r border-surface-container-highest last:border-r-0 relative">
+                                            {isToday && <div className="absolute top-0 left-0 right-0 h-1 bg-primary"></div>}
+                                            <div className={`text-[11px] font-bold uppercase tracking-widest mb-1 ${isToday ? 'text-primary' : 'text-on-surface-variant'}`}>{d.dayName}</div>
+                                            <div className={`text-2xl font-display font-bold ${isToday ? 'text-primary' : 'text-on-surface'}`}>{d.dayNum}</div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            
+                            {/* Body Rows */}
+                            <div className="relative flex-1">
+                                {isLoading && <div className="absolute inset-0 bg-surface/50 z-50 flex items-center justify-center backdrop-blur-sm"><div className="animate-spin w-8 h-8 border-3 border-primary border-t-transparent rounded-full"></div></div>}
+                                {hours.map(hour => (
+                                    <div key={hour} className="grid grid-cols-8 border-b border-surface-container-highest last:border-b-0 min-h-[120px]">
+                                        <div className="p-3 border-r border-surface-container-highest flex items-start justify-center bg-surface-container-low/10">
+                                            <span className="text-[11px] font-bold text-outline mt-1 bg-surface-container px-2 py-1 rounded-lg">{hour}</span>
+                                        </div>
+                                        {weekDays.map(d => {
+                                            const hourPrefix = hour.slice(0, 2);
+                                            const hourAppts = appointments.filter(a => a.appointment_date === d.date && a.appointment_time.startsWith(hourPrefix));
+                                            const isToday = d.date === getLocalDateString();
+                                            
+                                            return (
+                                                <div key={`${d.date}-${hour}`} className={`p-2 border-r border-surface-container-highest last:border-r-0 ${isToday ? 'bg-primary/5' : 'bg-transparent'}`}>
+                                                    {hourAppts.map(app => (
+                                                        <div key={app.id} className={`p-3 rounded-2xl mb-2 text-xs border shadow-sm flex flex-col group ${getStatusStyle(app.status)}`}>
+                                                            <div className="font-bold truncate mb-1 text-sm">{app.Patient?.User?.full_name}</div>
+                                                            <div className="opacity-90 font-medium truncate mb-2">{app.appointment_time.slice(0,5)} • {app.reason || 'Khám'}</div>
+                                                            
+                                                            {app.status === 'PENDING' && (
+                                                                <div className="flex gap-2 mt-auto">
+                                                                    <button onClick={() => handleStatusChange(app.id, 'CONFIRMED')} className="flex-1 bg-white/50 hover:bg-white text-secondary py-1.5 rounded-lg font-bold transition-colors">Nhận</button>
+                                                                    <button onClick={() => handleStatusChange(app.id, 'CANCELLED')} className="flex-1 bg-white/50 hover:bg-white text-error py-1.5 rounded-lg font-bold transition-colors">Từ chối</button>
+                                                                </div>
+                                                            )}
+                                                            {app.status === 'CONFIRMED' && (
+                                                                <button onClick={() => handleStatusChange(app.id, 'COMPLETED')} className="mt-auto w-full bg-white/40 hover:bg-white text-secondary py-1.5 rounded-lg font-bold transition-colors">Hoàn Tất</button>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                /* Patient Appointments List - Editorial Card Style */
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center px-2">
+                        <h2 className="text-sm font-semibold text-outline uppercase tracking-widest">
+                            Danh sách ngày {new Date(filterDate).toLocaleDateString('vi-VN')}
+                        </h2>
+                    </div>
+                    
+                    {isLoading ? (
+                        <div className="py-20 text-center"><div className="animate-spin w-8 h-8 border-3 border-primary border-t-transparent rounded-full mx-auto"></div></div>
+                    ) : appointments.length === 0 ? (
+                        <div className="bg-surface-container-lowest rounded-3xl p-16 flex flex-col items-center justify-center text-center shadow-[0_4px_20px_rgba(0,24,72,0.03)]">
+                            <h3 className="text-2xl font-display font-bold text-on-surface mb-2">Không Có Lịch Hẹn</h3>
+                            <p className="text-on-surface-variant max-w-sm">Bạn chưa có lịch thăm khám nào trong ngày này.</p>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4">
+                            {appointments.map(app => (
+                                <div key={app.id} className="bg-surface-container-lowest rounded-2xl p-6 flex flex-col md:flex-row gap-6 md:items-center shadow-[0_4px_20px_rgba(0,24,72,0.03)] hover:shadow-[0_8px_30px_rgba(0,24,72,0.06)] transition-shadow">
+                                    <div className="flex-shrink-0 w-24">
+                                        <div className="text-3xl font-display font-bold text-on-surface">{app.appointment_time.slice(0, 5)}</div>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-display font-bold text-on-surface mb-1">
+                                            Bác sĩ: {app.Doctor?.full_name}
+                                        </h3>
+                                        <div className="flex items-center gap-3 text-sm text-on-surface-variant">
+                                            <span className="font-medium">{app.reason || 'Khám tổng quát'}</span>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase border ${getStatusStyle(app.status)}`}>
+                                                {getStatusText(app.status)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3 flex-shrink-0">
+                                        {app.status === 'PENDING' && (
+                                            app.created_by_role === user?.role ? (
+                                                <span className="px-4 py-2 bg-surface-container text-on-surface-variant text-xs font-semibold rounded-xl">
+                                                    Đợi {user?.role === 'DOCTOR' ? 'Bệnh nhân' : 'Bác sĩ'} Duyệt
+                                                </span>
+                                            ) : (
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => handleStatusChange(app.id, 'CONFIRMED')} className="p-3 bg-secondary-container text-secondary hover:bg-secondary hover:text-white rounded-xl transition-colors" title="Xác nhận">
+                                                        <MdCheckCircle className="w-5 h-5" />
+                                                    </button>
+                                                    <button onClick={() => handleStatusChange(app.id, 'CANCELLED')} className="p-3 bg-error-container text-error hover:bg-error hover:text-white rounded-xl transition-colors" title="Từ chối">
+                                                        <MdCancel className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                    {app.status === 'PENDING' && (
-                                        app.created_by_role === user?.role ? (
-                                            <span className="px-3 py-1.5 bg-[#f97316]/10 text-[#f97316] text-[10px] font-bold uppercase tracking-widest rounded-xl border border-[#f97316]/20">
-                                                Đợi {user?.role === 'DOCTOR' ? 'bệnh nhân' : 'bác sĩ'} duyệt
-                                            </span>
-                                        ) : (
-                                            <>
-                                                <button onClick={() => handleStatusChange(app.id, 'CONFIRMED')} className="p-2.5 bg-primary-container text-on-primary-container hover:bg-primary-container/80 rounded-xl transition-colors" title="Xác nhận">
-                                                    <CheckCircle className="w-5 h-5" />
-                                                </button>
-                                                <button onClick={() => handleStatusChange(app.id, 'CANCELLED')} className="p-2.5 bg-error-container text-on-error-container hover:bg-error-container/80 rounded-xl transition-colors" title="Từ chối">
-                                                    <XCircle className="w-5 h-5" />
-                                                </button>
-                                            </>
-                                        )
-                                    )}
-                                    {app.status === 'CONFIRMED' && (
-                                        <Button onClick={() => handleStatusChange(app.id, 'COMPLETED')}>
-                                            Hoàn tất
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Modal Tạo lịch */}
-            {isModalOpen && createPortal(
-                <div className="fixed inset-0 bg-scrim/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-surface-container-lowest rounded-lg w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-outline-variant">
-                        <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-                            <h2 className="text-lg font-black text-on-surface uppercase tracking-wide">Thêm Lịch Khám</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-on-surface-variant hover:text-on-surface"><XCircle className="w-6 h-6" /></button>
+                            ))}
                         </div>
-                        <form onSubmit={handleCreateAppointment} className="p-6 space-y-6">
+                    )}
+                </div>
+            )}
+
+            {/* Modal Tạo Lịch */}
+            {isModalOpen && createPortal(
+                <div className="fixed inset-0 bg-inverse-surface/40 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface-container-lowest rounded-3xl w-full max-w-lg overflow-hidden shadow-[0_24px_60px_rgba(0,24,72,0.15)] animate-in zoom-in-95 duration-200">
+                        <div className="px-8 py-6 flex justify-between items-center bg-surface-container-low/50 border-b border-outline-variant/30">
+                            <h2 className="text-xl font-display font-bold text-on-surface">Tạo Lịch Khám</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 rounded-xl text-outline hover:text-on-surface hover:bg-surface-container transition-colors">
+                                <MdCancel className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateAppointment} className="p-8 space-y-6">
                             {user?.role === 'DOCTOR' && (
-                                <div>
-                                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Bệnh nhân</label>
-                                    <div className="border border-outline-variant rounded-xl overflow-hidden focus-within:border-on-surface focus-within:ring-1 focus-within:ring-on-surface transition-all bg-surface-container-lowest">
-                                        <div className="flex items-center px-4 py-2 border-b border-outline-variant bg-surface-container-lowest">
-                                            <Search className="w-4 h-4 text-on-surface-variant mr-2 shrink-0" />
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-outline uppercase tracking-wider">Hồ Sơ Bệnh Nhân</label>
+                                    <div className="bg-surface-container-low rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-all border border-outline-variant/30">
+                                        <div className="flex items-center px-4 py-3 border-b border-outline-variant/30 bg-surface-container-lowest">
+                                            <MdSearch className="w-5 h-5 text-outline mr-2" />
                                             <input 
                                                 type="text" 
-                                                placeholder="Tìm tên hoặc số điện thoại..."
+                                                placeholder="Tìm theo tên hoặc SĐT..."
                                                 value={patientSearch}
                                                 onChange={e => setPatientSearch(e.target.value)}
-                                                className="w-full bg-transparent text-sm font-bold outline-none placeholder:font-medium placeholder:text-on-surface-variant text-on-surface"
+                                                className="w-full bg-transparent text-sm font-medium outline-none text-on-surface"
                                             />
                                         </div>
-                                        <select 
-                                            required size="4"
-                                            value={formData.patient_profile_id}
-                                            onChange={e => {
-                                                const selectedId = e.target.value;
-                                                const selectedPatient = patients.find(p => p.id === selectedId);
-                                                setFormData({...formData, patient_profile_id: selectedId});
-                                                if (selectedPatient) {
-                                                    setPatientSearch(selectedPatient.full_name);
-                                                }
-                                            }}
-                                            className="w-full px-2 py-2 bg-surface-container-low text-sm font-bold outline-none custom-scrollbar cursor-pointer text-on-surface"
-                                        >
+                                        <div className="max-h-48 overflow-y-auto custom-scrollbar pb-2">
                                             {patients.filter(p => 
                                                 (p.full_name || '').toLowerCase().includes(patientSearch.toLowerCase()) || 
                                                 (p.phone || '').includes(patientSearch)
                                             ).map(p => (
-                                                <option key={p.id} value={p.id} className="py-2.5 px-3 rounded-lg hover:bg-surface-container mb-1">{p.full_name} {p.phone ? `- ${p.phone}` : ''}</option>
+                                                <div 
+                                                    key={p.id} 
+                                                    onClick={() => {
+                                                        setFormData({...formData, patient_profile_id: p.id});
+                                                        setPatientSearch(p.full_name);
+                                                    }}
+                                                    className={`py-3 px-4 mx-2 mt-1 rounded-xl cursor-pointer transition-colors text-sm font-medium ${formData.patient_profile_id === p.id ? 'bg-primary-container text-on-primary-container' : 'hover:bg-surface-container-lowest text-on-surface'}`}
+                                                >
+                                                    {p.full_name} {p.phone ? `- ${p.phone}` : ''}
+                                                </div>
                                             ))}
-                                        </select>
+                                            {patients.length === 0 && <div className="text-center py-4 text-sm text-outline">Không có bệnh nhân</div>}
+                                        </div>
                                     </div>
                                 </div>
                             )}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Ngày khám</label>
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-outline uppercase tracking-wider">Ngày Khám</label>
                                     <input 
                                         type="date" required
                                         value={formData.appointment_date}
                                         onChange={e => setFormData({...formData, appointment_date: e.target.value})}
-                                        className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface"
+                                        className="w-full px-4 py-3.5 bg-surface-container-low rounded-xl text-sm font-semibold focus:ring-2 focus:ring-primary/20 outline-none text-on-surface border border-outline-variant/30"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Giờ khám</label>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-outline uppercase tracking-wider">Giờ Khám</label>
                                     <input 
                                         type="time" required
                                         value={formData.appointment_time}
                                         onChange={e => setFormData({...formData, appointment_time: e.target.value})}
-                                        className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface"
+                                        className="w-full px-4 py-3.5 bg-surface-container-low rounded-xl text-sm font-semibold focus:ring-2 focus:ring-primary/20 outline-none text-on-surface border border-outline-variant/30"
                                     />
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Lý do khám / Triệu chứng</label>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-outline uppercase tracking-wider">Lý Do / Triệu Chứng</label>
                                 <input 
                                     type="text"
-                                    placeholder="Khám định kỳ, Đau bụng..."
+                                    placeholder="Khám định kỳ, kiểm tra đường huyết..."
                                     value={formData.reason}
                                     onChange={e => setFormData({...formData, reason: e.target.value})}
-                                    className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold focus:border-on-surface focus:ring-1 focus:ring-on-surface outline-none text-on-surface placeholder:text-on-surface-variant"
+                                    className="w-full px-4 py-3.5 bg-surface-container-low rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-on-surface placeholder:text-outline border border-outline-variant/30"
                                 />
                             </div>
-                            <div className="pt-4 flex justify-end gap-3">
-                                <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>Hủy</Button>
-                                <Button type="submit">Tạo Lịch</Button>
+                            <div className="pt-6 flex justify-end gap-3 border-t border-outline-variant/30">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-3 font-semibold text-on-surface hover:bg-surface-container-low rounded-xl transition-colors">
+                                    Hủy
+                                </button>
+                                <button type="submit" className="px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white font-semibold rounded-xl hover:opacity-90 transition-opacity shadow-[0_8px_16px_rgba(37,99,235,0.2)]">
+                                    Xác Nhận Tạo
+                                </button>
                             </div>
                         </form>
                     </div>

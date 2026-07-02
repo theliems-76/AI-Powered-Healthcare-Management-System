@@ -77,252 +77,197 @@ export default function Dashboard() {
     return (
         <div className="max-w-7xl mx-auto p-4 space-y-6 animate-in fade-in duration-500 pb-12">
             
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 gap-4 border-b border-outline-variant">
+            {/* Header: Common to all roles */}
+            <header className="mb-8 border-b border-outline-variant pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-semibold text-on-surface tracking-tight">Tổng Quan Hệ Thống</h1>
-                    <p className="text-sm font-medium text-on-surface-variant mt-1">Chào mừng quay trở lại, {user?.full_name}</p>
+                    <h1 className="text-2xl font-bold text-on-surface mb-1 tracking-tight">
+                        {user?.role === 'PATIENT' ? 'Tổng Quan Sức Khỏe' : user?.role === 'DOCTOR' ? 'Bảng Điều Khiển Y Khoa' : 'Hệ Thống Quản Trị'}
+                    </h1>
+                    <p className="text-sm text-secondary font-medium">
+                        {user?.role === 'PATIENT' ? 'Báo cáo lâm sàng cho' : 'Chào mừng,'} <span className="font-semibold text-primary">{user?.full_name}</span>
+                    </p>
                 </div>
                 {user?.role === 'PATIENT' && (
                     <Button onClick={() => navigate('/assessment')} className="flex items-center gap-2">
                         <Stethoscope size={16} /> Khám Mới
                     </Button>
                 )}
-            </div>
+            </header>
 
+            {/* DOCTOR VIEW */}
             {user?.role === 'DOCTOR' && (
-                <div className="flex-1 bg-surface-container-lowest rounded shadow-sm border border-outline-variant overflow-hidden flex flex-col md:flex-row min-h-[75vh]">
-                    
-                    {/* Left Panel: Alerts & Schedule */}
-                    <div className="w-full md:w-1/3 bg-surface-container-low p-6 md:p-8 border-r border-outline-variant flex flex-col shrink-0">
-                        <div className="mb-8">
-                            <h2 className="font-bold text-on-surface text-xl tracking-tight">Tình hình chung</h2>
-                            <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mt-1">Báo cáo thời gian thực</p>
-                        </div>
-                        
-                        <div className="space-y-4">
-                            {/* Architectural Metric 1 */}
-                            <div className="bg-surface-container-lowest p-6 rounded border border-outline-variant shadow-sm hover:border-outline transition-colors cursor-pointer" onClick={() => navigate('/patients')}>
-                                <div className="mb-4 flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-primary"></div>
-                                    <h3 className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tổng hồ sơ quản lý</h3>
-                                </div>
-                                <div className="flex items-end gap-2 border-l-2 border-primary pl-4">
-                                    <p className="text-5xl font-bold text-on-surface tracking-tighter leading-none">{totalPatients}</p>
-                                    <div className="flex flex-col pb-1">
-                                        <span className="text-xs font-medium text-on-surface-variant">bệnh nhân</span>
-                                        <span className="text-[10px] font-bold text-primary uppercase mt-0.5">TỔNG QUAN</span>
-                                    </div>
-                                </div>
+                <div className="flex flex-col gap-6">
+                    {/* Urgent Alerts Section equivalent */}
+                    <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* High Risk Alerts */}
+                        <div className="bg-surface border border-outline-variant rounded-lg p-4 border-l-4 border-l-error relative overflow-hidden group hover:shadow-sm transition-all">
+                            <div className="flex justify-between items-start mb-2">
+                                <span className="text-xs font-bold text-error uppercase tracking-wider">Bệnh nhân Rủi ro cao</span>
                             </div>
-
-                            {/* Architectural Metric 2 */}
-                            <div className="bg-surface-container-lowest p-6 rounded border border-error-container shadow-sm hover:border-error transition-colors cursor-pointer" onClick={() => navigate('/patients')}>
-                                <div className="mb-4 flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-error animate-pulse"></div>
-                                    <h3 className="text-xs font-semibold text-error uppercase tracking-wider">Rủi ro lâm sàng cao</h3>
-                                </div>
-                                <div className="flex items-end gap-2 border-l-2 border-error pl-4">
-                                    <p className="text-5xl font-bold text-error tracking-tighter leading-none">{highRiskPatients}</p>
-                                    <div className="flex flex-col pb-1">
-                                        <span className="text-xs font-medium text-error">trường hợp</span>
-                                        <span className="text-[10px] font-bold text-error uppercase mt-0.5">CẦN CHÚ Ý GẤP</span>
-                                    </div>
-                                </div>
+                            <h3 className="text-2xl font-bold mb-1">{highRiskPatients} <span className="text-sm font-normal text-secondary">trường hợp</span></h3>
+                            <div className="bg-error-container text-on-error-container p-2 rounded border border-error/20 flex items-center justify-between mt-4">
+                                <span className="text-sm font-medium">Cần chú ý theo dõi</span>
                             </div>
                         </div>
-
-                        <div className="mt-8 flex-1 flex flex-col">
-                            <div className="flex justify-between items-end mb-4">
-                                <h3 className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Lịch hẹn hôm nay</h3>
-                                <span className="text-xs font-bold text-on-surface">{todayAppointments.length} LỊCH</span>
+                        {/* Total Patients */}
+                        <div className="bg-surface border border-outline-variant rounded-lg p-4 border-l-4 border-l-primary relative overflow-hidden group hover:shadow-sm transition-all">
+                            <div className="flex justify-between items-start mb-2">
+                                <span class="text-xs font-bold text-primary uppercase tracking-wider">Tổng Hồ sơ Quản lý</span>
                             </div>
-                            {todayAppointments.length > 0 ? (
-                                <div className="flex-1 flex flex-col space-y-2 overflow-y-auto custom-scrollbar pr-2 max-h-48">
-                                    {todayAppointments.map(app => (
-                                        <div key={app.id} className="bg-surface-container-lowest p-3 rounded border border-outline-variant shadow-sm flex justify-between items-center cursor-pointer hover:border-outline transition-colors" onClick={() => navigate('/appointments')}>
-                                            <div>
-                                                <p className="text-sm font-bold text-on-surface">{app.Patient?.User?.full_name}</p>
-                                                <p className="text-xs font-medium text-on-surface-variant mt-0.5">{app.reason || 'Khám tổng quát'}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="text-sm font-bold text-on-surface">{app.appointment_time.slice(0, 5)}</span>
-                                                <p className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 ${app.status === 'PENDING' ? 'text-tertiary' : app.status === 'CONFIRMED' ? 'text-primary' : 'text-on-surface-variant'}`}>
-                                                    {app.status === 'PENDING' ? 'Chờ duyệt' : app.status === 'CONFIRMED' ? 'Đã xác nhận' : app.status === 'COMPLETED' ? 'Hoàn tất' : 'Đã hủy'}
-                                                </p>
-                                            </div>
+                            <h3 className="text-2xl font-bold mb-1">{totalPatients} <span className="text-sm font-normal text-secondary">bệnh nhân</span></h3>
+                            <div className="bg-primary-container text-on-primary-container p-2 rounded border border-primary/20 flex items-center justify-between mt-4">
+                                <span className="text-sm font-medium">Hồ sơ lâm sàng đang theo dõi</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Main Grid: Queue & Schedule */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        {/* Recent Activity (Left Column) */}
+                        <div className="col-span-1 lg:col-span-8 bg-surface border border-outline-variant rounded-lg overflow-hidden flex flex-col max-h-[600px] shadow-sm">
+                            <div className="px-4 py-3 bg-surface-container-low border-b border-outline-variant flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-bold uppercase text-secondary tracking-wider">Cập nhật gần nhất</h3>
+                                </div>
+                            </div>
+                            <div className="flex-1 overflow-auto bg-surface-container-lowest">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-surface-container-low/50 sticky top-0 z-10">
+                                        <tr>
+                                            <th className="px-4 py-3 text-xs font-bold text-secondary uppercase tracking-wider border-b border-outline-variant">Bệnh nhân</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-secondary uppercase tracking-wider border-b border-outline-variant">Chỉ số rủi ro</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-secondary uppercase tracking-wider border-b border-outline-variant">Ngày khám</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-outline-variant bg-surface-container-lowest">
+                                        {recentUpdates.length > 0 ? recentUpdates.map((p, i) => (
+                                            <tr key={i} className="hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => navigate('/history', { state: { patientId: p.id, patientName: p.full_name } })}>
+                                                <td className="px-4 py-3">
+                                                    <p className="text-sm font-bold text-primary">{p.full_name}</p>
+                                                    <p className="text-xs text-secondary mt-0.5 line-clamp-1">{p.latest_diagnosis || 'Cập nhật hồ sơ'}</p>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${p.latest_risk_score > 66 ? 'bg-error text-on-error' : p.latest_risk_score > 33 ? 'bg-[#ffdbd0] text-[#9b2d00]' : 'bg-[#dce1ff] text-[#003baf]'}`}>
+                                                        {Math.round(p.latest_risk_score)}%
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-secondary font-mono">{p.last_visit}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr>
+                                                <td colSpan="3" className="px-4 py-8 text-center text-secondary text-sm">Chưa có cập nhật nào.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* Today's Appointments (Right Column) */}
+                        <div className="col-span-1 lg:col-span-4 bg-surface border border-outline-variant rounded-lg overflow-hidden flex flex-col max-h-[600px] shadow-sm">
+                            <div className="px-4 py-3 bg-surface-container-low border-b border-outline-variant flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-bold uppercase text-secondary tracking-wider">Lịch hẹn hôm nay</h3>
+                                </div>
+                                <span className="text-xs font-bold text-on-surface bg-surface-container-highest px-2 py-1 rounded">{todayAppointments.length}</span>
+                            </div>
+                            <div className="flex-1 overflow-auto p-4 space-y-4 bg-surface-container-lowest">
+                                {todayAppointments.length > 0 ? todayAppointments.map(app => (
+                                    <div key={app.id} className="relative pl-4 border-l-2 border-primary group cursor-pointer" onClick={() => navigate('/appointments')}>
+                                        <span className="absolute -left-[9px] top-0 w-4 h-4 bg-primary border-2 border-on-primary rounded-full group-hover:scale-110 transition-transform"></span>
+                                        <p className="text-xs font-mono font-bold text-primary mb-1">{app.appointment_time.slice(0, 5)}</p>
+                                        <div className="bg-surface-container-low p-3 rounded border border-outline-variant hover:border-primary transition-colors">
+                                            <p className="text-sm font-bold text-on-surface">{app.Patient?.User?.full_name}</p>
+                                            <p className="text-xs text-secondary mt-1">{app.reason || 'Khám tổng quát'}</p>
+                                            <p className={`text-[10px] font-bold uppercase mt-2 ${app.status === 'PENDING' ? 'text-tertiary' : 'text-primary'}`}>
+                                                {app.status}
+                                            </p>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-transparent border border-dashed border-outline-variant rounded">
-                                    <span className="text-3xl font-bold text-outline-variant mb-2">--</span>
-                                    <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Lịch trình trống</p>
-                                </div>
-                            )}
+                                    </div>
+                                )) : (
+                                    <div className="h-full flex flex-col items-center justify-center text-secondary text-sm">
+                                        Không có lịch hẹn hôm nay
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-
-                    {/* Right Panel: Recent Patient Activity */}
-                    <div className="w-full md:w-2/3 p-6 md:p-8 flex flex-col bg-surface-container-lowest">
-                        <div className="flex justify-between items-end mb-8 pb-4 border-b border-outline-variant">
-                            <div>
-                                <h2 className="font-bold text-on-surface text-xl tracking-tight">Cập nhật gần nhất</h2>
-                                <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mt-1">Các bệnh nhân vừa có kết quả đánh giá mới</p>
-                            </div>
-                            <button onClick={() => navigate('/patients')} className="text-xs font-bold text-primary hover:text-primary-container uppercase tracking-wider transition-colors">
-                                Xem toàn bộ danh sách
-                            </button>
-                        </div>
-                        
-                        <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                            {recentUpdates.length > 0 ? recentUpdates.map((p, i) => (
-                                <div key={i} className="group relative pl-4 border-l-2 hover:border-primary border-outline-variant transition-colors cursor-pointer py-2" onClick={() => navigate('/history', { state: { patientId: p.id, patientName: p.full_name } })}>
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <h4 className="font-bold text-on-surface text-base tracking-tight group-hover:text-primary transition-colors">{p.full_name}</h4>
-                                            <p className="text-sm font-medium text-on-surface-variant mt-1 line-clamp-1">{p.latest_diagnosis || 'Đã cập nhật hồ sơ y tế'}</p>
-                                        </div>
-                                        <div className="text-right flex flex-col items-end shrink-0 pl-4">
-                                            <span className="text-xs font-semibold text-on-surface-variant tracking-wider">{p.last_visit}</span>
-                                            <span className={`mt-2 text-[10px] font-bold uppercase tracking-wider ${p.latest_risk_score > 66 ? 'text-error' : p.latest_risk_score > 33 ? 'text-tertiary' : 'text-primary'}`}>
-                                                RỦI RO: {Math.round(p.latest_risk_score)}%
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )) : (
-                                <div className="text-center py-8 text-on-surface-variant text-sm font-semibold uppercase tracking-wider">
-                                    Chưa có cập nhật nào từ bệnh nhân
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
                 </div>
             )}
 
+            {/* PATIENT VIEW (No Records) */}
             {user?.role === 'PATIENT' && !latestRecord && (
-                <div className="bg-surface-container-lowest border border-outline-variant rounded p-8 md:p-14 shadow-sm overflow-hidden relative">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-                        {/* Left Side: Call to Action */}
-                        <div className="flex flex-col items-start text-left">
-                            <h2 className="text-4xl md:text-5xl font-bold text-on-surface tracking-tight leading-tight mb-6">
-                                Bắt đầu hành trình <br/> sức khỏe của bạn
-                            </h2>
-                            <p className="text-base text-on-surface-variant font-normal leading-relaxed mb-10 max-w-lg">
-                                Để hệ thống có thể cung cấp lộ trình điều trị chuẩn xác, chúng tôi cần thu thập các chỉ số lâm sàng hiện tại của bạn. Toàn bộ dữ liệu được phân tích bởi <strong className="text-on-surface">hệ thống y khoa thông minh</strong> và được giám sát chặt chẽ bởi bác sĩ chuyên khoa.
-                            </p>
-                            <Button onClick={() => navigate('/assessment')} size="lg">
-                                Bắt Đầu Khảo Sát Y Khoa &rarr;
-                            </Button>
-                        </div>
-                        
-                        {/* Right Side: How it works (Typography focus) */}
-                        <div className="flex flex-col space-y-10 pl-6 lg:pl-10">
-                            <div className="relative pl-8 border-l border-outline-variant">
-                                <span className="absolute -left-10 top-[-1rem] text-[4rem] font-bold text-surface-container-high select-none -z-10 leading-none">01</span>
-                                <h3 className="text-base font-bold text-on-surface mb-2 uppercase tracking-wide">Khảo sát Lâm sàng</h3>
-                                <p className="text-sm text-on-surface-variant font-normal leading-relaxed">Cung cấp 21 chỉ số cơ bản về sinh trắc học, bệnh lý nền và thói quen sinh hoạt hàng ngày.</p>
-                            </div>
-                            
-                            <div className="relative pl-8 border-l border-outline-variant">
-                                <span className="absolute -left-10 top-[-1rem] text-[4rem] font-bold text-surface-container-high select-none -z-10 leading-none">02</span>
-                                <h3 className="text-base font-bold text-on-surface mb-2 uppercase tracking-wide">Phân tích chuyên sâu</h3>
-                                <p className="text-sm text-on-surface-variant font-normal leading-relaxed">Hệ thống thiết lập ma trận rủi ro y khoa và đưa ra đánh giá dựa trên cơ sở dữ liệu y tế.</p>
-                            </div>
-                            
-                            <div className="relative pl-8 border-l border-outline-variant">
-                                <span className="absolute -left-10 top-[-1rem] text-[4rem] font-bold text-surface-container-high select-none -z-10 leading-none">03</span>
-                                <h3 className="text-base font-bold text-on-surface mb-2 uppercase tracking-wide">Phác đồ Cá nhân hóa</h3>
-                                <p className="text-sm text-on-surface-variant font-normal leading-relaxed">Nhận lộ trình can thiệp dinh dưỡng, tập luyện chuyên sâu từ bác sĩ chuyên khoa.</p>
-                            </div>
-                        </div>
-                    </div>
+                <div className="bg-surface border border-outline-variant rounded-lg p-8 md:p-12 text-center">
+                    <h2 className="text-3xl font-bold mb-4 tracking-tight">Chào mừng bạn đến với MediLink Pro</h2>
+                    <p className="text-secondary max-w-xl mx-auto mb-8">Bạn chưa có hồ sơ y tế nào. Hãy bắt đầu bằng cách thực hiện bài đánh giá lâm sàng đầu tiên để hệ thống AI có thể lập phác đồ cho bạn.</p>
+                    <Button onClick={() => navigate('/assessment')} size="lg">Bắt Đầu Đánh Giá</Button>
                 </div>
             )}
 
+            {/* PATIENT VIEW (With Records) */}
             {user?.role === 'PATIENT' && latestRecord && (
                 <div className="flex flex-col gap-6">
-                    {/* Section 1: Metrics */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Risk Card */}
-                        <div className="bg-surface-container-lowest rounded p-6 md:p-8 border border-outline-variant shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1 flex items-center gap-2">
-                                    <span className={`w-2 h-2 rounded-full ${latestRecord.risk_score <= 33 ? 'bg-primary' : latestRecord.risk_score <= 66 ? 'bg-tertiary' : 'bg-error'}`}></span> Tiên lượng rủi ro
-                                </p>
-                                <div className="flex items-baseline gap-2 mt-2">
-                                    <h2 className={`text-4xl md:text-5xl font-bold tracking-tighter ${latestRecord.risk_score <= 33 ? 'text-primary' : latestRecord.risk_score <= 66 ? 'text-tertiary' : 'text-error'}`}>
-                                        {latestRecord.risk_score}
-                                    </h2>
-                                    <span className="text-xl font-semibold text-on-surface-variant">%</span>
+                    {/* Health Summary Grid (Stitch Layout) */}
+                    <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Risk Score */}
+                        <div className={`bg-surface border border-outline-variant p-6 rounded-lg ${latestRecord.risk_score <= 33 ? 'border-l-4 border-l-[#004ac6]' : latestRecord.risk_score <= 66 ? 'border-l-4 border-l-[#9b2d00]' : 'border-l-4 border-l-[#ba1a1a]'}`}>
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Chỉ số rủi ro</h3>
+                                    <p className="text-4xl font-bold mt-2">{latestRecord.risk_score}<span className="text-lg font-normal text-secondary">%</span></p>
                                 </div>
                             </div>
-                            <div className={`px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider ${latestRecord.risk_score <= 33 ? 'bg-surface-container text-primary border-primary' : latestRecord.risk_score <= 66 ? 'bg-surface-container text-tertiary border-tertiary' : 'bg-error-container text-error border-error'}`}>
-                                {latestRecord.risk_score <= 33 ? 'Nguy cơ thấp' : latestRecord.risk_score <= 66 ? 'Nguy cơ trung bình' : 'Nguy cơ cao'}
+                            <div className="flex items-center gap-2 text-sm font-medium">
+                                <span className={`px-2 py-0.5 rounded text-xs uppercase tracking-wider ${latestRecord.risk_score <= 33 ? 'bg-[#dce1ff] text-[#003baf]' : latestRecord.risk_score <= 66 ? 'bg-[#ffdbd0] text-[#9b2d00]' : 'bg-error text-on-error'}`}>
+                                    {latestRecord.risk_score <= 33 ? 'Thấp' : latestRecord.risk_score <= 66 ? 'Trung bình' : 'Cao'}
+                                </span>
                             </div>
                         </div>
 
-                        {/* BMI Card */}
-                        <div className="bg-surface-container-lowest rounded p-6 md:p-8 border border-outline-variant shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">
-                                    Chỉ số khối cơ thể (BMI)
-                                </p>
-                                <div className="flex items-baseline gap-2 mt-2">
-                                    <h2 className="text-4xl md:text-5xl font-bold tracking-tighter text-on-surface">{latestRecord.bmi}</h2>
-                                    <span className="text-xl font-semibold text-on-surface-variant">kg/m²</span>
+                        {/* BMI */}
+                        <div className="bg-surface border border-outline-variant p-6 rounded-lg border-l-4 border-l-primary">
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Chỉ số BMI</h3>
+                                    <p className="text-4xl font-bold mt-2">{latestRecord.bmi}<span className="text-lg font-normal text-secondary"> kg/m²</span></p>
                                 </div>
                             </div>
-                            <div className="px-4 py-2 rounded border bg-surface-container-low border-outline-variant text-on-surface-variant text-xs font-bold uppercase tracking-wider">
-                                Thông số gốc
+                            <div className="flex items-center gap-2 text-sm font-medium text-secondary">
+                                <span className="text-xs uppercase tracking-wider">Thông số gốc</span>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Section 2: Clinical Summary (Rebranded AI) */}
-                    <div className="bg-surface-container-lowest rounded border border-outline-variant shadow-sm flex flex-col overflow-hidden">
-                        <div className="bg-surface-container-low border-b border-outline-variant px-6 md:px-8 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <h3 className="font-bold text-on-surface uppercase tracking-wide text-base">
-                                    Báo cáo Tổng hợp Y khoa
-                                </h3>
-                                <p className="text-xs font-medium text-on-surface-variant mt-1">Đánh giá chuyên sâu bởi hệ thống y khoa thông minh</p>
-                            </div>
-                            <Button variant="secondary" onClick={() => navigate(`/history/${latestRecord?.id}`)} className="shrink-0 text-xs">
-                                Xem Phác đồ Chi tiết &rarr;
-                            </Button>
-                        </div>
-                        <div className="p-6 md:p-8 bg-surface-container-lowest">
-                            <div className="text-sm text-on-surface font-normal leading-loose max-w-4xl whitespace-pre-line">
-                                {stripMarkdown(latestRecord?.ai_nutrition_plan || "Hồ sơ y tế hiện chưa có kết luận đánh giá chuyên sâu. Vui lòng thực hiện thêm các khảo sát hoặc cập nhật thông số lâm sàng.")}
+                        {/* Trend Chart Area */}
+                        <div className="bg-surface border border-outline-variant p-4 rounded-lg flex flex-col justify-center border-l-4 border-l-primary">
+                            <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-2">Biểu đồ Xu hướng</h3>
+                            <div className="h-24 w-full">
+                                {historyData.length >= 2 ? (
+                                    <MiniRiskChart data={historyData} className="h-full w-full" />
+                                ) : (
+                                    <p className="text-xs text-secondary text-center mt-6">Cần 2 lần kiểm tra để vẽ biểu đồ.</p>
+                                )}
                             </div>
                         </div>
-                    </div>
+                    </section>
 
-                    {/* Section 3: Trend Chart */}
-                    <div className="bg-surface-container-lowest rounded p-6 md:p-8 border border-outline-variant shadow-sm flex flex-col">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">
-                                Phân tích Xu hướng Rủi ro
-                            </h3>
+                    {/* AI Clinical Summary */}
+                    <section className="bg-surface border border-outline-variant rounded-lg overflow-hidden flex flex-col h-full">
+                        <div className="px-6 py-4 bg-surface-container-low border-b border-outline-variant flex justify-between items-center">
+                            <h2 className="text-lg font-bold text-on-surface">Phác đồ Cá nhân hóa (AI)</h2>
+                            <Button variant="secondary" onClick={() => navigate(`/history/${latestRecord?.id}`)} className="text-xs px-3 py-1">Chi tiết</Button>
                         </div>
-                        {historyData.length >= 2 ? (
-                            <div className="h-72 w-full">
-                                <MiniRiskChart data={historyData} className="h-full w-full" />
-                            </div>
-                        ) : (
-                            <div className="h-48 flex flex-col items-center justify-center text-on-surface-variant text-sm font-medium border border-dashed border-outline-variant rounded bg-surface-container-low">
-                                <Activity className="w-8 h-8 text-outline mb-3" />
-                                <span>Cần tối thiểu 2 lần kiểm tra để theo dõi diễn tiến sức khỏe</span>
-                            </div>
-                        )}
-                    </div>
+                        <div className="p-6 bg-surface-container-lowest">
+                            <p className="text-sm text-on-surface leading-relaxed whitespace-pre-line max-w-4xl">
+                                {stripMarkdown(latestRecord?.ai_nutrition_plan || "Đang xử lý phân tích chuyên sâu...")}
+                            </p>
+                        </div>
+                    </section>
                 </div>
             )}
 
+            {/* ADMIN VIEW */}
             {user?.role === 'ADMIN' && adminStats && (
-                <div className="space-y-8">
+                <div className="space-y-6">
                     <AdminStats stats={adminStats} />
                     <AdminOverviewTab stats={adminStats} />
                 </div>

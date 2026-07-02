@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediLink Pro | Clinical Assessment</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#0b1c30",
+                    "surface-container-high": "#e7e7f4",
+                    "outline": "#737688",
+                    "surface-variant": "#e1e1ef",
+                    "tertiary-container": "#c53b00",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "on-primary-fixed-variant": "#003baf",
+                    "surface-dim": "#d9d9e6",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#e1e1ef",
+                    "on-tertiary": "#ffffff",
+                    "tertiary": "#9b2d00",
+                    "on-surface-variant": "#434656",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#0b5cff",
+                    "surface-container": "#ededfa",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#0046cc",
+                    "secondary": "#505f76",
+                    "secondary-fixed": "#d3e4fe",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#d0e1fb",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#eff0fd",
+                    "on-surface": "#191b24",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "primary-fixed-dim": "#b5c4ff",
+                    "surface-bright": "#faf8ff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f3f2ff",
+                    "inverse-primary": "#b5c4ff",
+                    "on-primary-container": "#ecedff",
+                    "background": "#faf8ff",
+                    "surface": "#faf8ff",
+                    "on-secondary-container": "#54647a",
+                    "on-tertiary-fixed-variant": "#842500",
+                    "outline-variant": "#c3c5d9",
+                    "on-tertiary-fixed": "#3a0b00",
+                    "surface-tint": "#0050e4",
+                    "inverse-surface": "#2e303a",
+                    "on-tertiary-container": "#ffeae5",
+                    "on-background": "#191b24",
+                    "on-primary-fixed": "#00164e",
+                    "primary-fixed": "#dce1ff",
+                    "tertiary-fixed-dim": "#ffb59e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "max-width": "1440px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "32px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "label-bold": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        /* Wizard Specific Transitions */
+        .step-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .hidden-step {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        /* Standardized Radio/Check Overrides */
+        input[type="radio"]:checked {
+            background-color: #0046cc;
+            border-color: #0046cc;
+        }
+        
+        .active-nav-link {
+            border-bottom: 2px solid #0046cc;
+            color: #0046cc;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="bg-surface docked full-width top-0 sticky z-50 border-b border-outline-variant">
+<div class="flex justify-between items-center px-margin-desktop py-md w-full max-w-max-width mx-auto">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md text-primary">MediLink Pro</span>
+<nav class="hidden md:flex gap-md">
+<a class="text-primary font-label-bold border-b-2 border-primary py-xs" href="#">Assessment</a>
+<a class="text-secondary font-body-md hover:bg-surface-container-low transition-colors px-sm py-xs rounded-lg" href="#">Patients</a>
+<a class="text-secondary font-body-md hover:bg-surface-container-low transition-colors px-sm py-xs rounded-lg" href="#">Reporting</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center bg-surface-container-low px-sm py-xs rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-48" placeholder="Search patient ID..." type="text"/>
+</div>
+<div class="flex gap-sm">
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:bg-surface-container-low p-xs rounded-full" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:bg-surface-container-low p-xs rounded-full" data-icon="help">help</span>
+</div>
+<img class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional portrait of a doctor in a medical setting, bright lighting, high-quality professional photography style, sterile clinic background, confident expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATBU_mB9IPRpyddcbJOpZco4kq6n_FYTYKfKIVMSFi9-N3JX8duo0L3dx_o197CJHwYCb3yyiOwA5Xt-WTuJGEZrcP3VCiLOP7-pmJpGBq_qEcc9zl-ELUgMyGWXnFRorsHOp2tC2zQewqkthBZsS8TNz_uJ6c3kXX-OMX8f-xPXnaxVYzafgc4F7BDXVGkaTYetvHGixbqvhzrbldSYqmm0BfAS4lzt9L7qVSIoUNBOT3zQSywId5U3TpGQSB79vMxG5PudLGs_pO"/>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center py-xl px-margin-mobile">
+<div class="w-full max-w-3xl">
+<!-- Header Section -->
+<div class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Medical Assessment Intake</h1>
+<p class="font-body-md text-body-md text-secondary">Please complete the following CDC health indicator assessment for the patient. All fields marked with an asterisk (*) are required.</p>
+</div>
+<!-- Progress Tracker -->
+<div class="bg-white border border-outline-variant rounded-xl p-md mb-lg">
+<div class="flex items-center justify-between mb-sm">
+<span class="font-label-bold text-label-bold text-primary uppercase" id="progress-text">Step 1 of 4: Patient Demographics</span>
+<span class="font-mono-data text-mono-data text-secondary" id="progress-percentage">25% Complete</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full transition-all duration-500 ease-in-out" id="progress-bar" style="width: 25%;"></div>
+</div>
+</div>
+<!-- Form Container -->
+<form class="bg-white border border-outline-variant rounded-xl overflow-hidden" id="assessment-form">
+<!-- Step 1: Demographics -->
+<div class="step-transition p-xl space-y-lg" id="step-1">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="font-label-bold text-label-bold text-on-surface">FULL NAME *</label>
+<input class="w-full border border-outline-variant rounded-lg p-sm focus:ring-2 focus:ring-primary focus:border-primary" placeholder="e.g. John Doe" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-bold text-label-bold text-on-surface">DATE OF BIRTH *</label>
+<input class="w-full border border-outline-variant rounded-lg p-sm focus:ring-2 focus:ring-primary focus:border-primary" required="" type="date"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-bold text-label-bold text-on-surface">GENDER *</label>
+<select class="w-full border border-outline-variant rounded-lg p-sm focus:ring-2 focus:ring-primary focus:border-primary">
+<option value="">Select gender</option>
+<option value="male">Male</option>
+<option value="female">Female</option>
+<option value="other">Other</option>
+<option value="prefer-not-to-say">Prefer not to say</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-bold text-label-bold text-on-surface">PATIENT ID (MRN) *</label>
+<input class="w-full border border-outline-variant rounded-lg p-sm font-mono-data focus:ring-2 focus:ring-primary focus:border-primary" placeholder="MED-000-000" required="" type="text"/>
+</div>
+</div>
+</div>
+<!-- Step 2: Health Indicators -->
+<div class="step-transition hidden-step p-xl space-y-lg" id="step-2">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-sm">General Health Indicators</h3>
+<div class="space-y-md">
+<p class="font-label-bold text-label-bold text-on-surface">1. WOULD YOU SAY THAT IN GENERAL YOUR HEALTH IS: *</p>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-sm">
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-4 h-4 text-primary" name="health_gen" type="radio" value="excellent"/>
+<span class="text-body-md">Excellent</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-4 h-4 text-primary" name="health_gen" type="radio" value="very_good"/>
+<span class="text-body-md">Very Good</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-4 h-4 text-primary" name="health_gen" type="radio" value="good"/>
+<span class="text-body-md">Good</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-4 h-4 text-primary" name="health_gen" type="radio" value="fair"/>
+<span class="text-body-md">Fair</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-4 h-4 text-primary" name="health_gen" type="radio" value="poor"/>
+<span class="text-body-md">Poor</span>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-xs pt-md">
+<label class="font-label-bold text-label-bold text-on-surface">2. DURING THE PAST 30 DAYS, FOR ABOUT HOW MANY DAYS DID POOR PHYSICAL OR MENTAL HEALTH KEEP YOU FROM DOING YOUR USUAL ACTIVITIES? *</label>
+<div class="flex items-center gap-sm">
+<input class="w-24 border border-outline-variant rounded-lg p-sm focus:ring-2 focus:ring-primary focus:border-primary" max="30" min="0" placeholder="0-30" type="number"/>
+<span class="text-body-sm text-secondary">Days</span>
+</div>
+</div>
+</div>
+<!-- Step 3: Risk Factors -->
+<div class="step-transition hidden-step p-xl space-y-lg" id="step-3">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-sm">Risk Assessment</h3>
+<div class="bg-surface-container-low p-md rounded-lg border-l-4 border-primary">
+<p class="text-body-sm text-on-surface-variant italic">Note: These questions refer to behavioral risks identified by CDC Surveillance Systems.</p>
+</div>
+<div class="space-y-md">
+<p class="font-label-bold text-label-bold text-on-surface">3. DO YOU CURRENTLY SMOKE TOBACCO PRODUCTS? *</p>
+<div class="flex gap-lg">
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="w-4 h-4 text-primary" name="smoke" type="radio" value="yes"/>
+<span class="text-body-md">Yes</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="w-4 h-4 text-primary" name="smoke" type="radio" value="no"/>
+<span class="text-body-md">No</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="w-4 h-4 text-primary" name="smoke" type="radio" value="former"/>
+<span class="text-body-md">Former Smoker</span>
+</label>
+</div>
+</div>
+<div class="space-y-md pt-md">
+<p class="font-label-bold text-label-bold text-on-surface">4. HAVE YOU EVER BEEN TOLD BY A DOCTOR THAT YOU HAVE DIABETES? *</p>
+<div class="flex gap-lg">
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="w-4 h-4 text-primary" name="diabetes" type="radio" value="yes"/>
+<span class="text-body-md">Yes</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="w-4 h-4 text-primary" name="diabetes" type="radio" value="no"/>
+<span class="text-body-md">No</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="w-4 h-4 text-primary" name="diabetes" type="radio" value="pre"/>
+<span class="text-body-md">Pre-diabetes</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Step 4: Final Review -->
+<div class="step-transition hidden-step p-xl space-y-lg" id="step-4">
+<div class="text-center space-y-sm">
+<span class="material-symbols-outlined text-primary text-[48px] block mx-auto" data-icon="task_alt" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Ready for Submission</h3>
+<p class="text-body-md text-secondary">Please review all patient information before final clinical submission.</p>
+</div>
+<div class="border border-outline-variant rounded-lg overflow-hidden">
+<div class="bg-surface-container-high p-sm border-b border-outline-variant flex justify-between">
+<span class="font-label-bold text-label-bold uppercase">Summary Check</span>
+<span class="text-body-sm text-primary cursor-pointer hover:underline">Edit All</span>
+</div>
+<div class="p-md space-y-sm">
+<div class="flex justify-between border-b border-outline-variant pb-xs">
+<span class="text-secondary text-body-sm">Patient Status</span>
+<span class="text-on-surface font-mono-data font-bold">STABLE</span>
+</div>
+<div class="flex justify-between border-b border-outline-variant pb-xs">
+<span class="text-secondary text-body-sm">Indicator Completion</span>
+<span class="text-on-surface font-mono-data">100% Verified</span>
+</div>
+<div class="flex justify-between pb-xs">
+<span class="text-secondary text-body-sm">Risk Assessment</span>
+<span class="text-on-surface font-mono-data">Low Severity</span>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-sm mt-md">
+<input class="mt-1 rounded-sm text-primary" required="" type="checkbox"/>
+<p class="text-body-sm text-secondary">I certify that the information provided is accurate and adheres to HIPAA data collection standards and clinical protocols of City General Oncology Department.</p>
+</div>
+</div>
+<!-- Wizard Footer Actions -->
+<div class="bg-surface-container-lowest border-t border-outline-variant p-md flex justify-between items-center">
+<button class="hidden flex items-center gap-xs px-lg py-sm border border-outline-variant text-on-secondary-fixed rounded-lg font-label-bold hover:bg-surface-container-high transition-all" id="prev-btn" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+                        Back
+                    </button>
+<div class="flex-grow"></div>
+<button class="flex items-center gap-xs px-lg py-sm bg-primary text-on-primary rounded-lg font-label-bold hover:opacity-90 active:opacity-80 transition-all shadow-sm" id="next-btn" type="button">
+                        Next
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="hidden flex items-center gap-xs px-lg py-sm bg-primary-container text-on-primary-container rounded-lg font-label-bold hover:opacity-90 active:opacity-80 transition-all shadow-sm" id="submit-btn" type="submit">
+                        Submit Assessment
+                        <span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</form>
+<!-- Supplemental Info -->
+<div class="mt-xl grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="p-md bg-white border border-outline-variant rounded-xl flex items-start gap-md">
+<span class="material-symbols-outlined text-primary p-sm bg-surface-container-low rounded-lg" data-icon="shield">shield</span>
+<div>
+<h4 class="font-label-bold text-label-bold text-on-surface">HIPAA COMPLIANT</h4>
+<p class="text-body-sm text-secondary">All data is encrypted in transit and at rest using enterprise-grade AES-256 protocols.</p>
+</div>
+</div>
+<div class="p-md bg-white border border-outline-variant rounded-xl flex items-start gap-md">
+<span class="material-symbols-outlined text-primary p-sm bg-surface-container-low rounded-lg" data-icon="sync">sync</span>
+<div>
+<h4 class="font-label-bold text-label-bold text-on-surface">REAL-TIME SYNC</h4>
+<p class="text-body-sm text-secondary">Drafts are automatically saved to the patient electronic health record every 30 seconds.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full py-xl mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-md max-w-max-width mx-auto">
+<span class="font-label-bold text-label-bold text-secondary">© 2024 MediLink Health Systems. All rights reserved.</span>
+<div class="flex gap-lg">
+<a class="text-secondary text-body-sm hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-secondary text-body-sm hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-secondary text-body-sm hover:text-primary transition-colors font-bold underline" href="#">HIPAA Compliance</a>
+<a class="text-secondary text-body-sm hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- Notification Toast (Hidden) -->
+<div class="fixed bottom-lg right-lg bg-on-surface text-surface p-md rounded-xl shadow-lg transform translate-y-24 transition-transform duration-300 flex items-center gap-sm z-[100]" id="toast">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md" id="toast-message">Assessment saved successfully.</span>
+</div>
+<script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const stepLabels = [
+            "Patient Demographics",
+            "General Health Indicators",
+            "Risk Assessment",
+            "Final Review & Submission"
+        ];
+
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const progressPercentage = document.getElementById('progress-percentage');
+        const toast = document.getElementById('toast');
+
+        function updateUI() {
+            // Update steps visibility
+            for (let i = 1; i <= totalSteps; i++) {
+                const step = document.getElementById(`step-${i}`);
+                if (i === currentStep) {
+                    step.classList.remove('hidden-step');
+                } else {
+                    step.classList.add('hidden-step');
+                }
+            }
+
+            // Update Progress Bar
+            const percent = (currentStep / totalSteps) * 100;
+            progressBar.style.width = `${percent}%`;
+            progressText.innerText = `Step ${currentStep} of ${totalSteps}: ${stepLabels[currentStep - 1]}`;
+            progressPercentage.innerText = `${percent}% Complete`;
+
+            // Update Buttons
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function showToast(message) {
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('translate-y-24');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24');
+            }, 3000);
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+                showToast("Auto-saving draft...");
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        document.getElementById('assessment-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showToast("Submitting official medical record...");
+            // Simulate submission
+            setTimeout(() => {
+                alert("Assessment successfully submitted to clinical database.");
+                window.location.reload();
+            }, 1500);
+        });
+
+        // Initialize UI
+        updateUI();
+
+        // Cosmetic Radio Button Focus logic
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const name = e.target.name;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                    r.closest('label').classList.remove('border-primary', 'bg-surface-container-low');
+                });
+                if (e.target.checked) {
+                    e.target.closest('label').classList.add('border-primary', 'bg-surface-container-low');
+                }
+            });
+        });
+    </script>
+</body></html>

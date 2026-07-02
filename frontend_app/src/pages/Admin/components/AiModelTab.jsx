@@ -3,13 +3,13 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, 
     PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { BrainCircuit, Database, CheckCircle, Target, Activity } from 'lucide-react';
+import { MdStorage, MdCheckCircle, MdTimeline } from 'react-icons/md';
 
 export default function AiModelTab() {
     // Dữ liệu thực tế từ mô hình CatBoost
     const performanceMetrics = [
         { label: 'Độ chính xác (Accuracy)', value: '75.0%', color: 'text-emerald-600', bg: 'bg-emerald-50', icon: Target },
-        { label: 'Độ nhạy (Recall)', value: '80.0%', color: 'text-blue-600', bg: 'bg-blue-50', icon: Activity },
+        { label: 'Độ nhạy (Recall)', value: '80.0%', color: 'text-primary', bg: 'bg-primary-container', icon: Activity },
         { label: 'Độ đặc hiệu (Specificity)', value: '70.4%', color: 'text-indigo-600', bg: 'bg-indigo-50', icon: CheckCircle },
         { label: 'Điểm F1 (F1-Score)', value: '76.0%', color: 'text-purple-600', bg: 'bg-purple-50', icon: BrainCircuit },
     ];
@@ -41,18 +41,18 @@ export default function AiModelTab() {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header / Intro */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+            <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-[0_4px_12px_rgba(0,24,72,0.04)] border border-outline-variant">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
                             <BrainCircuit className="w-6 h-6 text-indigo-600" /> Báo Cáo Minh Bạch Mô Hình AI (XAI)
                         </h2>
-                        <p className="text-sm text-slate-500 mt-1 max-w-3xl leading-relaxed">
-                            Mô hình Trí tuệ nhân tạo (AI) trong hệ thống được huấn luyện bằng thuật toán <strong className="text-slate-700">CatBoost Classifier</strong> dựa trên bộ dữ liệu <strong className="text-slate-700">BRFSS (Behavioral Risk Factor Surveillance System)</strong>. Kết quả dưới đây được trích xuất từ tập Test (14,139 mẫu) sau khi đã cân bằng dữ liệu.
+                        <p className="text-sm text-on-surface-variant mt-1 max-w-3xl leading-relaxed">
+                            Mô hình Trí tuệ nhân tạo (AI) trong hệ thống được huấn luyện bằng thuật toán <strong className="text-on-surface">CatBoost Classifier</strong> dựa trên bộ dữ liệu <strong className="text-on-surface">BRFSS (Behavioral Risk Factor Surveillance System)</strong>. Kết quả dưới đây được trích xuất từ tập Test (14,139 mẫu) sau khi đã cân bằng dữ liệu.
                         </p>
                     </div>
                     <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 shrink-0">
-                        <Database className="w-5 h-5 text-indigo-600" />
+                        <MdStorage className="w-5 h-5 text-indigo-600" />
                         <div className="text-sm">
                             <p className="text-indigo-900 font-bold">14,139</p>
                             <p className="text-[10px] text-indigo-600 font-semibold uppercase">Mẫu kiểm thử</p>
@@ -64,11 +64,11 @@ export default function AiModelTab() {
             {/* Metrics Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {performanceMetrics.map((metric, idx) => (
-                    <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center">
+                    <div key={idx} className="bg-surface-container-lowest p-5 rounded-2xl shadow-[0_4px_12px_rgba(0,24,72,0.04)] border border-outline-variant flex flex-col justify-center items-center text-center">
                         <div className={`p-3 rounded-full ${metric.bg} mb-3`}>
                             <metric.icon className={`w-6 h-6 ${metric.color}`} />
                         </div>
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{metric.label}</p>
+                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-1">{metric.label}</p>
                         <p className={`text-2xl font-bold ${metric.color}`}>{metric.value}</p>
                     </div>
                 ))}
@@ -76,8 +76,8 @@ export default function AiModelTab() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Feature Importance Chart */}
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <h3 className="text-lg font-bold text-slate-800 mb-6">Mức độ quan trọng của các chỉ số (Feature Importance)</h3>
+                <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-[0_4px_12px_rgba(0,24,72,0.04)] border border-outline-variant">
+                    <h3 className="text-lg font-bold text-on-surface mb-6">Mức độ quan trọng của các chỉ số (Feature Importance)</h3>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={featureImportanceData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
@@ -96,16 +96,16 @@ export default function AiModelTab() {
 
                 {/* Confusion Matrix & Distribution */}
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                        <h3 className="text-lg font-bold text-slate-800 mb-2">Ma trận nhầm lẫn (Confusion Matrix)</h3>
-                        <p className="text-xs text-slate-500 mb-4">Kết quả đánh giá trên tập Test Data (đã chia tỷ lệ).</p>
+                    <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-[0_4px_12px_rgba(0,24,72,0.04)] border border-outline-variant">
+                        <h3 className="text-lg font-bold text-on-surface mb-2">Ma trận nhầm lẫn (Confusion Matrix)</h3>
+                        <p className="text-xs text-on-surface-variant mb-4">Kết quả đánh giá trên tập Test Data (đã chia tỷ lệ).</p>
                         
                         <div className="grid grid-cols-3 gap-2 text-center text-sm">
                             <div className="p-2"></div>
-                            <div className="p-2 font-bold text-slate-600 bg-slate-50 rounded-t-lg">Thực tế: Bình thường</div>
-                            <div className="p-2 font-bold text-slate-600 bg-slate-50 rounded-t-lg">Thực tế: Có bệnh</div>
+                            <div className="p-2 font-bold text-on-surface-variant bg-surface-container rounded-t-lg">Thực tế: Bình thường</div>
+                            <div className="p-2 font-bold text-on-surface-variant bg-surface-container rounded-t-lg">Thực tế: Có bệnh</div>
                             
-                            <div className="p-4 font-bold text-slate-600 bg-slate-50 rounded-l-lg flex items-center justify-center">Dự đoán:<br/>Bình thường</div>
+                            <div className="p-4 font-bold text-on-surface-variant bg-surface-container rounded-l-lg flex items-center justify-center">Dự đoán:<br/>Bình thường</div>
                             <div className="p-4 bg-orange-100 text-orange-800 rounded-lg border border-orange-200 flex flex-col justify-center">
                                 <span className="font-bold text-xl">4,975</span>
                                 <span className="text-[10px] uppercase">True Negative (TN)</span>
@@ -115,7 +115,7 @@ export default function AiModelTab() {
                                 <span className="text-[10px] uppercase">False Negative (FN)</span>
                             </div>
 
-                            <div className="p-4 font-bold text-slate-600 bg-slate-50 rounded-l-lg flex items-center justify-center">Dự đoán:<br/>Có bệnh</div>
+                            <div className="p-4 font-bold text-on-surface-variant bg-surface-container rounded-l-lg flex items-center justify-center">Dự đoán:<br/>Có bệnh</div>
                             <div className="p-4 bg-orange-50 text-orange-700 rounded-lg border border-orange-100 flex flex-col justify-center">
                                 <span className="font-bold text-xl">2,095</span>
                                 <span className="text-[10px] uppercase">False Positive (FP)</span>
@@ -127,10 +127,10 @@ export default function AiModelTab() {
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center">
+                    <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-[0_4px_12px_rgba(0,24,72,0.04)] border border-outline-variant flex items-center">
                         <div className="flex-1">
-                            <h3 className="text-lg font-bold text-slate-800">Phân bổ tập kiểm thử (Test Set)</h3>
-                            <p className="text-xs text-slate-500 mt-1">Gồm 14,139 mẫu thử nghiệm đã được cân bằng.</p>
+                            <h3 className="text-lg font-bold text-on-surface">Phân bổ tập kiểm thử (Test Set)</h3>
+                            <p className="text-xs text-on-surface-variant mt-1">Gồm 14,139 mẫu thử nghiệm đã được cân bằng.</p>
                         </div>
                         <div className="w-32 h-32">
                             <ResponsiveContainer width="100%" height="100%">

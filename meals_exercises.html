@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediLink Pro | Nutrition & Exercise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e7f4",
+                        "outline": "#737688",
+                        "surface-variant": "#e1e1ef",
+                        "tertiary-container": "#c53b00",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-primary-fixed-variant": "#003baf",
+                        "surface-dim": "#d9d9e6",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e1e1ef",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#9b2d00",
+                        "on-surface-variant": "#434656",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#0b5cff",
+                        "surface-container": "#ededfa",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#0046cc",
+                        "secondary": "#505f76",
+                        "secondary-fixed": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#d0e1fb",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eff0fd",
+                        "on-surface": "#191b24",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "primary-fixed-dim": "#b5c4ff",
+                        "surface-bright": "#faf8ff",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f2ff",
+                        "inverse-primary": "#b5c4ff",
+                        "on-primary-container": "#ecedff",
+                        "background": "#faf8ff",
+                        "surface": "#faf8ff",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary-fixed-variant": "#842500",
+                        "outline-variant": "#c3c5d9",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "surface-tint": "#0050e4",
+                        "inverse-surface": "#2e303a",
+                        "on-tertiary-container": "#ffeae5",
+                        "on-background": "#191b24",
+                        "on-primary-fixed": "#00164e",
+                        "primary-fixed": "#dce1ff",
+                        "tertiary-fixed-dim": "#ffb59e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "max-width": "1440px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "mono-data": ["JetBrains Mono"],
+                        "label-bold": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline docked full-width top-0 sticky z-50">
+<nav class="flex justify-between items-center px-margin-desktop py-md w-full max-w-max-width mx-auto">
+<div class="flex items-center gap-xl">
+<span class="text-headline-md font-headline-md text-primary dark:text-primary-fixed-dim cursor-pointer">MediLink Pro</span>
+<div class="hidden md:flex gap-lg">
+<a class="text-secondary font-body-md hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80" href="#">Dashboard</a>
+<a class="text-primary font-label-bold border-b-2 border-primary hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80" href="#">Patients</a>
+<a class="text-secondary font-body-md hover:bg-surface-container-low transition-colors cursor-pointer active:opacity-80" href="#">Schedule</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg pl-xl pr-md py-xs text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-64" placeholder="Search records..." type="text"/>
+</div>
+<div class="flex items-center gap-sm border-l border-outline-variant pl-md ml-sm">
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:bg-surface-container-low p-xs rounded transition-colors">notifications</span>
+<span class="material-symbols-outlined text-secondary cursor-pointer hover:bg-surface-container-low p-xs rounded transition-colors">help</span>
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A clean professional headshot of a female doctor in her 40s wearing a white clinical coat and a stethoscope. She is smiling warmly against a bright, softly blurred clinical office background. The lighting is high-key and professional, reinforcing themes of clinical trust and authority in a modern light-mode interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMe2Sc0gQyCQiuKjlwSoeFoINLNa3rVj7K_5qTMiIz1dZjxVFprV8ey1nw9InbVyOyH9B0ZUlFWUpTiDiD40P3u6sjnr2c5vWIy-jRagbQLeZnTTxacFKE0ayu-daTIBu8kQ2nZaaIccyy9wA1UTNgIoir4AX2lB98SjpigyVMDq9TA9qikM0INk1egw8bgmFSSNpfLgT2lhZHIjz0CdhmFz13nWR6PA4LoAQchi8ef94hnVl7lfjoWs1G9GYpovcmLHNiHMC7ao9s"/>
+</div>
+</div>
+</nav>
+</header>
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low dark:bg-on-secondary-fixed h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col gap-sm p-md pt-24 border-r border-outline-variant">
+<div class="mb-lg px-xs">
+<h3 class="font-headline-md text-headline-md text-on-surface">City General</h3>
+<p class="text-body-sm text-secondary">Oncology Dept</p>
+</div>
+<nav class="flex flex-col gap-xs flex-1">
+<button class="flex items-center gap-md px-md py-sm text-secondary hover:bg-surface-container-high transition-all rounded-lg cursor-pointer transform duration-200">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-bold text-label-bold">Dashboard</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg cursor-pointer transform duration-200">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-bold text-label-bold">Patients</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-secondary hover:bg-surface-container-high transition-all rounded-lg cursor-pointer transform duration-200">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-bold text-label-bold">History</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-secondary hover:bg-surface-container-high transition-all rounded-lg cursor-pointer transform duration-200">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-bold text-label-bold">Appointments</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-secondary hover:bg-surface-container-high transition-all rounded-lg cursor-pointer transform duration-200 mt-auto">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-bold text-label-bold">Settings</span>
+</button>
+</nav>
+<button class="mt-md bg-primary-container text-on-primary-container font-label-bold py-md rounded-xl hover:opacity-90 transition-opacity">
+                New Consultation
+            </button>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 p-margin-desktop bg-background max-w-7xl mx-auto w-full">
+<!-- Page Header -->
+<header class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<nav class="flex gap-xs text-secondary text-body-sm mb-xs">
+<span>Patients</span>
+<span>/</span>
+<span class="text-primary font-semibold">Robert Chen (ID: 88241)</span>
+</nav>
+<h1 class="font-display-lg text-display-lg text-on-surface">Nutrition & Exercise Tracking</h1>
+<p class="text-body-lg text-secondary mt-xs">AI-driven intervention plan for metabolic optimization.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface border border-outline-variant px-md py-sm rounded flex items-center gap-xs font-label-bold text-secondary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span> Export Report
+                    </button>
+<button class="bg-primary text-on-primary px-md py-sm rounded flex items-center gap-xs font-label-bold shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">sync</span> Update Plan
+                    </button>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Progress Overview Card -->
+<section class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-md bg-surface border border-outline-variant rounded-xl p-xl relative overflow-hidden">
+<div class="absolute left-0 top-0 h-full w-1 bg-primary"></div>
+<div class="flex flex-col items-center justify-center p-md text-center border-r border-outline-variant border-dashed">
+<div class="relative w-32 h-32 mb-md">
+<svg class="w-full h-full">
+<circle class="text-surface-container-highest stroke-current" cx="64" cy="64" fill="transparent" r="58" stroke-width="8"></circle>
+<circle class="text-primary stroke-current progress-ring-circle" cx="64" cy="64" fill="transparent" r="58" stroke-dasharray="364.4" stroke-dashoffset="91.1" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-display-lg text-display-lg">2,450</span>
+<span class="text-label-bold text-secondary">kcal</span>
+</div>
+</div>
+<h4 class="font-label-bold text-on-surface">Daily Caloric Target</h4>
+<p class="text-body-sm text-secondary">75% of target achieved</p>
+</div>
+<div class="flex flex-col gap-md p-md border-r border-outline-variant border-dashed">
+<h4 class="font-label-bold text-on-surface mb-sm">Macro Distribution</h4>
+<div class="space-y-sm">
+<div>
+<div class="flex justify-between text-body-sm mb-xs">
+<span class="font-semibold">Protein</span>
+<span class="text-secondary">180g / 200g</span>
+</div>
+<div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[90%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-body-sm mb-xs">
+<span class="font-semibold">Carbohydrates</span>
+<span class="text-secondary">240g / 300g</span>
+</div>
+<div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-[80%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-body-sm mb-xs">
+<span class="font-semibold">Fats</span>
+<span class="text-secondary">55g / 70g</span>
+</div>
+<div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[78%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col p-md">
+<h4 class="font-label-bold text-on-surface mb-md">Key Indicators</h4>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded border border-outline-variant">
+<p class="text-label-bold text-secondary uppercase text-[10px]">Water</p>
+<p class="font-mono-data text-headline-md">2.8L</p>
+</div>
+<div class="bg-surface-container-low p-sm rounded border border-outline-variant">
+<p class="text-label-bold text-secondary uppercase text-[10px]">Fiber</p>
+<p class="font-mono-data text-headline-md">32g</p>
+</div>
+<div class="bg-surface-container-low p-sm rounded border border-outline-variant">
+<p class="text-label-bold text-secondary uppercase text-[10px]">Steps</p>
+<p class="font-mono-data text-headline-md">8.4k</p>
+</div>
+<div class="bg-surface-container-low p-sm rounded border border-outline-variant">
+<p class="text-label-bold text-secondary uppercase text-[10px]">Sleep</p>
+<p class="font-mono-data text-headline-md">7.2h</p>
+</div>
+</div>
+</div>
+</section>
+<!-- AI Insights Card -->
+<section class="col-span-12 lg:col-span-4 bg-primary-container text-on-primary-container rounded-xl p-xl flex flex-col justify-between border border-primary">
+<div>
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined">auto_awesome</span>
+<h3 class="font-label-bold text-label-bold uppercase">AI Health Insight</h3>
+</div>
+<p class="font-headline-md text-headline-md leading-tight mb-md">Patient is showing high responsiveness to increased protein intake.</p>
+<p class="text-body-md opacity-90">Weight variance has stabilized at -0.4kg/week. Recommend increasing complex carbohydrate intake by 15% on high-intensity training days to prevent muscle catabolism.</p>
+</div>
+<button class="mt-xl bg-white text-primary font-label-bold py-sm rounded-lg hover:bg-primary-fixed-dim transition-colors">
+                        Adjust Recommendations
+                    </button>
+</section>
+<!-- Exercise Table Section -->
+<section class="col-span-12 lg:col-span-7 bg-surface border border-outline-variant rounded-xl overflow-hidden flex flex-col">
+<div class="p-xl border-b border-outline-variant flex justify-between items-center">
+<div>
+<h3 class="font-headline-md text-headline-md">Workout Routine</h3>
+<p class="text-body-sm text-secondary">Hypertrophy Phase - Week 3</p>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-sm py-xs rounded font-label-bold text-[10px] uppercase">High Intensity</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 border-b border-outline-variant">
+<th class="px-md py-sm font-label-bold text-[12px] text-secondary uppercase">Exercise</th>
+<th class="px-md py-sm font-label-bold text-[12px] text-secondary uppercase">Sets/Reps</th>
+<th class="px-md py-sm font-label-bold text-[12px] text-secondary uppercase">Load</th>
+<th class="px-md py-sm font-label-bold text-[12px] text-secondary uppercase text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors h-14">
+<td class="px-md font-body-md text-primary font-semibold">Barbell Squats</td>
+<td class="px-md font-mono-data">4 x 8-10</td>
+<td class="px-md font-mono-data">105 kg</td>
+<td class="px-md text-right">
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors h-14">
+<td class="px-md font-body-md text-primary font-semibold">Romanian Deadlift</td>
+<td class="px-md font-mono-data">3 x 12</td>
+<td class="px-md font-mono-data">80 kg</td>
+<td class="px-md text-right">
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors h-14">
+<td class="px-md font-body-md text-primary font-semibold">Leg Press</td>
+<td class="px-md font-mono-data">3 x 15</td>
+<td class="px-md font-mono-data">180 kg</td>
+<td class="px-md text-right">
+<span class="material-symbols-outlined text-outline">pending</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors h-14">
+<td class="px-md font-body-md text-primary font-semibold">Calf Raises</td>
+<td class="px-md font-mono-data">4 x 20</td>
+<td class="px-md font-mono-data">60 kg</td>
+<td class="px-md text-right">
+<span class="material-symbols-outlined text-outline">pending</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md bg-surface-container-lowest text-center border-t border-outline-variant">
+<button class="text-primary font-label-bold text-body-sm hover:underline">View Full Program</button>
+</div>
+</section>
+<!-- Nutrition Plan Section -->
+<section class="col-span-12 lg:col-span-5 bg-surface border border-outline-variant rounded-xl p-xl">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-headline-md text-headline-md">AI Meal Plan</h3>
+<div class="flex gap-xs bg-surface-container-high p-xs rounded">
+<button class="bg-white px-sm py-xs rounded shadow-sm font-label-bold text-[10px]">TODAY</button>
+<button class="px-sm py-xs rounded font-label-bold text-[10px] text-secondary">TOMORROW</button>
+</div>
+</div>
+<div class="space-y-lg relative">
+<div class="absolute left-[11px] top-2 bottom-2 w-[2px] bg-outline-variant"></div>
+<!-- Meal 1 -->
+<div class="relative pl-xl">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[12px] font-bold z-10">1</div>
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant">
+<div class="flex justify-between items-start mb-sm">
+<h5 class="font-label-bold text-on-surface">Power Breakfast</h5>
+<span class="text-mono-data text-secondary">07:30</span>
+</div>
+<p class="text-body-sm text-secondary mb-sm">Oatmeal with whey isolate, blueberries, and walnuts.</p>
+<div class="flex gap-md text-[11px] font-mono-data text-outline">
+<span>P: 45g</span>
+<span>C: 60g</span>
+<span>F: 12g</span>
+</div>
+</div>
+</div>
+<!-- Meal 2 -->
+<div class="relative pl-xl">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[12px] font-bold z-10">2</div>
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant">
+<div class="flex justify-between items-start mb-sm">
+<h5 class="font-label-bold text-on-surface">Pre-Workout Meal</h5>
+<span class="text-mono-data text-secondary">12:30</span>
+</div>
+<p class="text-body-sm text-secondary mb-sm">Grilled chicken breast with jasmine rice and sautéed spinach.</p>
+<div class="flex gap-md text-[11px] font-mono-data text-outline">
+<span>P: 52g</span>
+<span>C: 75g</span>
+<span>F: 8g</span>
+</div>
+</div>
+</div>
+<!-- Meal 3 -->
+<div class="relative pl-xl">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[12px] font-bold z-10">3</div>
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant border-primary/40 shadow-sm ring-1 ring-primary/10">
+<div class="flex justify-between items-start mb-sm">
+<h5 class="font-label-bold text-on-surface">Evening Recovery</h5>
+<span class="text-mono-data text-secondary">19:00</span>
+</div>
+<p class="text-body-sm text-secondary mb-sm">Salmon fillet with sweet potato wedges and asparagus.</p>
+<div class="flex gap-md text-[11px] font-mono-data text-outline">
+<span>P: 40g</span>
+<span>C: 45g</span>
+<span>F: 22g</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Clinical Trends Chart (Placeholder Simulation) -->
+<section class="col-span-12 bg-surface border border-outline-variant rounded-xl p-xl">
+<div class="flex justify-between items-start mb-xl">
+<div>
+<h3 class="font-headline-md text-headline-md">Metric Trends (30 Days)</h3>
+<p class="text-body-sm text-secondary">Correlation between activity volume and blood glucose levels.</p>
+</div>
+<select class="bg-surface-container-low border border-outline-variant text-body-sm rounded px-sm py-xs outline-none focus:ring-1 ring-primary">
+<option>Body Weight / Fat %</option>
+<option>Glucose / Insulin</option>
+<option>Step Count / Heart Rate</option>
+</select>
+</div>
+<div class="h-64 w-full flex items-end gap-xs">
+<!-- Simulated Chart Bars -->
+<div class="flex-1 bg-primary/20 h-[60%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"><div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-sm py-xs rounded">78.2kg</div></div>
+<div class="flex-1 bg-primary/20 h-[62%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[58%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[55%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[59%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[64%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[61%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[57%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[53%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[51%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[48%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[45%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[46%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary/20 h-[43%] rounded-t-sm hover:bg-primary transition-all group relative cursor-pointer"></div>
+<div class="flex-1 bg-primary h-[40%] rounded-t-sm relative"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-sm py-xs rounded">74.5kg</div></div>
+</div>
+<div class="flex justify-between mt-md text-label-bold text-secondary uppercase text-[10px]">
+<span>Oct 01</span>
+<span>Oct 15</span>
+<span>Oct 30</span>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-on-secondary-fixed w-full py-xl border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-md w-full max-w-max-width mx-auto">
+<span class="font-body-sm text-body-sm text-secondary">© 2024 MediLink Health Systems. All rights reserved.</span>
+<div class="flex gap-lg">
+<a class="font-body-sm text-body-sm text-secondary hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-secondary hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-secondary hover:text-primary transition-colors" href="#">HIPAA Compliance</a>
+<a class="font-body-sm text-body-sm text-secondary hover:text-primary transition-colors" href="#">Support</a>
+</div>
+<span class="font-label-bold text-label-bold text-secondary">MediLink Pro | Institutional Grade</span>
+</div>
+</footer>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'scale(0.98)';
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'scale(1)';
+            });
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

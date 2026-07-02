@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const { User } = require('../models');
 
-exports.verifyToken = (req, res, next) => {
+exports.verifyToken = async (req, res, next) => {
     const token = req.header('Authorization');
 
     if (!token) {
@@ -12,6 +13,15 @@ exports.verifyToken = (req, res, next) => {
         
         const verified = jwt.verify(cleanToken, process.env.JWT_SECRET);
         
+        // Kiểm tra xem tài khoản có bị admin khóa (is_active = false) không
+        const user = await User.findByPk(verified.id, { attributes: ['is_active'] });
+        if (!user) {
+            return res.status(401).json({ error: "Tài khoản không tồn tại!" });
+        }
+        if (!user.is_active) {
+            return res.status(403).json({ error: "Tài khoản của bạn đã bị khóa! Không thể tiếp tục truy cập." });
+        }
+
         req.user = verified;
         
         next();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { User, Phone, Mail, Calendar, MapPin, Weight, Ruler, Save, Loader2, Lock, Stethoscope, XCircle, CheckCircle } from 'lucide-react';
+import { MdPerson, MdPhone, MdEmail, MdCalendarMonth, MdLocationOn, MdMonitorWeight, MdStraighten, MdSave, MdLock, MdHealthAndSafety, MdCancel, MdCheckCircle, MdPsychology, MdSecurity } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
@@ -135,20 +135,23 @@ export default function Profile() {
     };
 
     if (isLoading) {
-        return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+        return <div className="flex justify-center py-20"><div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-8 h-8  text-primary"></div></div>;
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
+        <div className="max-w-max-width mx-auto pb-12 animate-in fade-in duration-500">
             {/* Header */}
-            <div className="pb-6 border-b border-outline-variant flex justify-between items-end">
+            <div className="pb-6 border-b border-outline-variant flex justify-between items-end mb-8">
                 <div>
                     <h1 className="text-3xl font-black text-on-surface tracking-tight uppercase">Hồ Sơ Cá Nhân</h1>
                     <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-2">Cập nhật định danh & sinh trắc học</p>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-surface-container-lowest rounded-lg border border-outline-variant flex flex-col">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Main Content */}
+                <div className="lg:col-span-8 space-y-8">
+                    <form onSubmit={handleSubmit} className="bg-surface-container-lowest rounded-xl border border-outline-variant flex flex-col">
                 <div className="p-6 md:p-8 space-y-8">
                     
                     {/* Section 1: Định danh */}
@@ -159,7 +162,7 @@ export default function Profile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <Input 
                                 label="Họ và tên"
-                                icon={User}
+                                icon={MdPerson}
                                 type="text" 
                                 name="full_name" 
                                 value={formData.full_name} 
@@ -169,7 +172,7 @@ export default function Profile() {
                             <div className="flex flex-col">
                                 <label className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5">Email (Định danh tĩnh)</label>
                                 <div className="relative">
-                                    <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                                    <MdEmail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                                     <input 
                                         type="email" 
                                         value={user?.email || ''} 
@@ -180,7 +183,7 @@ export default function Profile() {
                             </div>
                             <Input 
                                 label="Số điện thoại"
-                                icon={Phone}
+                                icon={MdPhone}
                                 type="tel" 
                                 name="phone" 
                                 value={formData.phone} 
@@ -199,7 +202,7 @@ export default function Profile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <Input 
                                 label="Cân nặng (kg)"
-                                icon={Weight}
+                                icon={MdMonitorWeight}
                                 type="number" 
                                 step="0.1" 
                                 name="weight_kg" 
@@ -209,7 +212,7 @@ export default function Profile() {
                             />
                             <Input 
                                 label="Chiều cao (cm)"
-                                icon={Ruler}
+                                icon={MdStraighten}
                                 type="number" 
                                 step="0.1" 
                                 name="height_cm" 
@@ -219,7 +222,7 @@ export default function Profile() {
                             />
                             <Input 
                                 label="Ngày sinh"
-                                icon={Calendar}
+                                icon={MdCalendarMonth}
                                 type="date" 
                                 name="date_of_birth" 
                                 value={formData.date_of_birth} 
@@ -254,7 +257,7 @@ export default function Profile() {
                                     <div className="bg-surface-container border border-outline-variant p-4 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 bg-surface-container-lowest rounded flex items-center justify-center border border-outline-variant">
-                                                <Stethoscope className="w-5 h-5 text-on-surface-variant" />
+                                                <MdHealthAndSafety className="w-5 h-5 text-on-surface-variant" />
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-sm text-on-surface">BS. {doctorInfo.full_name}</h4>
@@ -266,7 +269,7 @@ export default function Profile() {
                                             onClick={handleRemoveDoctor}
                                             className="text-error border-error/50 hover:bg-error-container hover:border-error flex items-center gap-2"
                                         >
-                                            <XCircle className="w-4 h-4" /> Hủy Kết Nối
+                                            <MdCancel className="w-4 h-4" /> Hủy Kết Nối
                                         </Button>
                                     </div>
                                 ) : (
@@ -288,7 +291,7 @@ export default function Profile() {
                                                 disabled={isRequestingDoctor || !selectedDoctor}
                                                 className="flex items-center justify-center gap-2"
                                             >
-                                                {isRequestingDoctor ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                                                {isRequestingDoctor ? <div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-4 h-4"></div> : <MdCheckCircle className="w-4 h-4" />}
                                                 Gửi Yêu Cầu
                                             </Button>
                                         </div>
@@ -307,7 +310,7 @@ export default function Profile() {
                         </div>
                         <Input 
                             label="Địa chỉ thường trú"
-                            icon={MapPin}
+                            icon={MdLocationOn}
                             type="text" 
                             name="address" 
                             value={formData.address} 
@@ -318,7 +321,7 @@ export default function Profile() {
 
                 <div className="p-4 md:p-6 bg-surface-container-low border-t border-outline-variant flex justify-end">
                     <Button type="submit" disabled={isSaving} className="flex items-center gap-2">
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {isSaving ? <div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-4 h-4"></div> : <MdSave className="w-4 h-4" />}
                         {isSaving ? 'Đang lưu...' : 'Lưu Hồ Sơ'}
                     </Button>
                 </div>
@@ -361,11 +364,66 @@ export default function Profile() {
                 </div>
                 <div className="p-4 md:p-6 bg-surface-container-low border-t border-outline-variant flex justify-end">
                     <Button variant="outline" type="submit" disabled={isChangingPassword} className="flex items-center gap-2">
-                        {isChangingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                        {isChangingPassword ? <div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-4 h-4"></div> : <MdLock className="w-4 h-4" />}
                         {isChangingPassword ? 'Đang đổi...' : 'Đổi Mật Khẩu'}
                     </Button>
                 </div>
-            </form>
+                </form>
+            </div>
+
+            {/* Expert Corner / Sidebar */}
+            <div className="lg:col-span-4 space-y-6">
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-[0_8px_24px_rgba(0,24,72,0.06)] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+                    
+                    <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider mb-4 relative z-10 flex items-center gap-2">
+                        <MdPsychology className="w-5 h-5 text-primary" />
+                        Trợ Lý Sức Khỏe AI
+                    </h3>
+                    
+                    {formData.weight_kg && formData.height_cm ? (
+                        (() => {
+                            const bmi = (formData.weight_kg / Math.pow(formData.height_cm / 100, 2)).toFixed(1);
+                            let status = 'Bình thường';
+                            let color = 'text-secondary';
+                            let bg = 'bg-secondary-container';
+                            if (bmi < 18.5) { status = 'Thiếu cân'; color = 'text-tertiary'; bg = 'bg-tertiary-container'; }
+                            else if (bmi >= 25 && bmi < 30) { status = 'Thừa cân'; color = 'text-error'; bg = 'bg-error-container'; }
+                            else if (bmi >= 30) { status = 'Béo phì'; color = 'text-error'; bg = 'bg-error-container'; }
+                            
+                            return (
+                                <div className="space-y-4 relative z-10">
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Chỉ số BMI</span>
+                                        <span className="text-3xl font-black text-on-surface font-mono">{bmi}</span>
+                                    </div>
+                                    <div className={`px-3 py-1.5 rounded-lg text-xs font-bold ${color} ${bg} inline-block`}>
+                                        {status}
+                                    </div>
+                                    <p className="text-sm text-on-surface-variant leading-relaxed">
+                                        Hệ thống Clinical Curator sẽ tự động theo dõi biến động sinh trắc học của bạn để điều chỉnh phác đồ dinh dưỡng.
+                                    </p>
+                                </div>
+                            )
+                        })()
+                    ) : (
+                        <p className="text-sm text-on-surface-variant leading-relaxed relative z-10">
+                            Vui lòng cập nhật đầy đủ chiều cao và cân nặng để trợ lý AI có thể đánh giá tổng quan thể trạng.
+                        </p>
+                    )}
+                </div>
+
+                <div className="bg-surface-container-low border border-outline-variant rounded-xl p-6">
+                    <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <MdSecurity className="w-5 h-5 text-secondary" />
+                        Bảo Mật Lâm Sàng
+                    </h3>
+                    <p className="text-sm text-on-surface-variant leading-relaxed">
+                        Thông tin định danh được mã hóa AES-256. Mọi sửa đổi hồ sơ cá nhân đều được lưu vết trên hệ thống Audit Log tuân thủ tiêu chuẩn y khoa.
+                    </p>
+                </div>
+            </div>
+        </div>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 
 export default function AdminPagination({ pagination, onPageChange }) {
     const { page, totalPages, total, limit } = pagination;
@@ -30,13 +30,13 @@ export default function AdminPagination({ pagination, onPageChange }) {
     };
 
     return (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4 border-t border-slate-200 mt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4 border-t border-outline-variant mt-4">
             {/* Hiển thị tóm tắt */}
-            <p className="text-xs font-bold text-slate-500">
+            <p className="text-xs font-bold text-on-surface-variant">
                 Hiển thị{' '}
-                <span className="text-slate-800">{from}–{to}</span>{' '}
+                <span className="text-on-surface">{from}–{to}</span>{' '}
                 của{' '}
-                <span className="text-blue-600">{total}</span> người dùng
+                <span className="text-primary">{total}</span> người dùng
             </p>
 
             {/* Điều hướng */}
@@ -44,23 +44,23 @@ export default function AdminPagination({ pagination, onPageChange }) {
                 <button
                     onClick={() => onPageChange(page - 1)}
                     disabled={page === 1}
-                    className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="p-2 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     aria-label="Trang trước"
                 >
-                    <ChevronLeft className="w-4 h-4" />
+                    <MdChevronLeft className="w-4 h-4" />
                 </button>
 
                 {getPageNumbers().map((p, idx) =>
                     p === '...' ? (
-                        <span key={`e-${idx}`} className="px-2 text-slate-400 font-bold text-sm select-none">...</span>
+                        <span key={`e-${idx}`} className="px-2 text-outline font-bold text-sm select-none">...</span>
                     ) : (
                         <button
                             key={p}
                             onClick={() => onPageChange(p)}
                             className={`min-w-[36px] h-9 rounded-lg text-sm font-bold transition-all ${
                                 p === page
-                                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
-                                    : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                    ? 'bg-primary text-white shadow-[0_4px_12px_rgba(0,24,72,0.04)] shadow-blue-200'
+                                    : 'border border-outline-variant text-on-surface-variant hover:bg-surface-container'
                             }`}
                         >
                             {p}
@@ -71,10 +71,10 @@ export default function AdminPagination({ pagination, onPageChange }) {
                 <button
                     onClick={() => onPageChange(page + 1)}
                     disabled={page === totalPages}
-                    className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="p-2 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     aria-label="Trang sau"
                 >
-                    <ChevronRight className="w-4 h-4" />
+                    <MdChevronRight className="w-4 h-4" />
                 </button>
             </div>
         </div>

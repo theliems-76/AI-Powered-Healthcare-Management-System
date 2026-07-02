@@ -7,8 +7,8 @@
 @layer base {
   body {
     font-family: 'Inter', sans-serif;
-    background-color: #faf8ff; /* Stitch background token */
-    color: #191b24; /* Stitch on-background token */
+    background-color: #f8fafb; /* Stitch background token */
+    color: #191c1d; /* Stitch on-background token */
   }
 
   h1, h2, h3, h4, h5, h6 {

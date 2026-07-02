@@ -1,18 +1,18 @@
 import React from 'react';
 import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
 
-export default function MiniRiskChart({ data }) {
+export default function MiniRiskChart({ data, className }) {
     return (
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Xu hướng rủi ro (các lần gần nhất)</p>
-            <div className="h-24">
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data}>
-                        <Line type="monotone" dataKey="risk_score" stroke="#e11d48" strokeWidth={3} dot={{ r: 4 }} />
-                        <Tooltip contentStyle={{ borderRadius: '12px' }} />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
+        <div className={`w-full h-full ${className || ''}`}>
+            <ResponsiveContainer width="99%" height="100%">
+                <LineChart data={data}>
+                    <Line type="monotone" dataKey="risk_score" stroke="#004ac6" strokeWidth={3} dot={{ r: 4, fill: '#004ac6' }} activeDot={{ r: 6 }} />
+                    <Tooltip 
+                        contentStyle={{ borderRadius: '0.5rem', border: '1px solid #c3c5d9', backgroundColor: '#ffffff', fontSize: '12px', fontWeight: 'bold' }}
+                        itemStyle={{ color: '#004ac6' }}
+                    />
+                </LineChart>
+            </ResponsiveContainer>
         </div>
     );
 }

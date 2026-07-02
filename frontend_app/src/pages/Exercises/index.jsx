@@ -120,7 +120,7 @@ export default function Exercises() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
+        <div className="max-w-7xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
             
             {/* Modals */}
             <ExerciseSearchModal 
@@ -150,51 +150,90 @@ export default function Exercises() {
             />
 
             {/* Header */}
-            <div className="pb-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 shrink-0">
+            <div className="pb-6 border-b border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 shrink-0">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Nhật Ký Tập Luyện</h1>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">Theo dõi năng lượng tiêu hao chuẩn y khoa.</p>
+                    <h1 className="text-3xl font-semibold text-on-surface tracking-tight uppercase">Nhật Ký Tập Luyện</h1>
+                    <p className="text-[12px] font-bold text-on-surface-variant uppercase tracking-widest mt-2">Theo dõi năng lượng tiêu hao chuẩn y khoa.</p>
                 </div>
                 <div className="flex gap-3 mt-4 sm:mt-0">
                     <button 
                         onClick={() => handleOpenBuilder(null)} 
-                        className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:border-slate-300 transition-colors shadow-sm active:scale-95"
+                        className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-on-surface bg-surface border-2 border-outline-variant rounded-xl hover:bg-surface-container-high transition-colors shadow-sm active:scale-95"
                     >
                         Tạo môn mới
                     </button>
                     <button 
                         onClick={() => setIsSearchOpen(true)} 
-                        className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                        className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest text-on-primary bg-primary rounded-xl hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-95"
                     >
                         Thêm bài tập
                     </button>
                 </div>
             </div>
 
-            {/* Unified Panel */}
-            <div className="flex-1 bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden flex flex-col lg:flex-row min-h-[75vh]">
+            {/* Daily Schedule Row */}
+            <div className="bg-surface border border-outline-variant rounded-xl p-4 mb-6">
+                <DailySchedule selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+            </div>
+
+            {/* Bento Grid Layout */}
+            <div className="grid grid-cols-12 gap-6">
                 
-                {/* Left Panel: Schedule & Stats */}
-                <div className="w-full md:w-1/3 bg-slate-50/50 p-6 md:p-8 border-r border-slate-100 flex flex-col shrink-0 overflow-y-auto custom-scrollbar">
-                    <DailySchedule selectedDate={selectedDate} onSelectDate={setSelectedDate} />
-                    <div className="mt-8">
-                        <ExerciseStatsCard burnedCalories={burnedCalories} dailyGoal={DAILY_BURN_GOAL} />
-                    </div>
+                {/* Progress Overview Card */}
+                <div className="col-span-12 lg:col-span-6">
+                    <ExerciseStatsCard burnedCalories={burnedCalories} dailyGoal={DAILY_BURN_GOAL} />
                 </div>
 
-                {/* Right Panel: Exercise List */}
-                <div className="w-full lg:w-2/3 p-6 md:p-8 flex flex-col bg-white relative overflow-hidden">
-                    <div className="mb-8 pb-4 border-b border-slate-100 flex justify-between items-end shrink-0">
-                        <h2 className="font-black text-slate-900 text-xl tracking-tight">
-                            Hoạt động ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}
-                        </h2>
+                {/* Dynamic Insights Card (Frontend Calculated) */}
+                <div className="col-span-12 lg:col-span-6 bg-surface-container-low text-on-surface rounded-xl p-6 flex flex-col border border-outline-variant relative overflow-hidden shadow-sm">
+                    <div className="flex items-center gap-2 mb-4 pb-3 border-b border-outline-variant/50">
+                        <span className="material-symbols-outlined text-primary"></span>
+                        <h3 className="font-bold text-[12px] uppercase tracking-widest text-primary">Phân tích Vận động</h3>
                     </div>
                     
-                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                        <ExerciseList exercises={exercises} onRemoveExercise={handleRemoveExercise} />
-                    </div>
+                    {exercises.length > 0 ? (
+                        <div className="space-y-4 flex-1">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-on-surface-variant">Tổng thời gian:</span>
+                                <span className="text-sm font-bold">{exercises.reduce((sum, ex) => sum + ex.duration, 0)} phút</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-on-surface-variant">Cường độ cao nhất:</span>
+                                <span className="text-sm font-bold text-orange-600">
+                                    {exercises.reduce((max, ex) => ex.met > max.met ? ex : max, exercises[0]).name} 
+                                    <span className="text-[10px] ml-1 text-secondary font-mono">(MET: {exercises.reduce((max, ex) => ex.met > max.met ? ex : max, exercises[0]).met})</span>
+                                </span>
+                            </div>
+                            <div className="mt-4 p-3 bg-surface border border-outline-variant rounded-lg">
+                                <p className="text-xs leading-relaxed font-medium">
+                                    {exercises.reduce((sum, ex) => sum + ex.duration, 0) >= 30 
+                                        ? "🔥 Tuyệt vời! Bạn đã duy trì vận động trên 30 phút, rất tốt cho hệ tim mạch và độ nhạy insulin."
+                                        : "💡 Hãy cố gắng tích lũy đủ 30 phút vận động mỗi ngày để đạt hiệu quả sức khỏe tối ưu nhé."}
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center opacity-70">
+                            <span className="material-symbols-outlined text-4xl mb-2 text-outline-variant">fitness_center</span>
+                            <p className="text-xs font-medium">Chưa có dữ liệu để phân tích.<br/>Hãy ghi nhận bài tập đầu tiên của bạn!</p>
+                        </div>
+                    )}
                 </div>
 
+                {/* Exercise Table Section */}
+                <div className="col-span-12">
+                    <div className="bg-surface border border-outline-variant rounded-xl p-6">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-outline-variant">
+                            <h3 className="font-semibold text-on-surface text-xl tracking-tight">Workout Routine (Hoạt Động)</h3>
+                            <span className="bg-surface-container-high px-3 py-1 rounded text-[10px] font-bold text-secondary uppercase tracking-widest">
+                                {new Date(selectedDate).toLocaleDateString('vi-VN')}
+                            </span>
+                        </div>
+                        <div className="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                            <ExerciseList exercises={exercises} onRemoveExercise={handleRemoveExercise} />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

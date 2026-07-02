@@ -76,49 +76,49 @@ export default function ChatWidget({ user }) {
         return (
             <button 
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center text-white shadow-xl hover:shadow-slate-900/50 hover:scale-105 transition-all duration-300 z-50 group border border-slate-700"
+                className="fixed bottom-6 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-xl hover:shadow-primary/40 hover:scale-105 transition-all duration-300 z-50 group border border-primary-container"
             >
                 <MessageSquare size={26} className="group-hover:animate-pulse" />
                 <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-slate-500 border-2 border-slate-900"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-container opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-secondary border-2 border-primary"></span>
                 </span>
             </button>
         );
     }
 
     return (
-        <div className="fixed bottom-6 right-6 w-[380px] h-[550px] bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden transform transition-all duration-300">
+        <div className="fixed bottom-6 right-6 w-[380px] h-[550px] bg-surface-container-lowest/95 backdrop-blur-md border border-outline-variant rounded-2xl shadow-[0_8px_30px_rgba(0,24,72,0.12)] flex flex-col z-50 overflow-hidden transform transition-all duration-300">
             {/* Header */}
-            <div className="bg-slate-900 p-4 flex items-center justify-between text-white shrink-0 shadow-md">
+            <div className="bg-primary p-4 flex items-center justify-between text-on-primary shrink-0 shadow-sm border-b border-primary/20">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shadow-sm">
                         <Bot size={22} className="text-white" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-sm leading-tight">Bác sĩ AI</h3>
+                        <h3 className="font-bold text-sm leading-tight text-white">Bác sĩ AI</h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                            <span className="text-xs text-slate-300">Đang trực tuyến</span>
+                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                            <span className="text-xs font-medium text-white/90">Đang trực tuyến</span>
                         </div>
                     </div>
                 </div>
                 <button 
                     onClick={() => setIsOpen(false)}
-                    className="p-1.5 hover:bg-white/20 rounded-full transition-colors text-slate-300 hover:text-white"
+                    className="p-1.5 hover:bg-white/20 rounded-full transition-colors text-white/80 hover:text-white"
                 >
                     <X size={20} />
                 </button>
             </div>
 
             {/* Chat Body */}
-            <div className="flex-1 p-4 overflow-y-auto bg-[#F8F9FB] custom-scrollbar flex flex-col gap-4">
+            <div className="flex-1 p-4 overflow-y-auto bg-surface-container-low custom-scrollbar flex flex-col gap-4">
                 {messages.map((msg, idx) => (
                     <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-sm ${
+                        <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-sm font-medium ${
                             msg.role === 'user' 
-                                ? 'bg-slate-900 text-white rounded-tr-sm' 
-                                : 'bg-white text-slate-700 border border-slate-200 rounded-tl-sm'
+                                ? 'bg-primary text-on-primary rounded-tr-sm' 
+                                : 'bg-surface-container-lowest text-on-surface border border-outline-variant/50 rounded-tl-sm'
                         }`}>
                             <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                         </div>
@@ -126,11 +126,11 @@ export default function ChatWidget({ user }) {
                 ))}
                 {isLoading && (
                     <div className="flex justify-start">
-                        <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-2">
+                        <div className="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-2">
                             <span className="flex gap-1">
-                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                             </span>
                         </div>
                     </div>
@@ -139,27 +139,27 @@ export default function ChatWidget({ user }) {
             </div>
 
             {/* Chat Input */}
-            <div className="p-3 bg-white border-t border-slate-100 shrink-0">
-                <div className="relative flex items-center bg-[#F1F5F9] rounded-xl border border-transparent focus-within:border-slate-900 focus-within:bg-white transition-all overflow-hidden shadow-inner">
+            <div className="p-3 bg-surface-container-lowest border-t border-outline-variant shrink-0">
+                <div className="relative flex items-center bg-surface-container rounded-xl border border-transparent focus-within:border-primary focus-within:bg-surface-container-lowest transition-all overflow-hidden shadow-inner">
                     <textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyPress}
                         placeholder="Nhập câu hỏi của bạn..."
-                        className="w-full bg-transparent text-sm text-slate-700 py-3 pl-4 pr-12 outline-none resize-none min-h-[44px] max-h-[120px]"
+                        className="w-full bg-transparent text-sm font-medium text-on-surface py-3 pl-4 pr-12 outline-none resize-none min-h-[44px] max-h-[120px] placeholder-on-surface-variant/70"
                         rows={1}
                         style={{ height: '44px' }}
                     />
                     <button 
                         onClick={handleSend}
                         disabled={!input.trim() || isLoading}
-                        className="absolute right-2 p-1.5 text-slate-900 hover:bg-slate-100 rounded-lg transition-colors disabled:text-slate-400 disabled:hover:bg-transparent"
+                        className="absolute right-2 p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors disabled:text-outline disabled:hover:bg-transparent"
                     >
                         <Send size={18} />
                     </button>
                 </div>
                 <div className="text-center mt-2">
-                    <span className="text-[10px] text-slate-400 font-medium">Bác sĩ AI có thể cung cấp thông tin không chính xác.</span>
+                    <span className="text-[10px] text-on-surface-variant font-bold tracking-widest uppercase">Bác sĩ AI có thể nhầm lẫn.</span>
                 </div>
             </div>
         </div>

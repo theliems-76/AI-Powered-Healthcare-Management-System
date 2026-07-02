@@ -9,33 +9,30 @@ export default function AdminOverviewTab({ stats }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 {/* Chart 1: Risk Distribution */}
-                <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:shadow-md group">
-                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div> Cấu trúc Rủi ro Lâm sàng
+                <div className="bg-surface border border-outline-variant rounded-xl p-6 transition-all hover:shadow-sm">
+                    <h3 className="text-xs font-bold text-secondary uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-error"></div> Cấu trúc Rủi ro Lâm sàng
                     </h3>
                     <div className="h-64 w-full relative">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <defs>
                                     <linearGradient id="riskHigh" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#ff4b72" />
-                                        <stop offset="100%" stopColor="#e11d48" />
+                                        <stop offset="0%" stopColor="#ba1a1a" />
+                                        <stop offset="100%" stopColor="#93000a" />
                                     </linearGradient>
                                     <linearGradient id="riskMedium" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#fb923c" />
-                                        <stop offset="100%" stopColor="#ea580c" />
+                                        <stop offset="0%" stopColor="#c53b00" />
+                                        <stop offset="100%" stopColor="#9b2d00" />
                                     </linearGradient>
                                     <linearGradient id="riskLow" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#2dd4bf" />
-                                        <stop offset="100%" stopColor="#0d9488" />
+                                        <stop offset="0%" stopColor="#0046cc" />
+                                        <stop offset="100%" stopColor="#003baf" />
                                     </linearGradient>
                                     <linearGradient id="riskEmpty" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#f1f5f9" />
-                                        <stop offset="100%" stopColor="#e2e8f0" />
+                                        <stop offset="0%" stopColor="#e1e1ef" />
+                                        <stop offset="100%" stopColor="#c3c5d9" />
                                     </linearGradient>
-                                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                                        <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#0f172a" floodOpacity="0.1" />
-                                    </filter>
                                 </defs>
                                 <Pie
                                     data={stats.riskDistribution}
@@ -46,7 +43,6 @@ export default function AdminOverviewTab({ stats }) {
                                     paddingAngle={2}
                                     dataKey="value"
                                     stroke="none"
-                                    style={{ filter: 'url(#shadow)' }}
                                 >
                                     {stats.riskDistribution?.map((entry, index) => {
                                         let fillUrl = "url(#riskEmpty)";
@@ -57,24 +53,24 @@ export default function AdminOverviewTab({ stats }) {
                                         return <Cell key={`cell-${index}`} fill={fillUrl} />;
                                     })}
                                 </Pie>
-                                    <Tooltip 
-                                        contentStyle={{ borderRadius: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', fontWeight: '900', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                                        itemStyle={{ color: '#0f172a' }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '0.5rem', border: '1px solid #c3c5d9', backgroundColor: '#ffffff', fontSize: '12px', fontWeight: 'bold' }}
+                                    itemStyle={{ color: '#191b24' }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
                     </div>
                     <div className="flex justify-center gap-6 mt-4">
                         {stats.riskDistribution?.map((item, idx) => {
-                            let dotColor = '#e2e8f0';
-                            if (item.name === "Nguy cơ cao") dotColor = '#e11d48';
-                            if (item.name === "Trung bình") dotColor = '#ea580c';
-                            if (item.name === "Khỏe mạnh") dotColor = '#0d9488';
-                            if (item.name === "Chưa đánh giá") dotColor = '#cbd5e1';
+                            let dotColor = '#e1e1ef';
+                            if (item.name === "Nguy cơ cao") dotColor = '#ba1a1a';
+                            if (item.name === "Trung bình") dotColor = '#c53b00';
+                            if (item.name === "Khỏe mạnh") dotColor = '#0046cc';
+                            if (item.name === "Chưa đánh giá") dotColor = '#737688';
                             return (
                                 <div key={idx} className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: dotColor }}></div>
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">{item.name}</span>
+                                    <div className="w-2.5 h-2.5 rounded-full shadow-[0_4px_12px_rgba(0,24,72,0.04)]" style={{ backgroundColor: dotColor }}></div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">{item.name}</span>
                                 </div>
                             );
                         })}
@@ -82,9 +78,9 @@ export default function AdminOverviewTab({ stats }) {
                 </div>
 
                 {/* Chart 2: System Growth */}
-                <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:shadow-md group">
-                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div> Tăng trưởng Hồ sơ Y tế (6 Tháng)
+                <div className="bg-surface border border-outline-variant rounded-xl p-6 transition-all hover:shadow-sm">
+                    <h3 className="text-xs font-bold text-secondary uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary"></div> Tăng trưởng Hồ sơ Y tế
                     </h3>
                     <div className="h-64 w-full">
                         {stats.recordTrend?.length > 0 ? (
@@ -92,21 +88,21 @@ export default function AdminOverviewTab({ stats }) {
                                 <BarChart data={stats.recordTrend} barSize={24}>
                                     <defs>
                                         <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#818cf8" />
-                                            <stop offset="100%" stopColor="#4f46e5" />
+                                            <stop offset="0%" stopColor="#0046cc" />
+                                            <stop offset="100%" stopColor="#003baf" />
                                         </linearGradient>
                                     </defs>
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: '900', fill: '#94a3b8' }} dy={10} />
-                                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: '900', fill: '#94a3b8' }} dx={-10} />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 'bold', fill: '#737688' }} dy={10} />
+                                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 'bold', fill: '#737688' }} dx={-10} />
                                     <Tooltip 
-                                        contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', fontWeight: '900', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#0f172a' }}
-                                        cursor={{ fill: '#f8fafc' }}
+                                        contentStyle={{ borderRadius: '0.5rem', border: '1px solid #c3c5d9', backgroundColor: '#ffffff', fontSize: '12px', fontWeight: 'bold' }}
+                                        cursor={{ fill: '#f3f2ff' }}
                                     />
-                                    <Bar dataKey="records" fill="url(#barGradient)" radius={[6, 6, 6, 6]} />
+                                    <Bar dataKey="records" fill="url(#barGradient)" radius={[4, 4, 4, 4]} />
                                 </BarChart>
                             </ResponsiveContainer>
                         ) : (
-                            <div className="flex items-center justify-center h-full text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            <div className="flex items-center justify-center h-full text-[10px] font-bold text-outline uppercase tracking-widest">
                                 Chưa có dữ liệu hồ sơ
                             </div>
                         )}
@@ -116,17 +112,17 @@ export default function AdminOverviewTab({ stats }) {
             </div>
             
             {/* User Roles Bar Chart */}
-            <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:shadow-md">
-                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                     <div className="w-1.5 h-1.5 rounded-full bg-cyan-500"></div> Tỷ lệ Phân bố Nguồn nhân lực
+            <div className="bg-surface border border-outline-variant rounded-xl p-6 transition-all hover:shadow-sm">
+                 <h3 className="text-xs font-bold text-secondary uppercase tracking-widest mb-6 flex items-center gap-2">
+                     <div className="w-2 h-2 rounded-full bg-secondary"></div> Phân bố Nguồn nhân lực
                  </h3>
-                 <div className="w-full flex h-4 rounded-full overflow-hidden bg-slate-100 shadow-inner">
-                     <div style={{ width: `${(stats.totalPatients / (stats.totalUsers || 1)) * 100}%` }} className="bg-gradient-to-r from-cyan-400 to-teal-500 h-full transition-all duration-1000"></div>
-                     <div style={{ width: `${(stats.totalDoctors / (stats.totalUsers || 1)) * 100}%` }} className="bg-gradient-to-r from-slate-700 to-slate-900 h-full transition-all duration-1000"></div>
+                 <div className="w-full flex h-4 rounded-full overflow-hidden bg-surface-container-high shadow-inner">
+                     <div style={{ width: `${(stats.totalPatients / (stats.totalUsers || 1)) * 100}%` }} className="bg-primary h-full transition-all duration-1000"></div>
+                     <div style={{ width: `${(stats.totalDoctors / (stats.totalUsers || 1)) * 100}%` }} className="bg-secondary h-full transition-all duration-1000"></div>
                  </div>
                  <div className="flex justify-between mt-4 px-2">
-                     <div className="text-[10px] font-bold uppercase tracking-widest text-teal-600">Bệnh nhân ({stats.totalPatients})</div>
-                     <div className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Bác sĩ ({stats.totalDoctors})</div>
+                     <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Bệnh nhân ({stats.totalPatients})</div>
+                     <div className="text-[10px] font-bold uppercase tracking-widest text-secondary">Bác sĩ ({stats.totalDoctors})</div>
                  </div>
             </div>
         </div>

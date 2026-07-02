@@ -120,31 +120,31 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center p-4 md:p-6 animate-in fade-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 bg-surface-container/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 md:p-6 animate-in fade-in zoom-in-95 duration-300">
             {/* Modal Container */}
-            <div className="bg-white/95 backdrop-blur-xl w-full max-w-5xl rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-white/50">
+            <div className="bg-surface w-full max-w-5xl rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-outline-variant">
                 
                 {/* Left Column: Ingredients */}
-                <div className="w-full md:w-5/12 flex flex-col bg-slate-50/80 border-r border-slate-100/80">
-                    <div className="p-6 md:px-8 border-b border-slate-100/50">
-                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Thêm nguyên liệu</h2>
+                <div className="w-full md:w-5/12 flex flex-col bg-surface-container-lowest border-r border-outline-variant">
+                    <div className="p-6 md:px-8 border-b border-outline-variant">
+                        <h2 className="text-2xl font-semibold text-on-surface tracking-tight">Thêm nguyên liệu</h2>
                         <div className="mt-4 relative">
-                            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                             <input 
                                 type="text" placeholder="Tìm tên nguyên liệu..." 
                                 value={search} onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3.5 bg-white/80 backdrop-blur border border-slate-200 rounded-2xl text-sm font-bold focus:border-slate-400 focus:ring-4 focus:ring-slate-100 outline-none text-slate-900 transition-all shadow-sm placeholder:text-slate-400"
+                                className="w-full pl-11 pr-4 py-3.5 bg-surface border border-outline-variant rounded-lg text-sm font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all shadow-sm placeholder:text-on-surface-variant"
                             />
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 md:px-8 space-y-3 custom-scrollbar">
                         {filteredIngredients.map(ing => (
-                            <div key={ing.id} className="flex justify-between items-center p-4 bg-white/60 backdrop-blur-sm border border-white hover:border-slate-300 rounded-2xl hover:shadow-md hover:shadow-slate-200/50 hover:-translate-y-0.5 transition-all group">
+                            <div key={ing.id} className="flex justify-between items-center p-4 bg-surface border border-outline-variant hover:border-primary rounded-xl hover:shadow-sm hover:-translate-y-0.5 transition-all group">
                                 <div>
-                                    <p className="font-bold text-sm text-slate-900">{ing.name}</p>
-                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{ing.calories_per_100g} kcal/100g</p>
+                                    <p className="font-semibold text-sm text-on-surface">{ing.name}</p>
+                                    <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mt-1">{ing.calories_per_100g} kcal/100g</p>
                                 </div>
-                                <button onClick={() => handleAddIngredient(ing)} className="w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white hover:shadow-lg hover:shadow-slate-900/20 transition-all transform active:scale-95">
+                                <button onClick={() => handleAddIngredient(ing)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant hover:bg-primary hover:text-on-primary transition-all transform active:scale-95">
                                     <Plus className="w-4 h-4" />
                                 </button>
                             </div>
@@ -153,38 +153,38 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
                 </div>
 
                 {/* Right Column: Recipe Builder */}
-                <div className="w-full md:w-7/12 flex flex-col relative bg-white/80">
+                <div className="w-full md:w-7/12 flex flex-col relative bg-surface">
                     
                     <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
                         {initialData && (
                             <button 
                                 onClick={onBack} 
-                                className="flex items-center gap-1.5 px-4 py-2 bg-white/90 backdrop-blur hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 rounded-xl transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-surface hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface border border-outline-variant rounded-lg transition-all text-[10px] font-bold uppercase tracking-wider shadow-sm"
                             >
                                 <ArrowLeft className="w-3.5 h-3.5" /> Trở lại
                             </button>
                         )}
                         <button 
                             onClick={onClose} 
-                            className="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur border border-slate-200 hover:bg-rose-50 hover:border-rose-200 text-slate-400 hover:text-rose-600 rounded-2xl transition-all shadow-sm"
+                            className="w-10 h-10 flex items-center justify-center bg-surface border border-outline-variant hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface rounded-lg transition-all shadow-sm"
                         >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
 
                     <div className="p-6 md:px-8 pt-8">
-                        <h2 className="text-2xl font-black text-slate-800 tracking-tight pr-24">
+                        <h2 className="text-2xl font-semibold text-on-surface tracking-tight pr-24">
                             {initialData ? 'Tinh chỉnh món ăn' : 'Tạo món ăn mới'}
                         </h2>
                         <div className="mt-6 space-y-4">
                             <input 
                                 type="text" placeholder="Tên món ăn (vd: Ức gà áp chảo)..." 
                                 value={dishName} onChange={(e) => setDishName(e.target.value)}
-                                className="w-full text-lg font-black p-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 outline-none text-slate-900 transition-all placeholder:text-slate-400 shadow-sm"
+                                className="w-full text-lg font-semibold p-4 bg-surface-container-low border border-outline-variant rounded-lg focus:bg-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all placeholder:text-on-surface-variant shadow-sm"
                             />
                             <select 
                                 value={category} onChange={(e) => setCategory(e.target.value)}
-                                className="w-full p-4 text-sm font-bold bg-slate-50/50 border border-slate-200 rounded-2xl focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 outline-none text-slate-800 transition-all appearance-none shadow-sm cursor-pointer"
+                                className="w-full p-4 text-sm font-semibold bg-surface-container-low border border-outline-variant rounded-lg focus:bg-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all appearance-none shadow-sm cursor-pointer"
                             >
                                 <option value="Sáng">Bữa Sáng</option>
                                 <option value="Trưa">Bữa Trưa</option>
@@ -196,27 +196,27 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
 
                     <div className="flex-1 overflow-y-auto px-6 md:px-8 py-2 space-y-3 custom-scrollbar">
                         {selectedIngs.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-200 hover:border-slate-400 rounded-3xl bg-slate-50/50 transition-colors duration-300">
-                                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm mb-4">
-                                    <ChefHat className="w-6 h-6 text-slate-400" />
+                            <div className="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-lowest transition-colors duration-300">
+                                <div className="w-14 h-14 bg-surface rounded-xl flex items-center justify-center border border-outline-variant shadow-sm mb-4">
+                                    <ChefHat className="w-6 h-6 text-on-surface-variant" />
                                 </div>
-                                <p className="text-base font-black text-slate-600">Chưa có nguyên liệu nào.</p>
-                                <p className="text-[11px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Hãy chọn nguyên liệu từ cột bên trái</p>
+                                <p className="text-base font-semibold text-on-surface">Chưa có nguyên liệu nào.</p>
+                                <p className="text-[11px] font-bold text-on-surface-variant mt-2 uppercase tracking-wider">Hãy chọn nguyên liệu từ cột bên trái</p>
                             </div>
                         ) : (
                             selectedIngs.map(ing => (
-                                <div key={ing.id} className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md border border-slate-100 hover:border-slate-300 flex items-center justify-between gap-4 group transition-all">
-                                    <span className="text-sm font-bold text-slate-900 flex-1 truncate">{ing.name}</span>
+                                <div key={ing.id} className="bg-surface p-4 rounded-xl shadow-sm border border-outline-variant flex items-center justify-between gap-4 group transition-all">
+                                    <span className="text-sm font-semibold text-on-surface flex-1 truncate">{ing.name}</span>
                                     <div className="flex items-center gap-3">
-                                        <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 focus-within:bg-white transition-all">
+                                        <div className="flex items-center bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary focus-within:bg-surface transition-all">
                                             <input 
                                                 type="number" min="0" value={ing.weight}
                                                 onChange={(e) => handleWeightChange(ing.id, e.target.value)}
-                                                className="w-12 p-0 text-center text-sm font-black text-slate-900 bg-transparent outline-none"
+                                                className="w-12 p-0 text-center text-sm font-semibold text-on-surface bg-transparent outline-none"
                                             />
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase ml-1">g</span>
+                                            <span className="text-[10px] font-bold text-on-surface-variant uppercase ml-1">g</span>
                                         </div>
-                                        <button onClick={() => handleRemoveIngredient(ing.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all border border-transparent hover:scale-110 active:scale-95">
+                                        <button onClick={() => handleRemoveIngredient(ing.id)} className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-all border border-transparent hover:scale-110 active:scale-95">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -226,20 +226,20 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
                     </div>
 
                     {/* Standard Unified Footer */}
-                    <div className="mt-auto bg-white/90 backdrop-blur-md p-6 md:px-8 border-t border-slate-100">
-                        <div className="flex justify-between items-end mb-6 bg-slate-900 p-5 rounded-2xl shadow-xl shadow-slate-900/10">
+                    <div className="mt-auto bg-surface p-6 md:px-8 border-t border-outline-variant">
+                        <div className="flex justify-between items-end mb-6 bg-surface-container-lowest border border-outline-variant p-5 rounded-xl">
                             <div>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tổng năng lượng</p>
-                                <p className="text-3xl font-black text-white">{totals.calories.toFixed(0)} <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-0.5">kcal</span></p>
+                                <p className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider mb-0.5">Tổng năng lượng</p>
+                                <p className="text-3xl font-semibold text-on-surface">{totals.calories.toFixed(0)} <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">kcal</span></p>
                             </div>
-                            <div className="text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest space-y-2">
-                                <p>Tinh bột: <span className="text-emerald-400 font-black text-xs ml-1">{totals.carbs.toFixed(1)}g</span></p>
-                                <p>Đạm: <span className="text-amber-400 font-black text-xs ml-1">{totals.protein.toFixed(1)}g</span></p>
+                            <div className="text-right text-[10px] font-bold text-on-surface-variant uppercase tracking-wider space-y-2">
+                                <p>Tinh bột: <span className="text-secondary font-semibold text-xs ml-1">{totals.carbs.toFixed(1)}g</span></p>
+                                <p>Đạm: <span className="text-primary font-semibold text-xs ml-1">{totals.protein.toFixed(1)}g</span></p>
                             </div>
                         </div>
                         <button 
                             onClick={handleSaveDish} disabled={isSaving || selectedIngs.length === 0}
-                            className={`w-full py-4 rounded-2xl font-black flex justify-center items-center gap-2 transition-all text-sm tracking-wide ${isSaving || selectedIngs.length === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 active:scale-95'}`}
+                            className={`w-full py-4 rounded-xl font-bold flex justify-center items-center gap-2 transition-all text-sm tracking-wide uppercase ${isSaving || selectedIngs.length === 0 ? 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed' : 'bg-primary text-on-primary hover:opacity-90 active:scale-95 shadow-sm'}`}
                         >
                             <Save className="w-4 h-4" /> 
                             {isSaving ? 'Đang lưu...' : (initialData ? 'Cập nhật món ăn' : 'Lưu Vào Thực Đơn')}

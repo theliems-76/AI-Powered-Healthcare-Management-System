@@ -36,16 +36,14 @@ export default function MainLayout() {
             </main>
             
             {/* Global Floating Actions */}
-            {user?.role === 'PATIENT' && (
-                <>
-                    {/* Dời Feedback sang góc Dưới-Trái */}
-                    <div className="fixed bottom-6 left-6 z-40 hidden md:block">
-                        <FeedbackWidget />
-                    </div>
-                    {/* Bác sĩ AI chiếm góc VIP Dưới-Phải */}
-                    <ChatWidget user={user} />
-                </>
-            )}
+            <>
+                {/* Dời Feedback lên trên Chatbot ở góc phải */}
+                <div className="fixed bottom-[96px] right-6 z-40 hidden md:block">
+                    <FeedbackWidget />
+                </div>
+                {/* Bác sĩ AI chiếm góc VIP Dưới-Phải */}
+                <ChatWidget user={user} />
+            </>
         </div>
     );
 }

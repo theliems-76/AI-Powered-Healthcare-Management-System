@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import api from '../../../services/api';
-import { Send, Loader2, Clock } from 'lucide-react';
+import { MdAccessTime, MdSend } from 'react-icons/md';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -103,23 +103,23 @@ export default function AdminNotificationsTab() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-slate-100 animate-in slide-in-from-right-4 duration-300">
+            <div className="bg-surface-container-lowest rounded-[2rem] p-6 sm:p-8 shadow-[0_4px_12px_rgba(0,24,72,0.04)] border border-slate-100 animate-in slide-in-from-right-4 duration-300">
                 <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-amber-400 to-orange-500 shadow-sm"></div>
+                            <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-amber-400 to-orange-500 shadow-[0_4px_12px_rgba(0,24,72,0.04)]"></div>
                             <h2 className="text-base font-bold text-slate-900 uppercase tracking-widest flex items-center gap-3">
                                 Phát Sóng Thông Báo
                             </h2>
                         </div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Gửi thông điệp quan trọng tới toàn bộ hệ thống.</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-outline">Gửi thông điệp quan trọng tới toàn bộ hệ thống.</p>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Đối Tượng Nhận</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Đối Tượng Nhận</label>
                             <div className="flex flex-wrap gap-2">
                                 {['ALL', 'DOCTOR', 'PATIENT'].map(role => {
                                     const isSelected = formData.targetRoles.includes(role);
@@ -131,8 +131,8 @@ export default function AdminNotificationsTab() {
                                             onClick={() => handleRoleToggle(role)}
                                             className={`px-4 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 ${
                                                 isSelected 
-                                                ? 'bg-slate-900 text-white shadow-md shadow-slate-900/10' 
-                                                : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200'
+                                                ? 'bg-slate-900 text-white shadow-[0_8px_24px_rgba(0,24,72,0.06)] shadow-slate-900/10' 
+                                                : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high border border-outline-variant'
                                             }`}
                                         >
                                             {label}
@@ -142,11 +142,11 @@ export default function AdminNotificationsTab() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Phân Loại</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Phân Loại</label>
                             <select
                                 value={formData.type}
                                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-sm"
+                                className="w-full px-4 py-3 bg-surface-container border border-outline-variant rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-[0_4px_12px_rgba(0,24,72,0.04)]"
                             >
                                 <option value="SYSTEM">Hệ thống (Bảo trì, Update)</option>
                                 <option value="ALERT">Cảnh báo Khẩn cấp</option>
@@ -156,20 +156,20 @@ export default function AdminNotificationsTab() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Tiêu đề</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Tiêu đề</label>
                         <input
                             type="text"
                             required
                             placeholder="VD: HỆ THỐNG SẼ BẢO TRÌ VÀO LÚC 12H ĐÊM NAY..."
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-sm transition-all"
+                            className="w-full px-5 py-4 bg-surface-container border border-outline-variant rounded-xl text-sm font-bold uppercase tracking-wider text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-[0_4px_12px_rgba(0,24,72,0.04)] transition-all"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Nội dung chi tiết (Có thể chèn ảnh, định dạng)</label>
-                        <div className="bg-white rounded-xl focus-within:ring-1 focus-within:ring-amber-500 transition-all [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-slate-200 [&_.ql-editor]:min-h-[250px] [&_.ql-editor]:text-sm [&_.ql-editor]:font-medium">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Nội dung chi tiết (Có thể chèn ảnh, định dạng)</label>
+                        <div className="bg-surface-container-lowest rounded-xl focus-within:ring-1 focus-within:ring-amber-500 transition-all [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:rounded-b-xl [&_.ql-container]:border-slate-200 [&_.ql-editor]:min-h-[250px] [&_.ql-editor]:text-sm [&_.ql-editor]:font-medium">
                             <ReactQuill 
                                 bounds={'body'}
                                 ref={quillRef}
@@ -217,7 +217,7 @@ export default function AdminNotificationsTab() {
                                 };
                                 input.click();
                             }}
-                            className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-[11px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-2 px-6 py-4 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface text-[11px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-[0_4px_12px_rgba(0,24,72,0.04)] active:scale-95"
                         >
                             📎 Đính kèm File
                         </button>
@@ -227,7 +227,7 @@ export default function AdminNotificationsTab() {
                             disabled={loading || !formData.title || !formData.message || formData.message === '<p><br></p>'}
                             className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-[11px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-amber-500/20 active:scale-95"
                         >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4" />}
+                            {loading ? <div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-5 h-5"></div> : <MdSend className="w-4 h-4" />}
                             {loading ? 'Đang gửi...' : 'Phát Sóng Ngay'}
                         </button>
                     </div>
@@ -235,36 +235,36 @@ export default function AdminNotificationsTab() {
             </div>
 
             {/* History Section */}
-            <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-slate-100 animate-in slide-in-from-right-4 duration-300 delay-100">
+            <div className="bg-surface-container-lowest rounded-[2rem] p-6 sm:p-8 shadow-[0_4px_12px_rgba(0,24,72,0.04)] border border-slate-100 animate-in slide-in-from-right-4 duration-300 delay-100">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100">
-                        <Clock className="w-5 h-5 text-slate-500" />
+                    <div className="w-10 h-10 rounded-2xl bg-surface-container flex items-center justify-center border border-slate-100">
+                        <MdAccessTime className="w-5 h-5 text-on-surface-variant" />
                     </div>
                     <div>
                         <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Lịch sử phát sóng gần đây</h3>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">5 thông báo mới nhất</p>
+                        <p className="text-[10px] font-bold text-outline uppercase tracking-widest">5 thông báo mới nhất</p>
                     </div>
                 </div>
 
                 <div className="space-y-4">
                     {historyLoading ? (
-                        <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-amber-500" /></div>
+                        <div className="flex justify-center py-8"><div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-6 h-6  text-amber-500"></div></div>
                     ) : history.length === 0 ? (
-                        <div className="text-center py-8 text-sm font-bold text-slate-400">Chưa có lịch sử phát sóng.</div>
+                        <div className="text-center py-8 text-sm font-bold text-outline">Chưa có lịch sử phát sóng.</div>
                     ) : (
                         history.map(log => {
                             let details = {};
                             try { details = JSON.parse(log.details); } catch(e) {}
                             return (
-                                <div key={log.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-amber-200 transition-colors">
+                                <div key={log.id} className="p-5 rounded-2xl bg-surface-container border border-slate-100 hover:border-amber-200 transition-colors">
                                     <div className="flex justify-between items-start mb-2">
                                         <h4 className="text-sm font-bold text-slate-900">{details.title || 'Thông báo không tên'}</h4>
-                                        <span className="text-[10px] font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200">
+                                        <span className="text-[10px] font-bold text-outline bg-surface-container-lowest px-2 py-1 rounded-md border border-outline-variant">
                                             {new Date(log.createdAt).toLocaleString('vi-VN')}
                                         </span>
                                     </div>
                                     <div 
-                                        className="text-xs font-medium text-slate-500 mb-3 line-clamp-3 prose prose-sm max-w-none"
+                                        className="text-xs font-medium text-on-surface-variant mb-3 line-clamp-3 prose prose-sm max-w-none"
                                         dangerouslySetInnerHTML={{ __html: details.message }}
                                     />
                                     <div className="flex gap-2">

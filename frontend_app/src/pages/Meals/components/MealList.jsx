@@ -4,81 +4,67 @@ import { Trash2 } from 'lucide-react';
 export default function MealList({ meals, onRemoveMeal }) {
     if (meals.length === 0) {
         return (
-            <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                <p className="text-slate-400 text-sm font-medium">Chưa có món ăn nào được thêm.</p>
+            <div className="text-center py-12 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm">
+                <p className="text-on-surface-variant text-sm font-medium">Chưa có món ăn nào được thêm.</p>
             </div>
         );
     }
 
-    const timeOrder = ['Sáng', 'Trưa', 'Tối', 'Phụ'];
-    const timeColorMap = {
-        'Sáng': 'bg-amber-50 text-amber-700 border-amber-100',
-        'Trưa': 'bg-orange-50 text-orange-700 border-orange-100',
-        'Tối': 'bg-indigo-50 text-indigo-700 border-indigo-100',
-        'Phụ': 'bg-emerald-50 text-emerald-700 border-emerald-100'
-    };
-    const timeIconBgMap = {
-        'Sáng': 'bg-amber-100 text-amber-600',
-        'Trưa': 'bg-orange-100 text-orange-600',
-        'Tối': 'bg-indigo-100 text-indigo-600',
-        'Phụ': 'bg-emerald-100 text-emerald-600'
-    };
-
-    const groupedMeals = timeOrder.map(time => ({
-        time,
-        items: meals.filter(m => m.time === time)
-    })).filter(group => group.items.length > 0);
+    const timeOrder = { 'Sáng': 1, 'Trưa': 2, 'Tối': 3, 'Phụ': 4 };
+    
+    // Sắp xếp các bữa ăn theo thời gian trong ngày
+    const sortedMeals = [...meals].sort((a, b) => {
+        return (timeOrder[a.time] || 99) - (timeOrder[b.time] || 99);
+    });
 
     return (
-        <div className="space-y-6">
-            {groupedMeals.map((group) => {
-                const headerColor = timeColorMap[group.time] || 'bg-slate-50 text-slate-700 border-slate-200';
-                const badgeColor = timeIconBgMap[group.time] || 'bg-slate-100 text-slate-600';
-                
-                return (
-                <div key={group.time} className={`rounded-2xl border overflow-hidden shadow-sm ${headerColor.split(' ')[2]}`}>
-                    {/* Header Buổi */}
-                    <div className={`px-5 py-3 border-b flex items-center justify-between ${headerColor}`}>
-                        <h3 className="text-[11px] font-bold uppercase tracking-widest">
-                            Buổi {group.time}
-                        </h3>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${badgeColor}`}>
-                            {Math.round(group.items.reduce((sum, item) => sum + item.calories, 0))} KCAL
-                        </span>
+        <div className="space-y-6 relative ml-1">
+            <div className="absolute left-[11px] top-2 bottom-2 w-[2px] bg-outline-variant"></div>
+            
+            {sortedMeals.map((meal, index) => (
+                <div key={meal.id} className="relative pl-8 sm:pl-10 group">
+                    <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-on-primary text-[10px] font-bold z-10 ring-4 ring-surface shadow-sm">
+                        {index + 1}
                     </div>
                     
-                    {/* Danh sách Món ăn */}
-                    <div className="divide-y divide-slate-100 bg-white">
-                        {group.items.map(meal => (
-                            <div key={meal.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 group hover:bg-slate-50/50 transition-colors">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <h4 className="font-bold text-slate-800 text-sm tracking-tight">{meal.name}</h4>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}`}>{meal.weight}g</span>
-                                    </div>
-                                    <p className="text-[10px] font-bold text-slate-500 mt-1.5 uppercase tracking-widest">
-                                        Carbs: <span className="text-slate-700">{Number(meal.carbs).toFixed(1)}g</span> <span className="mx-2 text-slate-200">•</span> Protein: <span className="text-slate-700">{Number(meal.protein).toFixed(1)}g</span>
-                                    </p>
-                                </div>
-                                <div className="flex items-center justify-between sm:justify-end gap-6 mt-3 sm:mt-0">
-                                    <div className="text-right flex items-baseline gap-1">
-                                        <span className="font-black text-lg text-slate-800">{Math.round(meal.calories)}</span>
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Kcal</span>
-                                    </div>
-                                    <button 
-                                        onClick={() => onRemoveMeal(meal.id)} 
-                                        className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-colors sm:opacity-0 group-hover:opacity-100"
-                                        title="Xóa món ăn"
-                                    >
-                                        <Trash2 className="w-4.5 h-4.5" />
-                                    </button>
-                                </div>
+                    <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-colors relative">
+                        <div className="flex justify-between items-start mb-2 gap-4">
+                            <div>
+                                <h5 className="font-semibold text-on-surface text-sm tracking-tight">{meal.name}</h5>
+                                <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary-container/20 px-2 py-0.5 rounded mt-1 inline-block">
+                                    Buổi {meal.time}
+                                </span>
                             </div>
-                        ))}
+                            
+                            <div className="flex items-center gap-4">
+                                <div className="text-right flex items-baseline gap-1">
+                                    <span className="font-semibold text-lg text-on-surface">{Math.round(meal.calories)}</span>
+                                    <span className="text-[10px] text-secondary font-bold uppercase tracking-wider">Kcal</span>
+                                </div>
+                                <button 
+                                    onClick={() => onRemoveMeal(meal.id)} 
+                                    className="text-on-surface-variant hover:text-error transition-colors sm:opacity-0 group-hover:opacity-100"
+                                    title="Xóa món ăn"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <p className="text-xs text-secondary mb-2 flex items-center gap-2">
+                            <span>Khối lượng: <span className="font-semibold text-on-surface">{meal.weight}g</span></span>
+                        </p>
+                        
+                        <div className="flex gap-4 text-[11px] font-mono text-outline-variant border-t border-outline-variant/50 pt-2 mt-2">
+                            <span className="text-secondary"><span className="font-semibold text-on-surface">P:</span> {Number(meal.protein).toFixed(1)}g</span>
+                            <span className="text-secondary"><span className="font-semibold text-on-surface">C:</span> {Number(meal.carbs).toFixed(1)}g</span>
+                            {meal.fat !== undefined && (
+                                <span className="text-secondary"><span className="font-semibold text-on-surface">F:</span> {Number(meal.fat).toFixed(1)}g</span>
+                            )}
+                        </div>
                     </div>
                 </div>
-                );
-            })}
+            ))}
         </div>
     );
 }

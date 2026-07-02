@@ -134,11 +134,17 @@ exports.login = async (req, res) => {
         }
 
         if (user.is_active === false || user.is_active === 0) {
-            return res.status(403).json({ 
-                error: "Tài khoản của bạn chưa được kích hoạt. Vui lòng kiểm tra email.",
-                requiresVerification: true,
-                email: user.email
-            });
+            if (user.verification_token) {
+                return res.status(403).json({ 
+                    error: "Tài khoản của bạn chưa được xác thực. Vui lòng kiểm tra email.",
+                    requiresVerification: true,
+                    email: user.email
+                });
+            } else {
+                return res.status(403).json({ 
+                    error: "Tài khoản của bạn đã bị khóa bởi Quản trị viên. Vui lòng liên hệ CSKH để được hỗ trợ."
+                });
+            }
         }
 
         const isMatch = await bcrypt.compare(password, user.password_hash);

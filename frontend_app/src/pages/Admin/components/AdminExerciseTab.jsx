@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import api from '../../../services/api';
 import AdminPagination from './AdminPagination';
-import { Loader2, Search, Dumbbell, UploadCloud, Plus, Edit, Trash2 } from 'lucide-react';
+import { MdSearch, MdAdd, MdEdit, MdDelete, MdCloudUpload } from 'react-icons/md';
 
 import JSONImportModal from './JSONImportModal';
 import SingleExerciseModal from './SingleExerciseModal';
@@ -89,46 +89,46 @@ export default function AdminExerciseTab() {
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-blue-400 to-indigo-500 shadow-sm"></div>
+                    <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-blue-400 to-indigo-500 shadow-[0_4px_12px_rgba(0,24,72,0.04)]"></div>
                     <h2 className="text-base font-bold text-slate-900 uppercase tracking-widest flex items-center gap-3">
                         Kho Bài Tập Hệ Thống
-                        {loading && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
+                        {loading && <div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-4 h-4  text-outline"></div>}
                     </h2>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                     <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-64">
-                        <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <MdSearch className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-outline" />
                         <input
                             type="text"
                             placeholder="TÌM KIẾM BÀI TẬP..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                            className="w-full pl-11 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all shadow-[0_4px_12px_rgba(0,24,72,0.04)]"
                         />
                     </form>
                     <button 
                         onClick={() => setIsJsonModalOpen(true)}
-                        className="flex items-center gap-2 px-5 py-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all active:scale-95 w-full sm:w-auto justify-center"
+                        className="flex items-center gap-2 px-5 py-3 bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface-variant text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all active:scale-95 w-full sm:w-auto justify-center"
                     >
-                        <UploadCloud className="w-4 h-4" />
+                        <MdCloudUpload className="w-4 h-4" />
                         Nhập JSON
                     </button>
                     <button 
                         onClick={() => setIsSingleModalOpen(true)}
                         className="flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-slate-900/10 active:scale-95 w-full sm:w-auto justify-center"
                     >
-                        <Plus className="w-4 h-4" />
+                        <MdAdd className="w-4 h-4" />
                         Thêm mới
                     </button>
                 </div>
             </div>
             
-            <div className="bg-white border border-slate-100 rounded-[2rem] shadow-sm overflow-hidden transition-all hover:shadow-md">
+            <div className="bg-surface-container-lowest border border-slate-100 rounded-[2rem] shadow-[0_4px_12px_rgba(0,24,72,0.04)] overflow-hidden transition-all hover:shadow-md">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                            <tr className="bg-slate-50/50 border-b border-slate-100 text-outline text-[10px] font-bold uppercase tracking-widest">
                                 <th className="p-5">Tên bài tập</th>
                                 <th className="p-5">Phân loại</th>
                                 <th className="p-5">MET (Tiêu hao)</th>
@@ -138,19 +138,19 @@ export default function AdminExerciseTab() {
                         <tbody className="divide-y divide-slate-100">
                             {exercises.length === 0 && !loading ? (
                                 <tr>
-                                    <td colSpan="4" className="p-8 text-center text-slate-500">Không có dữ liệu.</td>
+                                    <td colSpan="4" className="p-8 text-center text-on-surface-variant">Không có dữ liệu.</td>
                                 </tr>
                             ) : (
                                 exercises.map(ex => (
                                     <tr key={ex.id} className="hover:bg-slate-50/50 transition-colors group border-b border-slate-50 last:border-0">
                                         <td className="p-5 font-bold text-sm text-slate-900">{ex.name}</td>
                                         <td className="p-5">
-                                            <span className="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-widest">{ex.category || 'Khác'}</span>
+                                            <span className="inline-block whitespace-nowrap px-3 py-1.5 bg-surface-container-low border border-outline-variant text-on-surface-variant rounded-xl text-[10px] font-bold uppercase tracking-widest">{ex.category || 'Khác'}</span>
                                         </td>
                                         <td className="p-5 text-sm font-bold text-blue-500">{ex.met_value}</td>
                                         <td className="p-5 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => handleEdit(ex)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"><Edit className="w-4 h-4" /></button>
-                                            <button onClick={() => handleDelete(ex.id)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                            <button onClick={() => handleEdit(ex)} className="p-2 text-outline hover:text-slate-900 hover:bg-surface-container-high rounded-xl transition-colors"><MdEdit className="w-4 h-4" /></button>
+                                            <button onClick={() => handleDelete(ex.id)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"><MdDelete className="w-4 h-4" /></button>
                                         </td>
                                     </tr>
                                 ))
@@ -159,7 +159,7 @@ export default function AdminExerciseTab() {
                     </table>
                 </div>
                 {pagination && (
-                    <div className="px-4 border-t border-slate-200">
+                    <div className="px-4 border-t border-outline-variant">
                         <AdminPagination pagination={{...pagination, limit: 20}} onPageChange={(p) => fetchData(p, search)} />
                     </div>
                 )}

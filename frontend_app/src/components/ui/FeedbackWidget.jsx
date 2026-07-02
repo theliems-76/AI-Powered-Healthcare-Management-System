@@ -5,9 +5,7 @@ import api from '../../services/api';
 
 export default function FeedbackWidget() {
     const [isOpen, setIsOpen] = useState(false);
-    const [hasSubmitted, setHasSubmitted] = useState(() => {
-        return localStorage.getItem('feedback_submitted') === 'true';
-    });
+    const [hasSubmitted, setHasSubmitted] = useState(false);
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [feedback, setFeedback] = useState('');
@@ -25,8 +23,9 @@ export default function FeedbackWidget() {
         try {
             await api.post('/feedbacks', { rating, content: feedback });
             setIsOpen(false);
+            setRating(0);
+            setFeedback('');
             setHasSubmitted(true);
-            localStorage.setItem('feedback_submitted', 'true');
             toast.success("Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi vô cùng trân trọng.");
         } catch (error) {
             console.error(error);
@@ -43,7 +42,7 @@ export default function FeedbackWidget() {
             {/* Floating Action Button */}
             <button 
                 onClick={() => setIsOpen(true)}
-                className={`fixed bottom-8 right-8 z-40 p-4 bg-slate-900 text-white rounded-2xl shadow-xl shadow-slate-900/20 hover:scale-110 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group ${isOpen ? 'opacity-0 scale-75 pointer-events-none' : 'opacity-100 scale-100'}`}
+                className={`p-4 bg-secondary text-on-secondary rounded-2xl shadow-xl shadow-secondary/30 hover:scale-110 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group ${isOpen ? 'opacity-0 scale-75 pointer-events-none' : 'opacity-100 scale-100'}`}
                 title="Góp ý & Đánh giá"
             >
                 <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -59,21 +58,17 @@ export default function FeedbackWidget() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     {/* Backdrop */}
                     <div 
-                        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+                        className="absolute inset-0 bg-on-surface/40 backdrop-blur-sm animate-in fade-in duration-300"
                         onClick={() => setIsOpen(false)}
                     ></div>
                     
                     {/* Modal Box */}
-                    <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl relative z-10 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 overflow-hidden flex flex-col">
+                    <div className="bg-surface-container-lowest w-full max-w-md rounded-[2rem] shadow-[0_12px_40px_rgba(0,24,72,0.15)] relative z-10 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 overflow-hidden flex flex-col">
                         
                         {/* Header Gradient */}
                         <div className="bg-gradient-to-br from-indigo-500 to-cyan-400 p-6 text-white relative overflow-hidden shrink-0">
                             <button 
-                                onClick={() => {
-                                    setIsOpen(false);
-                                    setHasSubmitted(true);
-                                    localStorage.setItem('feedback_submitted', 'true');
-                                }}
+                                onClick={() => setIsOpen(false)}
                                 className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                             >
                                 <X size={20} />
@@ -87,7 +82,7 @@ export default function FeedbackWidget() {
                             
                             {/* Star Rating */}
                             <div className="flex flex-col items-center gap-3">
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Đánh giá chung</span>
+                                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Đánh giá chung</span>
                                 <div className="flex items-center gap-2">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <button
@@ -103,13 +98,13 @@ export default function FeedbackWidget() {
                                                 className={`transition-colors duration-200 ${
                                                     star <= (hoverRating || rating) 
                                                     ? 'fill-amber-400 text-amber-400 drop-shadow-sm' 
-                                                    : 'fill-slate-100 text-slate-200'
+                                                    : 'fill-surface-container-highest text-outline-variant'
                                                 }`}
                                             />
                                         </button>
                                     ))}
                                 </div>
-                                <span className="text-sm font-bold text-slate-400 h-5">
+                                <span className="text-sm font-bold text-on-surface-variant h-5">
                                     {hoverRating === 1 || rating === 1 ? 'Rất tệ' : 
                                      hoverRating === 2 || rating === 2 ? 'Tệ' : 
                                      hoverRating === 3 || rating === 3 ? 'Bình thường' : 
@@ -120,11 +115,11 @@ export default function FeedbackWidget() {
 
                             {/* Text Area */}
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Bạn có muốn chia sẻ thêm không?</label>
+                                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Bạn có muốn chia sẻ thêm không?</label>
                                 <textarea 
                                     rows="4"
                                     placeholder="Tính năng nào bạn thích nhất? Hoặc có gì khiến bạn không hài lòng..."
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium text-slate-700 placeholder-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none"
+                                    className="w-full bg-surface-container border border-outline-variant rounded-2xl p-4 text-sm font-medium text-on-surface placeholder-on-surface-variant/60 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all resize-none"
                                     value={feedback}
                                     onChange={(e) => setFeedback(e.target.value)}
                                 ></textarea>
@@ -134,7 +129,7 @@ export default function FeedbackWidget() {
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting}
-                                className="w-full py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-900/10 flex items-center justify-center gap-2 disabled:opacity-70 disabled:pointer-events-none"
+                                className="w-full py-4 bg-primary text-on-primary rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-xl shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:pointer-events-none"
                             >
                                 {isSubmitting ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
