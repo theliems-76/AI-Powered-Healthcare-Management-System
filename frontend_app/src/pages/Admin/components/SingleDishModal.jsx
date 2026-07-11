@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MdClose, MdSave } from 'react-icons/md';
+import { MdClose, MdSave, MdRestaurantMenu } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import api from '../../../services/api';
 
@@ -59,7 +59,7 @@ export default function SingleDishModal({ isOpen, onClose, onSuccess, initialDat
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
                     <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                        <Utensils className="w-5 h-5 text-primary" />
+                        <MdRestaurantMenu className="w-5 h-5 text-primary" />
                         {initialData ? 'Cập Nhật Món Ăn' : 'Thêm Món Ăn Mới'}
                     </h3>
                     <button onClick={onClose} className="p-2 text-outline hover:text-slate-600 hover:bg-surface-container-high rounded-xl transition-colors">

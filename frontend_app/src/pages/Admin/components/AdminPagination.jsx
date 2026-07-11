@@ -1,7 +1,7 @@
 import React from 'react';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 
-export default function AdminPagination({ pagination, onPageChange }) {
+export default function AdminPagination({ pagination, onPageChange, itemName = "người dùng" }) {
     const { page, totalPages, total, limit } = pagination;
 
     if (!totalPages || totalPages <= 1) return null;
@@ -36,7 +36,7 @@ export default function AdminPagination({ pagination, onPageChange }) {
                 Hiển thị{' '}
                 <span className="text-on-surface">{from}–{to}</span>{' '}
                 của{' '}
-                <span className="text-primary">{total}</span> người dùng
+                <span className="text-primary">{total}</span> {itemName}
             </p>
 
             {/* Điều hướng */}

@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2, Trash2, Zap } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
+import ConfirmModal from '../common/ConfirmModal';
 
 export default function ExerciseSearchModal({ isOpen, onClose, onAddExercise, onEditExercise }) {
     const [exercises, setExercises] = useState([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
     const [durations, setDurations] = useState({});
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [clearAllConfirm, setClearAllConfirm] = useState(false);
 
     useEffect(() => {
         if (isOpen) fetchExercises();
@@ -26,7 +29,6 @@ export default function ExerciseSearchModal({ isOpen, onClose, onAddExercise, on
     };
 
     const handleClearAll = async () => {
-        if (!window.confirm("CẢNH BÁO: Thao tác này sẽ xóa toàn bộ các bài tập trong Kho cá nhân của bạn (Bao gồm cả AI gợi ý). Bạn có chắc chắn?")) return;
         try {
             await api.delete('/exercises/clear-all');
             toast.success("Đã làm sạch kho dữ liệu cá nhân!");
@@ -37,7 +39,6 @@ export default function ExerciseSearchModal({ isOpen, onClose, onAddExercise, on
     };
 
     const handleDeleteCustom = async (exId) => {
-        if (!window.confirm("Bạn có chắc muốn xóa bài tập này khỏi kho?")) return;
         try {
             await api.delete(`/exercises/custom/${exId}`);
             toast.success("Đã xóa bài tập!");
@@ -67,6 +68,20 @@ export default function ExerciseSearchModal({ isOpen, onClose, onAddExercise, on
 
     return (
         <div className="fixed inset-0 bg-surface-container/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200">
+            <ConfirmModal 
+                isOpen={clearAllConfirm}
+                onClose={() => setClearAllConfirm(false)}
+                onConfirm={handleClearAll}
+                title="Dọn sạch kho cá nhân"
+                message="CẢNH BÁO: Thao tác này sẽ xóa toàn bộ các bài tập trong Kho cá nhân của bạn (Bao gồm cả AI gợi ý). Bạn có chắc chắn?"
+            />
+            <ConfirmModal 
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => handleDeleteCustom(deleteConfirmId)}
+                title="Xóa bài tập"
+                message="Bạn có chắc muốn xóa bài tập này khỏi kho?"
+            />
             <div className="bg-surface w-full max-w-2xl rounded-xl shadow-lg flex flex-col max-h-[90vh] overflow-hidden border border-outline-variant">
                 
                 {/* Header */}
@@ -93,7 +108,7 @@ export default function ExerciseSearchModal({ isOpen, onClose, onAddExercise, on
                     
                     <div className="flex justify-end mt-3">
                         <button 
-                            onClick={handleClearAll}
+                            onClick={() => setClearAllConfirm(true)}
                             className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant hover:text-error transition-colors px-3 py-1.5 rounded-lg hover:bg-error/10 uppercase tracking-wider"
                         >
                             <Trash2 className="w-3.5 h-3.5" /> DỌN SẠCH KHO CÁ NHÂN
@@ -154,7 +169,7 @@ export default function ExerciseSearchModal({ isOpen, onClose, onAddExercise, on
                                             </div>
 
                                             {ex.is_custom && !ex.is_ai_generated && (
-                                                <button onClick={() => handleDeleteCustom(ex.id)} className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors border border-transparent">
+                                                <button onClick={() => setDeleteConfirmId(ex.id)} className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors border border-transparent">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             )}

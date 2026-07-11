@@ -3,7 +3,7 @@ import { Search, X, ArrowLeft, Plus, ChefHat, Trash2, Save } from 'lucide-react'
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 
-export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, initialData, onBack }) {
+export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, initialData, onBack, isAdmin = false }) {
     const [ingredients, setIngredients] = useState([]);
     const [search, setSearch] = useState('');
     
@@ -11,6 +11,8 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
     const [category, setCategory] = useState('Trưa');
     const [selectedIngs, setSelectedIngs] = useState([]); 
     const [isSaving, setIsSaving] = useState(false);
+    const [isCreatingIng, setIsCreatingIng] = useState(false);
+    const [newIng, setNewIng] = useState({ name: '', calories_per_100g: '', carbs_per_100g: '', protein_per_100g: '', fat_per_100g: '' });
 
     useEffect(() => {
         if (isOpen && initialData) {
@@ -94,17 +96,26 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
                 ingredients: selectedIngs.map(ing => ({ id: ing.id, weight: Number(ing.weight) || 0 }))
             };
 
-            if (initialData && initialData.is_custom) {
-                await api.put(`/meals/custom-dish/${initialData.id}`, payload);
+            if (initialData && (initialData.is_custom || isAdmin)) {
+                if (isAdmin) {
+                    await api.put(`/admin/dishes/${initialData.id}`, payload);
+                } else {
+                    await api.put(`/meals/custom-dish/${initialData.id}`, payload);
+                }
                 toast.success(`Đã cập nhật thành công: ${finalName}`);
             } 
             else {
-                if (initialData && finalName === initialData.name) {
+                if (initialData && finalName === initialData.name && !isAdmin) {
                     finalName = `${finalName} (Tùy chỉnh)`;
                     payload.name = finalName;
                 }
-                await api.post('/meals/custom-dish', payload);
-                toast.success(`Đã lưu bản sao thành công: ${finalName}`);
+                
+                if (isAdmin) {
+                    await api.post('/admin/dishes', payload);
+                } else {
+                    await api.post('/meals/custom-dish', payload);
+                }
+                toast.success(isAdmin ? `Đã lưu món hệ thống thành công: ${finalName}` : `Đã lưu bản sao thành công: ${finalName}`);
             }
             
             setDishName('');
@@ -116,6 +127,29 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
             toast.error(errMsg); 
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handleCreateNewIngredient = async () => {
+        try {
+            if (!newIng.name || !newIng.calories_per_100g) return toast.warning("Tên và Calo là bắt buộc!");
+            const payload = {
+                name: newIng.name,
+                calories_per_100g: parseFloat(newIng.calories_per_100g) || 0,
+                carbs_per_100g: parseFloat(newIng.carbs_per_100g) || 0,
+                protein_per_100g: parseFloat(newIng.protein_per_100g) || 0,
+                fat_per_100g: parseFloat(newIng.fat_per_100g) || 0,
+            };
+            const res = await api.post('/meals/ingredients', payload);
+            const createdIng = res.data.data;
+            setIngredients([...ingredients, createdIng]);
+            handleAddIngredient(createdIng);
+            toast.success("Đã tạo nguyên liệu mới!");
+            setIsCreatingIng(false);
+            setNewIng({ name: '', calories_per_100g: '', carbs_per_100g: '', protein_per_100g: '', fat_per_100g: '' });
+            setSearch('');
+        } catch (error) {
+            toast.error("Lỗi tạo nguyên liệu!");
         }
     };
 
@@ -138,17 +172,43 @@ export default function RecipeBuilderModal({ isOpen, onClose, onDishCreated, ini
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 md:px-8 space-y-3 custom-scrollbar">
-                        {filteredIngredients.map(ing => (
-                            <div key={ing.id} className="flex justify-between items-center p-4 bg-surface border border-outline-variant hover:border-primary rounded-xl hover:shadow-sm hover:-translate-y-0.5 transition-all group">
-                                <div>
-                                    <p className="font-semibold text-sm text-on-surface">{ing.name}</p>
-                                    <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mt-1">{ing.calories_per_100g} kcal/100g</p>
+                        {isCreatingIng ? (
+                            <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant space-y-3">
+                                <h3 className="text-sm font-bold text-primary uppercase tracking-widest mb-2">Tạo nguyên liệu mới</h3>
+                                <input type="text" placeholder="Tên nguyên liệu..." value={newIng.name} onChange={e => setNewIng({...newIng, name: e.target.value})} className="w-full p-3 bg-surface border border-outline-variant rounded-lg text-sm font-semibold outline-none" />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <input type="number" placeholder="Calo / 100g" value={newIng.calories_per_100g} onChange={e => setNewIng({...newIng, calories_per_100g: e.target.value})} className="w-full p-3 bg-surface border border-outline-variant rounded-lg text-sm font-semibold outline-none" />
+                                    <input type="number" placeholder="Tinh bột / 100g" value={newIng.carbs_per_100g} onChange={e => setNewIng({...newIng, carbs_per_100g: e.target.value})} className="w-full p-3 bg-surface border border-outline-variant rounded-lg text-sm font-semibold outline-none" />
                                 </div>
-                                <button onClick={() => handleAddIngredient(ing)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant hover:bg-primary hover:text-on-primary transition-all transform active:scale-95">
-                                    <Plus className="w-4 h-4" />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <input type="number" placeholder="Đạm / 100g" value={newIng.protein_per_100g} onChange={e => setNewIng({...newIng, protein_per_100g: e.target.value})} className="w-full p-3 bg-surface border border-outline-variant rounded-lg text-sm font-semibold outline-none" />
+                                    <input type="number" placeholder="Béo / 100g" value={newIng.fat_per_100g} onChange={e => setNewIng({...newIng, fat_per_100g: e.target.value})} className="w-full p-3 bg-surface border border-outline-variant rounded-lg text-sm font-semibold outline-none" />
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    <button onClick={handleCreateNewIngredient} className="flex-1 bg-primary text-on-primary py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider">Lưu lại</button>
+                                    <button onClick={() => setIsCreatingIng(false)} className="flex-1 bg-surface-container-highest text-on-surface-variant py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider">Hủy</button>
+                                </div>
+                            </div>
+                        ) : filteredIngredients.length === 0 && search ? (
+                            <div className="text-center p-6 border border-dashed border-outline-variant rounded-xl bg-surface-container-lowest">
+                                <p className="text-sm font-semibold text-on-surface mb-3">Không tìm thấy nguyên liệu!</p>
+                                <button onClick={() => { setIsCreatingIng(true); setNewIng({...newIng, name: search}); }} className="px-4 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-on-primary text-xs font-bold uppercase tracking-widest rounded-lg transition-colors">
+                                    + Tạo mới "{search}"
                                 </button>
                             </div>
-                        ))}
+                        ) : (
+                            filteredIngredients.map(ing => (
+                                <div key={ing.id} className="flex justify-between items-center p-4 bg-surface border border-outline-variant hover:border-primary rounded-xl hover:shadow-sm hover:-translate-y-0.5 transition-all group">
+                                    <div>
+                                        <p className="font-semibold text-sm text-on-surface">{ing.name}</p>
+                                        <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mt-1">{ing.calories_per_100g} kcal/100g</p>
+                                    </div>
+                                    <button onClick={() => handleAddIngredient(ing)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant hover:bg-primary hover:text-on-primary transition-all transform active:scale-95">
+                                        <Plus className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
 

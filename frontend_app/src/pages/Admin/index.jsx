@@ -99,6 +99,12 @@ export default function AdminLayout() {
                                     {loading ? '...' : stats?.totalDishes || 0}
                                 </span>
                             </div>
+                             <div className="flex justify-between items-center bg-white px-4 py-3 rounded-xl border border-slate-100">
+                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Bài tập mẫu</span>
+                                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-md">
+                                    {loading ? '...' : stats?.totalExercises || 0}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

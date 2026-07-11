@@ -101,6 +101,7 @@ exports.getSystemStats = async (req, res) => {
         const totalDoctors = await User.count({ where: { role: 'DOCTOR' } });
         const totalRecords = await MedicalRecord.count();
         const totalDishes = await Dish.count({ where: { user_id: null, is_deleted: false } });
+        const totalExercises = await Exercise.count({ where: { user_id: null, is_deleted: false } });
 
         // Risk distribution (AI Risk) - ONLY LATEST RECORD PER PATIENT
         const allRecords = await MedicalRecord.findAll({ 
@@ -152,7 +153,7 @@ exports.getSystemStats = async (req, res) => {
         res.status(200).json({
             status: "success",
             data: { 
-                totalUsers, totalPatients, totalDoctors, totalRecords, totalDishes,
+                totalUsers, totalPatients, totalDoctors, totalRecords, totalDishes, totalExercises,
                 riskDistribution: riskDistribution.length > 0 ? riskDistribution : [{ name: "Chưa có dữ liệu", value: 1, fill: "#e2e8f0" }],
                 recordTrend
             }
@@ -229,16 +230,27 @@ exports.importSystemExercises = async (req, res) => {
             return res.status(400).json({ error: "Dữ liệu JSON không hợp lệ!" });
         }
 
-        const exercises = data.map(item => ({
-            name: item.name,
-            met_value: parseFloat(item.met_value),
-            category: item.category || 'Khác',
-            user_id: null,
-            is_ai_generated: true
-        }));
+        let added = 0;
+        let skipped = 0;
 
-        await Exercise.bulkCreate(exercises, { ignoreDuplicates: true });
-        res.status(201).json({ status: "success", message: `Đã import thành công ${exercises.length} bài tập!` });
+        for (const item of data) {
+            const existingEx = await Exercise.findOne({ where: { name: item.name, user_id: null } });
+            if (existingEx) {
+                skipped++;
+                continue;
+            }
+
+            await Exercise.create({
+                name: item.name,
+                met_value: parseFloat(item.met_value),
+                category: item.category || 'Khác',
+                user_id: null,
+                is_ai_generated: true
+            });
+            added++;
+        }
+
+        res.status(201).json({ status: "success", message: `Đã thêm ${added} bài tập mới, bỏ qua ${skipped} bài tập trùng lặp.` });
     } catch (error) {
         res.status(500).json({ error: "Lỗi import bài tập!" });
     }
@@ -254,20 +266,90 @@ exports.importSystemDishes = async (req, res) => {
             return res.status(400).json({ error: "Dữ liệu JSON không hợp lệ!" });
         }
 
-        const dishes = data.map(item => ({
-            name: item.name,
-            category: item.category || 'Khác',
-            calories_per_100g: parseFloat(item.calories_per_100g) || 0,
-            carbs_per_100g: parseFloat(item.carbs_per_100g) || 0,
-            protein_per_100g: parseFloat(item.protein_per_100g) || 0,
-            fat_per_100g: parseFloat(item.fat_per_100g) || 0,
-            user_id: null,
-            is_ai_generated: true
-        }));
+        const { Ingredient, DishIngredient } = require('../models');
 
-        await Dish.bulkCreate(dishes, { ignoreDuplicates: true });
-        res.status(201).json({ status: "success", message: `Đã import thành công ${dishes.length} món ăn!` });
+        let added = 0;
+        let skipped = 0;
+
+        for (const item of data) {
+            // Kiểm tra xem món ăn đã tồn tại chưa (tránh trùng lặp)
+            const existingDish = await Dish.findOne({ where: { name: item.name, user_id: null } });
+            if (existingDish) {
+                skipped++;
+                continue; // Bỏ qua nếu món ăn đã tồn tại
+            }
+
+            let calcCal = parseFloat(item.calories_per_100g) || 0;
+            let calcCarb = parseFloat(item.carbs_per_100g) || 0;
+            let calcPro = parseFloat(item.protein_per_100g) || 0;
+            let calcFat = parseFloat(item.fat_per_100g) || 0;
+            
+            const ingredients = item.ingredients || [];
+            let resolvedIngredients = [];
+
+            if (Array.isArray(ingredients) && ingredients.length > 0) {
+                let totalCal = 0, totalCarb = 0, totalPro = 0, totalFat = 0, totalWeight = 0;
+                
+                for (const ing of ingredients) {
+                    let dbIng = await Ingredient.findOne({ where: { name: ing.name, user_id: null } });
+                    if (!dbIng) {
+                        dbIng = await Ingredient.create({
+                            name: ing.name,
+                            calories_per_100g: ing.calories_per_100g || 0,
+                            carbs_per_100g: ing.carbs_per_100g || 0,
+                            protein_per_100g: ing.protein_per_100g || 0,
+                            fat_per_100g: ing.fat_per_100g || 0,
+                            user_id: null,
+                            is_ai_generated: true
+                        });
+                    }
+                    
+                    resolvedIngredients.push({ id: dbIng.id, weight: ing.weight || 100 });
+                    
+                    if (calcCal === 0) {
+                        const weight = parseFloat(ing.weight) || 100;
+                        const ratio = weight / 100;
+                        totalCal += dbIng.calories_per_100g * ratio;
+                        totalCarb += dbIng.carbs_per_100g * ratio;
+                        totalPro += dbIng.protein_per_100g * ratio;
+                        totalFat += dbIng.fat_per_100g * ratio;
+                        totalWeight += weight;
+                    }
+                }
+                
+                if (calcCal === 0 && totalWeight > 0) {
+                    calcCal = (totalCal / totalWeight) * 100;
+                    calcCarb = (totalCarb / totalWeight) * 100;
+                    calcPro = (totalPro / totalWeight) * 100;
+                    calcFat = (totalFat / totalWeight) * 100;
+                }
+            }
+
+            const newDish = await Dish.create({
+                name: item.name,
+                category: item.category || 'Khác',
+                calories_per_100g: calcCal,
+                carbs_per_100g: calcCarb,
+                protein_per_100g: calcPro,
+                fat_per_100g: calcFat,
+                user_id: null,
+                is_ai_generated: true
+            });
+
+            if (resolvedIngredients.length > 0) {
+                const dishIngredientsData = resolvedIngredients.map(ing => ({
+                    dish_id: newDish.id,
+                    ingredient_id: ing.id,
+                    weight_grams: ing.weight
+                }));
+                await DishIngredient.bulkCreate(dishIngredientsData);
+            }
+            added++;
+        }
+
+        res.status(201).json({ status: "success", message: `Đã thêm ${added} món ăn mới, bỏ qua ${skipped} món trùng lặp.` });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Lỗi import món ăn!" });
     }
 };
@@ -299,19 +381,62 @@ exports.createSystemExercise = async (req, res) => {
 // ==========================================
 exports.createSystemDish = async (req, res) => {
     try {
-        const { name, category, calories_per_100g, carbs_per_100g, protein_per_100g, fat_per_100g } = req.body;
+        const { name, category, calories_per_100g, carbs_per_100g, protein_per_100g, fat_per_100g, ingredients } = req.body;
         if (!name) return res.status(400).json({ error: "Tên món ăn là bắt buộc!" });
+
+        let calcCal = parseFloat(calories_per_100g) || 0;
+        let calcCarb = parseFloat(carbs_per_100g) || 0;
+        let calcPro = parseFloat(protein_per_100g) || 0;
+        let calcFat = parseFloat(fat_per_100g) || 0;
+
+        if (ingredients && Array.isArray(ingredients) && ingredients.length > 0 && calcCal === 0) {
+            const { Ingredient } = require('../models');
+            const ingIds = ingredients.map(i => i.id);
+            const dbIngs = await Ingredient.findAll({ where: { id: ingIds } });
+            
+            let totalCal = 0, totalCarb = 0, totalPro = 0, totalFat = 0, totalWeight = 0;
+            
+            ingredients.forEach(ing => {
+                const dbIng = dbIngs.find(d => d.id === ing.id);
+                if (dbIng) {
+                    const weight = parseFloat(ing.weight) || 0;
+                    const ratio = weight / 100;
+                    totalCal += dbIng.calories_per_100g * ratio;
+                    totalCarb += dbIng.carbs_per_100g * ratio;
+                    totalPro += dbIng.protein_per_100g * ratio;
+                    totalFat += dbIng.fat_per_100g * ratio;
+                    totalWeight += weight;
+                }
+            });
+            
+            if (totalWeight > 0) {
+                calcCal = (totalCal / totalWeight) * 100;
+                calcCarb = (totalCarb / totalWeight) * 100;
+                calcPro = (totalPro / totalWeight) * 100;
+                calcFat = (totalFat / totalWeight) * 100;
+            }
+        }
 
         const newDish = await Dish.create({
             name,
             category: category || 'Khác',
-            calories_per_100g: parseFloat(calories_per_100g) || 0,
-            carbs_per_100g: parseFloat(carbs_per_100g) || 0,
-            protein_per_100g: parseFloat(protein_per_100g) || 0,
-            fat_per_100g: parseFloat(fat_per_100g) || 0,
+            calories_per_100g: calcCal,
+            carbs_per_100g: calcCarb,
+            protein_per_100g: calcPro,
+            fat_per_100g: calcFat,
             user_id: null,
             is_ai_generated: false
         });
+
+        if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
+            const { DishIngredient } = require('../models');
+            const dishIngredientsData = ingredients.map(ing => ({
+                dish_id: newDish.id,
+                ingredient_id: ing.id,
+                weight_grams: ing.weight
+            }));
+            await DishIngredient.bulkCreate(dishIngredientsData);
+        }
 
         res.status(201).json({ status: "success", message: "Thêm món ăn thành công!", data: newDish });
     } catch (error) {
@@ -350,12 +475,67 @@ exports.deleteSystemExercise = async (req, res) => {
 exports.updateSystemDish = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, category, calories_per_100g, carbs_per_100g, protein_per_100g, fat_per_100g } = req.body;
+        const { name, category, calories_per_100g, carbs_per_100g, protein_per_100g, fat_per_100g, ingredients } = req.body;
         
         const dish = await Dish.findOne({ where: { id, user_id: null } });
         if (!dish) return res.status(404).json({ error: "Không tìm thấy món ăn hệ thống!" });
         
-        await dish.update({ name, category, calories_per_100g, carbs_per_100g, protein_per_100g, fat_per_100g });
+        let calcCal = parseFloat(calories_per_100g) || 0;
+        let calcCarb = parseFloat(carbs_per_100g) || 0;
+        let calcPro = parseFloat(protein_per_100g) || 0;
+        let calcFat = parseFloat(fat_per_100g) || 0;
+
+        if (ingredients && Array.isArray(ingredients) && ingredients.length > 0 && calcCal === 0) {
+            const { Ingredient } = require('../models');
+            const ingIds = ingredients.map(i => i.id);
+            const dbIngs = await Ingredient.findAll({ where: { id: ingIds } });
+            
+            let totalCal = 0, totalCarb = 0, totalPro = 0, totalFat = 0, totalWeight = 0;
+            
+            ingredients.forEach(ing => {
+                const dbIng = dbIngs.find(d => d.id === ing.id);
+                if (dbIng) {
+                    const weight = parseFloat(ing.weight) || 0;
+                    const ratio = weight / 100;
+                    totalCal += dbIng.calories_per_100g * ratio;
+                    totalCarb += dbIng.carbs_per_100g * ratio;
+                    totalPro += dbIng.protein_per_100g * ratio;
+                    totalFat += dbIng.fat_per_100g * ratio;
+                    totalWeight += weight;
+                }
+            });
+            
+            if (totalWeight > 0) {
+                calcCal = (totalCal / totalWeight) * 100;
+                calcCarb = (totalCarb / totalWeight) * 100;
+                calcPro = (totalPro / totalWeight) * 100;
+                calcFat = (totalFat / totalWeight) * 100;
+            }
+        }
+
+        await dish.update({ 
+            name, 
+            category, 
+            calories_per_100g: calcCal, 
+            carbs_per_100g: calcCarb, 
+            protein_per_100g: calcPro, 
+            fat_per_100g: calcFat 
+        });
+
+        if (ingredients && Array.isArray(ingredients)) {
+            const { DishIngredient } = require('../models');
+            await DishIngredient.destroy({ where: { dish_id: id } });
+            
+            if (ingredients.length > 0) {
+                const dishIngredientsData = ingredients.map(ing => ({
+                    dish_id: id,
+                    ingredient_id: ing.id,
+                    weight_grams: ing.weight
+                }));
+                await DishIngredient.bulkCreate(dishIngredientsData);
+            }
+        }
+
         res.status(200).json({ status: "success", message: "Đã cập nhật món ăn!", data: dish });
     } catch (error) {
         res.status(500).json({ error: "Lỗi cập nhật món ăn!" });

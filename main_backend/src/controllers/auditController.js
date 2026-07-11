@@ -38,7 +38,8 @@ exports.getLogs = async (req, res) => {
             include: includeClause,
             order: [['createdAt', 'DESC']],
             limit,
-            offset
+            offset,
+            subQuery: false
         });
 
         res.status(200).json({

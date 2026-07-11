@@ -3,27 +3,27 @@ import { MdLock, MdLockOpen } from 'react-icons/md';
 
 export default function UserTable({ users, onRoleChange, onToggleStatus }) {
     return (
-        <div className="w-full">
+        <div className="bg-surface-container-lowest border border-slate-100 rounded-[2rem] shadow-[0_4px_12px_rgba(0,24,72,0.04)] overflow-hidden transition-all hover:shadow-md w-full">
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-surface-container-low text-on-surface-variant text-[11px] font-bold uppercase tracking-wider">
-                            <th className="px-4 py-3 border-b border-outline-variant">Họ và Tên</th>
-                            <th className="px-4 py-3 border-b border-outline-variant">Email / SĐT</th>
-                            <th className="px-4 py-3 border-b border-outline-variant text-center">Phân quyền</th>
-                            <th className="px-4 py-3 border-b border-outline-variant text-center">Trạng thái</th>
-                            <th className="px-4 py-3 border-b border-outline-variant text-center">Hành động</th>
+                        <tr className="bg-slate-50/50 border-b border-slate-100 text-outline text-[10px] font-bold uppercase tracking-widest">
+                            <th className="p-5">Họ và Tên</th>
+                            <th className="p-5">Email / SĐT</th>
+                            <th className="p-5 text-center">Phân quyền</th>
+                            <th className="p-5 text-center">Trạng thái</th>
+                            <th className="p-5 text-center">Hành động</th>
                         </tr>
                     </thead>
-                    <tbody className="text-sm bg-surface-container-lowest">
+                    <tbody className="divide-y divide-slate-100 bg-surface-container-lowest">
                         {users.map(user => (
-                            <tr key={user.id} className="hover:bg-surface-container-low/50 transition-colors h-14 border-b border-outline-variant/30">
-                                <td className="px-4 py-3 font-bold text-on-surface text-sm">{user.full_name}</td>
-                                <td className="px-4 py-3">
+                            <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group border-b border-slate-50 last:border-0 h-14">
+                                <td className="p-5 font-bold text-on-surface text-sm">{user.full_name}</td>
+                                <td className="p-5">
                                     <div className="font-bold text-on-surface text-sm">{user.email}</div>
                                     <div className="text-[11px] text-on-surface-variant font-medium mt-0.5">{user.phone || '—'}</div>
                                 </td>
-                                <td className="px-4 py-3 text-center">
+                                <td className="p-5 text-center">
                                     <select 
                                         value={user.role}
                                         onChange={(e) => onRoleChange(user.id, e.target.value)}
@@ -37,7 +37,7 @@ export default function UserTable({ users, onRoleChange, onToggleStatus }) {
                                         <option value="ADMIN">QUẢN TRỊ</option>
                                     </select>
                                 </td>
-                                <td className="px-4 py-3 text-center">
+                                <td className="p-5 text-center">
                                     {user.is_active ? (
                                         <span className="inline-block text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-md">
                                             Hoạt động
@@ -48,7 +48,7 @@ export default function UserTable({ users, onRoleChange, onToggleStatus }) {
                                         </span>
                                     )}
                                 </td>
-                                <td className="px-4 py-3 text-center">
+                                <td className="p-5 text-center">
                                     <button 
                                         onClick={() => onToggleStatus(user.id)}
                                         title={user.is_active ? "Khóa tài khoản" : "Mở khóa"}

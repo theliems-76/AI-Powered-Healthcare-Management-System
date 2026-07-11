@@ -26,12 +26,15 @@ export default function AuditLogsTab() {
     };
 
     useEffect(() => {
-        fetchLogs();
-    }, [actionFilter]);
+        const timer = setTimeout(() => {
+            fetchLogs(1);
+        }, 400); // Debounce 400ms
+
+        return () => clearTimeout(timer);
+    }, [search, actionFilter]);
 
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchLogs(1);
     };
 
     const formatAction = (action) => {
@@ -87,8 +90,9 @@ export default function AuditLogsTab() {
                 <div className="flex justify-center py-10"><div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full w-8 h-8  text-indigo-600"></div></div>
             ) : (
                 <div className="bg-surface-container-lowest border border-slate-100 rounded-[2rem] shadow-[0_4px_12px_rgba(0,24,72,0.04)] overflow-hidden transition-all hover:shadow-md">
-                    <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-slate-50/50 text-outline text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm whitespace-nowrap">
+                            <thead className="bg-slate-50/50 text-outline text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
                             <tr>
                                 <th className="p-5">Thời gian</th>
                                 <th className="p-5">Người thực hiện</th>
@@ -131,6 +135,7 @@ export default function AuditLogsTab() {
                             )}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             )}
 

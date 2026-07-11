@@ -6,6 +6,7 @@ import { MdSearch, MdAdd, MdEdit, MdDelete, MdCloudUpload } from 'react-icons/md
 
 import JSONImportModal from './JSONImportModal';
 import SingleExerciseModal from './SingleExerciseModal';
+import ConfirmModal from '../../../components/common/ConfirmModal';
 
 export default function AdminExerciseTab() {
     const [exercises, setExercises] = useState([]);
@@ -15,6 +16,7 @@ export default function AdminExerciseTab() {
     const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
     const [isSingleModalOpen, setIsSingleModalOpen] = useState(false);
     const [editingExercise, setEditingExercise] = useState(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     const fetchData = useCallback(async (page = 1, searchQuery = search) => {
         setLoading(true);
@@ -56,7 +58,6 @@ export default function AdminExerciseTab() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xóa bài tập này?")) return;
         try {
             await api.delete(`/admin/exercises/${id}`);
             toast.success("Đã xóa bài tập!");
@@ -85,6 +86,14 @@ export default function AdminExerciseTab() {
                 }}
                 onSuccess={() => fetchData(1, search)}
                 initialData={editingExercise}
+            />
+
+            <ConfirmModal 
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => handleDelete(deleteConfirmId)}
+                title="Xóa bài tập"
+                message="Bạn có chắc chắn muốn xóa bài tập hệ thống này? Thao tác này không thể hoàn tác."
             />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -150,7 +159,7 @@ export default function AdminExerciseTab() {
                                         <td className="p-5 text-sm font-bold text-blue-500">{ex.met_value}</td>
                                         <td className="p-5 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button onClick={() => handleEdit(ex)} className="p-2 text-outline hover:text-slate-900 hover:bg-surface-container-high rounded-xl transition-colors"><MdEdit className="w-4 h-4" /></button>
-                                            <button onClick={() => handleDelete(ex.id)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"><MdDelete className="w-4 h-4" /></button>
+                                            <button onClick={() => setDeleteConfirmId(ex.id)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"><MdDelete className="w-4 h-4" /></button>
                                         </td>
                                     </tr>
                                 ))
@@ -160,7 +169,11 @@ export default function AdminExerciseTab() {
                 </div>
                 {pagination && (
                     <div className="px-4 border-t border-outline-variant">
-                        <AdminPagination pagination={{...pagination, limit: 20}} onPageChange={(p) => fetchData(p, search)} />
+                        <AdminPagination 
+                            pagination={pagination} 
+                            onPageChange={fetchData}
+                            itemName="bài tập" 
+                        />
                     </div>
                 )}
             </div>

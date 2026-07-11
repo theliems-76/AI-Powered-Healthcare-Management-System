@@ -5,7 +5,8 @@ import AdminPagination from './AdminPagination';
 import { MdSearch, MdAdd, MdEdit, MdDelete, MdCloudUpload } from 'react-icons/md';
 
 import JSONImportModal from './JSONImportModal';
-import SingleDishModal from './SingleDishModal';
+import RecipeBuilderModal from '../../../components/meals/RecipeBuilderModal';
+import ConfirmModal from '../../../components/common/ConfirmModal';
 
 export default function AdminDishTab() {
     const [dishes, setDishes] = useState([]);
@@ -15,6 +16,7 @@ export default function AdminDishTab() {
     const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
     const [isSingleModalOpen, setIsSingleModalOpen] = useState(false);
     const [editingDish, setEditingDish] = useState(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     const fetchData = useCallback(async (page = 1, searchQuery = search) => {
         setLoading(true);
@@ -56,7 +58,6 @@ export default function AdminDishTab() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) return;
         try {
             await api.delete(`/admin/dishes/${id}`);
             toast.success("Đã xóa món ăn!");
@@ -73,18 +74,27 @@ export default function AdminDishTab() {
                 onClose={() => setIsJsonModalOpen(false)}
                 onSubmit={handleImportSubmit}
                 title="Nhập dữ liệu Món ăn (JSON)"
-                instructions='Copy yêu cầu sau (Prompt) và dán vào AI: "Trả cho tôi mảng JSON gồm 20 món ăn, cấu trúc: [{ \"name\": \"Phở bò\", \"category\": \"Món chính\", \"calories_per_100g\": 150, \"carbs_per_100g\": 20, \"protein_per_100g\": 10, \"fat_per_100g\": 4 }]"'
-                exampleJSON={`[\n  { "name": "Bánh mì", "category": "Sáng", "calories_per_100g": 250, "carbs_per_100g": 30, "protein_per_100g": 10, "fat_per_100g": 12 }\n]`}
+                instructions='Copy yêu cầu sau (Prompt) và dán vào AI: "Trả cho tôi mảng JSON gồm 20 món ăn. Mỗi món bắt buộc phải có danh sách nguyên liệu (ingredients), bao gồm khối lượng (weight) và các chỉ số dinh dưỡng / 100g. Cấu trúc: [{ \"name\": \"Cơm sườn\", \"category\": \"Món chính\", \"ingredients\": [{ \"name\": \"Cơm trắng\", \"weight\": 200, \"calories_per_100g\": 130, \"carbs_per_100g\": 28, \"protein_per_100g\": 2.7, \"fat_per_100g\": 0.3 }] }]"'
+                exampleJSON={`[\n  {\n    "name": "Cơm sườn",\n    "category": "Trưa",\n    "ingredients": [\n      { "name": "Cơm trắng", "weight": 200, "calories_per_100g": 130, "carbs_per_100g": 28, "protein_per_100g": 2.7, "fat_per_100g": 0.3 },\n      { "name": "Sườn non", "weight": 100, "calories_per_100g": 277, "carbs_per_100g": 0, "protein_per_100g": 14, "fat_per_100g": 23 }\n    ]\n  }\n]`}
             />
 
-            <SingleDishModal 
+            <RecipeBuilderModal 
                 isOpen={isSingleModalOpen}
                 onClose={() => {
                     setIsSingleModalOpen(false);
                     setEditingDish(null);
                 }}
-                onSuccess={() => fetchData(1, search)}
+                onDishCreated={() => fetchData(1, search)}
                 initialData={editingDish}
+                isAdmin={true}
+            />
+
+            <ConfirmModal 
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => handleDelete(deleteConfirmId)}
+                title="Xóa món ăn"
+                message="Bạn có chắc chắn muốn xóa món ăn hệ thống này? Thao tác này không thể hoàn tác."
             />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -156,7 +166,7 @@ export default function AdminDishTab() {
                                         <td className="p-5 text-sm font-bold text-rose-500 text-center">{dish.fat_per_100g}g</td>
                                         <td className="p-5 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button onClick={() => handleEdit(dish)} className="p-2 text-outline hover:text-slate-900 hover:bg-surface-container-high rounded-xl transition-colors"><MdEdit className="w-4 h-4" /></button>
-                                            <button onClick={() => handleDelete(dish.id)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"><MdDelete className="w-4 h-4" /></button>
+                                            <button onClick={() => setDeleteConfirmId(dish.id)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"><MdDelete className="w-4 h-4" /></button>
                                         </td>
                                     </tr>
                                 ))
@@ -166,7 +176,11 @@ export default function AdminDishTab() {
                 </div>
                 {pagination && (
                     <div className="px-4 border-t border-outline-variant">
-                        <AdminPagination pagination={{...pagination, limit: 20}} onPageChange={(p) => fetchData(p, search)} />
+                        <AdminPagination 
+                            pagination={pagination} 
+                            onPageChange={fetchData} 
+                            itemName="món ăn"
+                        />
                     </div>
                 )}
             </div>

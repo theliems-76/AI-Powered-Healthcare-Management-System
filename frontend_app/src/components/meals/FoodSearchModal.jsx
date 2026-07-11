@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2, Trash2, ChefHat, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
+import ConfirmModal from '../common/ConfirmModal';
 
 export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish, dailyGoal, consumed }) {
     const[dishes, setDishes] = useState([]);
     const [search, setSearch] = useState('');
     const[loading, setLoading] = useState(false);
     const [weights, setWeights] = useState({});
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [clearAllConfirm, setClearAllConfirm] = useState(false);
 
     const calculateDishMacros = (dish, targetWeight) => {
         if (!dish) return { calories: 0, carbs: 0, protein: 0 };
@@ -49,7 +52,6 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
     };
 
     const handleClearAll = async () => {
-        if (!window.confirm("CẢNH BÁO: Thao tác này sẽ xóa toàn bộ các món ăn trong Kho cá nhân của bạn (bao gồm cả món AI gợi ý). Bạn có chắc chắn?")) return;
         try {
             await api.delete('/meals/clear-all');
             toast.success("Đã làm sạch kho dữ liệu cá nhân!");
@@ -60,7 +62,6 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
     };
 
     const handleDeleteCustom = async (dishId) => {
-        if (!window.confirm("Bạn có chắc muốn xóa món ăn này khỏi kho?")) return;
         try {
             await api.delete(`/meals/custom-dish/${dishId}`);
             toast.success("Đã xóa món ăn!");
@@ -76,6 +77,20 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
 
     return (
         <div className="fixed inset-0 bg-surface-container/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200">
+            <ConfirmModal 
+                isOpen={clearAllConfirm}
+                onClose={() => setClearAllConfirm(false)}
+                onConfirm={handleClearAll}
+                title="Dọn sạch kho cá nhân"
+                message="CẢNH BÁO: Thao tác này sẽ xóa toàn bộ các món ăn trong Kho cá nhân của bạn (bao gồm cả món AI gợi ý). Bạn có chắc chắn?"
+            />
+            <ConfirmModal 
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => handleDeleteCustom(deleteConfirmId)}
+                title="Xóa món ăn"
+                message="Bạn có chắc muốn xóa món ăn này khỏi kho?"
+            />
             <div className="bg-surface w-full max-w-2xl rounded-xl shadow-lg flex flex-col max-h-[90vh] overflow-hidden border border-outline-variant">
                 
                 {/* Header */}
@@ -102,7 +117,7 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
 
                     <div className="flex justify-end mt-3">
                         <button 
-                            onClick={handleClearAll}
+                            onClick={() => setClearAllConfirm(true)}
                             className="flex items-center gap-1.5 text-[10px] font-bold text-on-surface-variant hover:text-error transition-colors px-3 py-1.5 rounded-lg hover:bg-error/10 uppercase tracking-wider"
                         >
                             <Trash2 className="w-3.5 h-3.5" /> DỌN SẠCH KHO CÁ NHÂN
@@ -216,7 +231,7 @@ export default function FoodSearchModal({ isOpen, onClose, onAddMeal, onEditDish
 
                                             {dish.is_custom && (
                                                 <button 
-                                                    onClick={() => handleDeleteCustom(dish.id)} 
+                                                    onClick={() => setDeleteConfirmId(dish.id)} 
                                                     className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors border border-transparent"
                                                     title="Xóa món này khỏi kho"
                                                 >

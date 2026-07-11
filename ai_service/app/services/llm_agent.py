@@ -41,16 +41,17 @@ def generate_nutrition_plan(diagnosis_data: dict) -> str:
     Dựa CHÍNH XÁC vào các yếu tố nguy hiểm và thói quen tốt ở trên, hãy lập một kế hoạch hành động cá nhân hóa cho bệnh nhân này. 
     LƯU Ý QUAN TRỌNG VỀ ĐỊNH DẠNG VÀ NỘI DUNG:
     - BẮT BUỘC chỉ sử dụng gạch đầu dòng (Bullet points). Tuyệt đối cấm viết văn xuôi dài dòng. Mỗi ý tối đa 1-2 câu ngắn, in đậm các từ khóa hành động cốt lõi. Bệnh nhân cần thông tin cực kỳ dễ nhớ và không bị mỏi mắt.
-    - THỰC ĐƠN BÌNH DÂN: Cấm gợi ý các thực phẩm đắt đỏ hoặc khó ăn (Tuyệt đối không khuyên ăn gạo lứt trừ khi bệnh nhân yêu cầu, cấm hạt chia, cá hồi, măng tây). Bắt buộc phải gợi ý các thực phẩm bình dân, rẻ tiền, truyền thống của người Việt (Ví dụ: Gạo xát dối, bún, khoai lang, rau muống luộc, rau ngót, cá đồng, thịt lợn nạc).
+    - THỰC ĐƠN BÌNH DÂN MÀ SINH ĐỘNG: Cấm gợi ý các thực phẩm đắt đỏ hoặc khó ăn (như gạo lứt, hạt chia, cá hồi, măng tây). Phải dùng thực phẩm bình dân, rẻ tiền của người Việt (Gạo xát dối, bún, khoai lang, rau muống, rau ngót, cá đồng, thịt nạc). 
+    - ĐA DẠNG LỰA CHỌN & GIẢI THÍCH RÕ RÀNG: Ở mục 🥗 Dinh dưỡng, thay vì chỉ đưa 1 món cho 1 ngày, hãy đưa ra 2-3 LỰA CHỌN cho mỗi bữa (Sáng/Trưa/Tối/Ăn vặt). Đặc biệt, BẮT BUỘC PHẢI GIẢI THÍCH NGẮN GỌN TẠI SAO lại khuyên ăn món đó (VD: "Bữa sáng - Lựa chọn 1: Bún riêu cua cua đồng (nhiều rau muống chẻ, ít bún). Lý do: Cua đồng giàu canxi, rau muống cung cấp chất xơ hòa tan giúp làm chậm hấp thu đường vào máu").
     - CHỈ SỐ MỤC TIÊU Y KHOA: Bắt buộc đưa ra các con số mục tiêu cần đạt được trong mục Đánh giá Y khoa (Ví dụ: Mục tiêu Huyết áp < 130/80 mmHg, Cholesterol LDL < 100 mg/dL theo chuẩn ADA).
     
     Yêu cầu định dạng đầu ra:
-    Phần 1: Trình bày bằng Markdown thật đẹp, cực kỳ ngắn gọn (KHÔNG CÓ JSON Ở ĐÂY). TUYỆT ĐỐI KHÔNG dùng lời chào hỏi (như "Chào bạn", "Dưới đây là..."). Đi thẳng vào 3 ý chính tóm tắt sau bằng cấu trúc Bullet points:
+    Phần 1: Trình bày bằng Markdown thật đẹp, rành mạch (KHÔNG CÓ JSON Ở ĐÂY). TUYỆT ĐỐI KHÔNG dùng lời chào hỏi (như "Chào bạn", "Dưới đây là..."). Đi thẳng vào 3 ý chính tóm tắt sau bằng cấu trúc Bullet points:
     1. 🩺 Đánh giá y khoa (Nhìn nhận rủi ro từ góc độ bác sĩ kèm theo CÁC CHỈ SỐ MỤC TIÊU CẦN ĐẠT ĐƯỢC. BẮT BUỘC trích dẫn chuẩn y khoa như ADA hoặc WHO).
-    2. 🥗 Dinh dưỡng (Thực đơn bình dân, dễ kiếm, rẻ tiền gợi ý phù hợp với rủi ro).
+    2. 🥗 Dinh dưỡng (Chia rõ Bữa sáng/Trưa/Tối/Ăn vặt. Mỗi bữa cung cấp 2-3 lựa chọn thay thế nhau kèm theo lời giải thích LÝ DO Y KHOA vì sao món đó tốt cho bệnh nhân này, ví dụ: ít đường, giàu chất xơ, hạ huyết áp).
     3. 🏃 Tập luyện & Lối sống (Hướng dẫn khắc phục trực tiếp các yếu tố cảnh báo bằng các hành động in đậm).
     
-    Chỉ trả về nội dung kế hoạch, không cần chào hỏi rườm rà. Viết bằng tiếng Việt tự nhiên, siêu ngắn gọn và chuyên nghiệp. Bắt đầu ngay lập tức bằng thẻ tiêu đề ### 🩺 Đánh giá y khoa.
+    Chỉ trả về nội dung kế hoạch, không cần chào hỏi rườm rà. Viết bằng tiếng Việt tự nhiên, chuyên nghiệp và cuốn hút. Bắt đầu ngay lập tức bằng thẻ tiêu đề ### 🩺 Đánh giá y khoa.
     
     Phần 2: Ở ĐOẠN CUỐI CÙNG của câu trả lời, hãy thêm một chuỗi JSON chuẩn (bắt đầu bằng ```json và kết thúc bằng ```). 
     Chuỗi JSON này chứa danh sách các món ăn và bài tập bạn đã gợi ý ở trên. 
